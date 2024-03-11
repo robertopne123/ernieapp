@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ernie London</string>
+    <string name="title_activity_main">Ernie London</string>
+    <string name="package_name">app.ernie.london</string>
+    <string name="custom_url_scheme">app.ernie.london</string>
+</resources>
