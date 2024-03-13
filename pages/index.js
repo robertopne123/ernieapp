@@ -42,8 +42,8 @@ export default function Home() {
         <p>Please use a mobile phone to view this page</p>
       </div>
       <div className="lg:hidden flex text-erniegreen relative w-full h-screen">
-        <div className="bg-welcomescreen h-full w-full bg-cover bg-[center_center] p-4 flex flex-col justify-end gap-4">
-          <p className="font-circe font-[900] text-erniegreen uppercase text-5xl mb-4">
+        <div className="bg-welcomescreen h-full w-full bg-cover bg-[center_center] px-8 pb-[66px] flex flex-col justify-end gap-4">
+          <p className="font-circe font-[900] text-erniegreen uppercase text-5xl">
             SUSTAINABLE WORKPLACE COFFEE DELIVERY
           </p>
           <Link href="/login">

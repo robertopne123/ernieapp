@@ -61,6 +61,8 @@ export default function Products({
     setBasket(item);
   };
 
+  console.log(subsidy);
+
   const ADD_TO_CART = gql`
     mutation addtocart(
       $productId: Int!
@@ -290,15 +292,15 @@ export default function Products({
   const setShowingBasketFromProductPage = () => {
     setBasketShowing(false);
     setBasketCount(0);
-    setBasket([]);
+    setBasket([]);  
   };
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full w-full relative">
+      <div className="h-full w-full relative flex flex-col bg-erniecream">
         {productFilter == -1 && (
           <div
-            className={`h-full w-full flex bg-erniecream flex-col flex-grow overflow-auto`}
+            className={`w-full flex bg-erniecream flex-col flex-grow overflow-auto`}
           >
             {filteredCategories()?.map((category, index) => (
               <div
@@ -502,7 +504,7 @@ export default function Products({
                     </div>
                     <div className="flex flex-row justify-end gap-2">
                       <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
-                        SUBSIDY ({subsidy?.amount}%)
+                        SUBSIDY ({subsidy?.amount ? subsidy.amount : subsidy}%)
                       </p>
                       <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
                         £
@@ -510,7 +512,7 @@ export default function Products({
                           (getBasketTotal()
                             ? getBasketTotal().replace("£", "")
                             : 0) *
-                          (subsidy?.amount * 0.01)
+                          ((subsidy?.amount ? subsidy.amount : subsidy) * 0.01)
                         ).toFixed(2)}
                       </p>
                     </div>
@@ -522,7 +524,11 @@ export default function Products({
                         £
                         {(
                           getBasketTotal() -
-                          (subsidy?.amount * 0.01 * getBasketTotal()).toFixed(2)
+                          (
+                            (subsidy?.amount ? subsidy.amount : subsidy) *
+                            0.01 *
+                            getBasketTotal()
+                          ).toFixed(2)
                         ).toFixed(2)}
                       </p>
                     </div>

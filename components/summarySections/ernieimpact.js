@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function ErnieImpact({ quantity, role }) {
   return (
-    <div className="flex flex-col gap-6 px-4 py-12 bg-erniemint h-[80vh] overflow-auto">
+    <div className="flex flex-col gap-6 px-4 py-12 bg-erniemint overflow-auto flex-grow">
       <p className="uppercase font-circe font-[900] text-center text-4xl text-erniegreen">
         {role == 0 ? "Our Total Impact" : "Ernie's Total Impact"}
       </p>

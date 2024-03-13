@@ -14,6 +14,8 @@ export default function Accounts({
   employees,
   nextDelivery,
   saveChanges,
+  subsidyChanging,
+  role,
 }) {
   const [selectedPage, setSelectedPage] = useState(-1);
 
@@ -24,36 +26,43 @@ export default function Accounts({
   };
 
   return (
-    <div className="w-full h-full">
+    <div className={`w-full h-full bg-erniemint`}>
       {selectedPage == -1 && (
-        <div className="flex flex-col bg-erniemint h-full w-full">
-          <div
-            className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
-            onClick={(e) => {
-              setSelectedPage(0);
-            }}
-          >
-            <Image
-              width={100}
-              height={100}
-              src="https://ernie.london/wp-content/uploads/2023/07/Asset-14@2x-3.png"
-              className="w-24 h-24 object-contain"
-              priority
-            ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase text-2xl">
-              My
-              <br />
-              Orders
-            </p>
-          </div>
-          <div className="h-1.5 w-full relative">
-            <Image
-              fill={true}
-              src="/divider.png"
-              className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
-              priority
-            ></Image>
-          </div>
+        <div
+          className={`flex flex-col bg-erniemint ${
+            role == 0 ? "h-full" : "h-1/2"
+          } w-full`}
+        >
+          {role == 0 && (
+            <div
+              className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
+              onClick={(e) => {
+                setSelectedPage(0);
+              }}
+            >
+              <Image
+                width={100}
+                height={100}
+                src="/ordersummary.png"
+                className="w-24 h-24 object-contain"
+                priority
+              ></Image>
+              <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+                Order
+                <br className="xlmb:hidden" /> Summary
+              </p>
+            </div>
+          )}
+          {role == 0 && (
+            <div className="h-1.5 w-full relative">
+              <Image
+                fill={true}
+                src="/divider.png"
+                className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
+                priority
+              ></Image>
+            </div>
+          )}
           <div
             className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
             onClick={(e) => {
@@ -63,12 +72,13 @@ export default function Accounts({
             <Image
               width={100}
               height={100}
-              src="https://ernie.london/wp-content/uploads/2023/07/Asset-14@2x-3.png"
+              src="/orderhistory.png"
               className="w-24 h-24 object-contain"
               priority
             ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase text-2xl">
-              Order History
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+              Order <br className="xlmb:hidden" />
+              History
             </p>
           </div>
           <div className="h-1.5 w-full relative">
@@ -79,31 +89,36 @@ export default function Accounts({
               priority
             ></Image>
           </div>
-          <div
-            className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
-            onClick={(e) => {
-              setSelectedPage(2);
-            }}
-          >
-            <Image
-              width={100}
-              height={100}
-              src="https://ernie.london/wp-content/uploads/2023/07/Asset-14@2x-3.png"
-              className="w-24 h-24 object-contain"
-              priority
-            ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase text-2xl">
-              Coffee To Desk
-            </p>
-          </div>
-          <div className="h-1.5 w-full relative">
-            <Image
-              fill={true}
-              src="/divider.png"
-              className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
-              priority
-            ></Image>
-          </div>
+          {role == 0 && (
+            <div
+              className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
+              onClick={(e) => {
+                setSelectedPage(2);
+              }}
+            >
+              <Image
+                width={100}
+                height={100}
+                src="/coffeetodesk.png"
+                className="w-24 h-24 object-contain"
+                priority
+              ></Image>
+              <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+                Coffee To <br className="xlmb:hidden" />
+                Desk
+              </p>
+            </div>
+          )}
+          {role == 0 && (
+            <div className="h-1.5 w-full relative">
+              <Image
+                fill={true}
+                src="/divider.png"
+                className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
+                priority
+              ></Image>
+            </div>
+          )}
           <div
             className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
             onClick={(e) => {
@@ -113,12 +128,12 @@ export default function Accounts({
             <Image
               width={100}
               height={100}
-              src="https://ernie.london/wp-content/uploads/2023/07/Asset-14@2x-3.png"
+              src="/aboutapp.png"
               className="w-24 h-24 object-contain"
               priority
             ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase text-2xl">
-              About <br />
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+              About <br className="xlmb:hidden" />
               The App
             </p>
           </div>
@@ -146,6 +161,7 @@ export default function Accounts({
           usageLimit={usageLimit}
           employees={employees}
           saveChanges={saveChangesFromCTDPage}
+          subsidyChanging={subsidyChanging}
         />
       )}
       {selectedPage == 3 && <About backAction={back} />}

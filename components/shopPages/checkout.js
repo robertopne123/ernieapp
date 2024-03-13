@@ -264,10 +264,15 @@ export default function Checkout({
                 </div>
                 <div className="flex flex-row justify-end gap-2">
                   <p className="font-circe text-erniegreen font-[900] uppercase mt-1.5">
-                    SUBSIDY ({subsidy?.amount}%)
+                    SUBSIDY ({subsidy?.amount ? subsidy.amount : subsidy}%)
                   </p>
                   <p className="font-circe text-erniegreen font-[900] uppercase text-2xl">
-                    £{(subsidy?.amount * 0.01 * getBasketTotal()).toFixed(2)}
+                    £
+                    {(
+                      (subsidy?.amount ? subsidy.amount : subsidy) *
+                      0.01 *
+                      getBasketTotal()
+                    ).toFixed(2)}
                   </p>
                 </div>
                 <div className="flex flex-row justify-end gap-2 pb-2">
@@ -278,7 +283,11 @@ export default function Checkout({
                     £
                     {(
                       getBasketTotal() -
-                      (subsidy?.amount * 0.01 * getBasketTotal()).toFixed(2)
+                      (
+                        (subsidy?.amount ? subsidy.amount : subsidy) *
+                        0.01 *
+                        getBasketTotal()
+                      ).toFixed(2)
                     ).toFixed(2)}
                   </p>
                 </div>

@@ -16,7 +16,7 @@ export default function Preview({
 
   return (
     <div
-      className={`flex flex-col h-[88vh] w-full overflow-auto bg-erniecream ${
+      className={`flex flex-col h-full w-full overflow-auto bg-erniecream ${
         role == 1 && "pb-8"
       }`}
     >

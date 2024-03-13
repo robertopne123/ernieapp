@@ -9,6 +9,14 @@ import { fullScreenPlugin } from "@react-pdf-viewer/full-screen";
 import "@react-pdf-viewer/full-screen/lib/styles/index.css";
 import { scrollModePlugin } from "@react-pdf-viewer/scroll-mode";
 import { ScrollMode } from "@react-pdf-viewer/core";
+import {
+  RenderCurrentScaleProps,
+  RenderZoomInProps,
+  RenderZoomOutProps,
+  zoomPlugin,
+} from "@react-pdf-viewer/zoom";
+import "@react-pdf-viewer/zoom/lib/styles/index.css";
+import { SpecialZoomLevel } from "@react-pdf-viewer/core";
 
 export default function Impact({
   quantity,
@@ -37,26 +45,67 @@ export default function Impact({
   const PdfViewer = ({ url }) => {
     const fullScreenPluginInstance = fullScreenPlugin();
     const scrollModePluginInstance = scrollModePlugin();
+    const zoomPluginInstance = zoomPlugin();
 
     // Switch to the wrapped mode
     scrollModePluginInstance.SwitchScrollMode(ScrollMode.Wrapped);
+    const { CurrentScale, ZoomIn, ZoomOut } = zoomPluginInstance;
 
     return (
-      <div className="h-full w-full">
-        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-          <Viewer
-            fileUrl={url}
-            plugins={[fullScreenPluginInstance, scrollModePluginInstance]}
-          />
-        </Worker>
+      <div className="h-full w-full bg-ernieteal flex flex-col">
+        <div className="max-h-pdfinner flex-grow">
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+            <Viewer
+              fileUrl={url}
+              plugins={[
+                fullScreenPluginInstance,
+                scrollModePluginInstance,
+                zoomPluginInstance,
+              ]}
+              defaultScale={SpecialZoomLevel.PageWidth}
+              className="w-full"
+            />
+          </Worker>
+        </div>
+        <div className="flex flex-row w-full bottom-0 left-0 justify-center bg-erniegreen p-2 gap-4">
+          <ZoomOut>
+            {(props) => (
+              <button
+                className="bg-erniegold border-none rounded-none text-erniegreen cursor-pointer py-2 px-4 font-circular font-[500]"
+                onClick={props.onClick}
+              >
+                Zoom out
+              </button>
+            )}
+          </ZoomOut>
+          <CurrentScale>
+            {(props) => (
+              <div className="flex flex-col justify-center">
+                <p className="text-erniecream font-circe font-[900] text-lg">{`${Math.round(
+                  props.scale * 100
+                )}%`}</p>
+              </div>
+            )}
+          </CurrentScale>
+          <ZoomIn>
+            {(props) => (
+              <button
+                className="bg-erniegold border-none rounded-none text-erniegreen cursor-pointer py-2 px-4 font-circular font-[500]"
+                onClick={props.onClick}
+              >
+                Zoom in
+              </button>
+            )}
+          </ZoomIn>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full bg-erniecream overflow-hidden">
       {!showingCert ? (
-        <div className="flex flex-col">
+        <div className="flex flex-col h-full">
           <div className="flex flex-row gap-0 px-2 mt-2">
             {tabs.map((tab, index) => (
               <div
@@ -69,7 +118,7 @@ export default function Impact({
                 }}
               >
                 <p
-                  className={`font-circe uppercase font-[900] text-base text-center ${
+                  className={`font-circe uppercase font-[900] text-base smmb:text-lg lgmb:text-xl text-center ${
                     impactTab == index ? "text-erniegreen" : "text-erniecream"
                   }`}
                 >
@@ -78,9 +127,9 @@ export default function Impact({
               </div>
             ))}
           </div>
-          <div className="bg-erniemint">
+          <div className="bg-erniemint flex flex-col overflow-hidden">
             {impactTab == 0 && (
-              <div className="flex flex-col gap-6 px-4 py-12 overflow-auto h-[80vh]">
+              <div className="flex flex-col gap-6 px-4 py-12 overflow-auto flex-grow">
                 <p className="uppercase font-circe font-[900] text-center text-4xl text-erniegreen">
                   {role == 0 ? "My Impact" : "Our Impact"}
                 </p>

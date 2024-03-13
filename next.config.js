@@ -11,7 +11,7 @@ const nextConfig = {
         pathname: "/ernie-london/wp-content/**",
       },
     ],
-    // unoptimized: true
+    unoptimized: true,
   },
   output: "export",
 };

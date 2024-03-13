@@ -1,6 +1,6 @@
 export default function EditEmployees({ backAction, employees }) {
   return (
-    <div className="flex flex-col flex-grow px-4 pt-10 gap-4 h-full">
+    <div className="flex flex-col flex-grow px-4 pt-10 gap-2 h-full bg-erniecream">
       <div
         className="absolute top-0 left-0 p-6 bg-erniemint w-full"
         onClick={backAction}
@@ -9,6 +9,9 @@ export default function EditEmployees({ backAction, employees }) {
       </div>
       <p className="uppercase font-circe font-[900] text-4xl text-erniegreen mt-16">
         View Employees
+      </p>
+      <p className="font-circular text-erniegreen font-[500] mb-2">
+        To manage employees, please visit https://ernie.london/
       </p>
       <div className="flex flex-col h-full overflow-auto pb-12">
         {employees?.map((employee, index) => (

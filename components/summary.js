@@ -13,7 +13,7 @@ export default function Summary({
   companyName,
 }) {
   return (
-    <div className="flex flex-col bg-erniecream overflow-auto h-[88vh]">
+    <div className="flex flex-col bg-erniecream overflow-auto h-full">
       {console.log(quantity)}
       <Intro
         firstName={firstName}

@@ -10,6 +10,7 @@ export default function CoffeeToDesk({
   usageLimit,
   employees,
   saveChanges,
+  subsidyChanging,
 }) {
   const [ctdTab, setCTDTab] = useState(-1);
 
@@ -23,7 +24,7 @@ export default function CoffeeToDesk({
   };
 
   return (
-    <div className="h-full">
+    <div className="h-full bg-erniecream">
       {ctdTab == -1 && (
         <div className="flex flex-col flex-grow pt-12 gap-4 h-full">
           <div
@@ -48,16 +49,32 @@ export default function CoffeeToDesk({
                     <p className="font-circular text-erniegreen font-[500]">
                       Subsidy
                     </p>
-                    <p className="font-circe text-erniegreen font-[900] text-4xl">
-                      {subsidy}%
+                    <p
+                      className={`font-circe text-erniegreen font-[900] ${
+                        subsidyChanging ? "text-2xl" : "text-4xl"
+                      }`}
+                    >
+                      {subsidyChanging
+                        ? "UPDATING..."
+                        : subsidyType == "FIXED_CART"
+                        ? "£" + subsidy.amount
+                        : subsidy.amount + "%"}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
                     <p className="font-circular text-erniegreen font-[500]">
                       Subsidy Type
                     </p>
-                    <p className="font-circe text-erniegreen font-[900] text-3xl uppercase">
-                      {subsidyType == "FIXED_CART" ? "Value" : "Percent"}
+                    <p
+                      className={`font-circe text-erniegreen font-[900] uppercase ${
+                        subsidyChanging ? "text-2xl" : "text-3xl"
+                      }`}
+                    >
+                      {subsidyChanging
+                        ? "UPDATING..."
+                        : subsidyType == "FIXED_CART"
+                        ? "Value"
+                        : "Percent"}
                     </p>
                   </div>
                 </div>

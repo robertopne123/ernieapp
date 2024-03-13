@@ -24,7 +24,7 @@ export default function OrderHistory({
   const [orderShowing, setOrderShowing] = useState(-1);
 
   return (
-    <div className="flex flex-col flex-grow px-4 py-12 gap-4 h-full">
+    <div className="flex flex-col flex-grow px-4 py-12 gap-4 h-full bg-erniecream">
       <div
         className="absolute top-0 left-0 p-6 bg-erniemint w-full"
         onClick={backAction}
