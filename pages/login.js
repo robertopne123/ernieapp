@@ -41,7 +41,7 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const [testingMode, setTestingMode] = useState(false);
+  const [testingMode, setTestingMode] = useState(true);
 
   const [loginLoading, setLoginLoading] = useState(false);
 
@@ -160,6 +160,7 @@ export default function Login() {
     console.log(data);
 
     localStorage.setItem("authtoken", data?.login?.authToken);
+    localStorage.setItem("refreshtoken", data?.login?.refreshToken);
     localStorage.setItem("role", data?.login?.user.roles.nodes[0].name);
     localStorage.setItem("customer", JSON.stringify(data?.login?.customer));
     localStorage.setItem("woo-session", data?.login?.customer?.sessionToken);
