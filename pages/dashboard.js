@@ -10,7 +10,6 @@ import Products from "@/components/products";
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client";
 import createApolloClient from "@/apollo-client";
-import GET_CATEGORIES from "../components/queries/products/GET_CATEGORIES";
 import graphqlClient from "@/apollo-client";
 import Impact from "@/components/impact";
 import ErnieImpact from "@/components/summarySections/ernieimpact";
