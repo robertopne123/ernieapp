@@ -27,10 +27,15 @@ export default function Products({
     console.log(productCategories);
 
     for (let i = 0; i < productCategories.length; i++) {
-      if (productCategories[i].tagCategoryImages.displayOrder != -1) {
+      if (
+        productCategories[i].tagCategoryImages.displayOrder != null &&
+        productCategories[i].tagCategoryImages.displayOrder != -1
+      ) {
         filtered.push(productCategories[i]);
       }
     }
+
+    console.log(filtered);
 
     filtered.sort(function (a, b) {
       return (
@@ -292,13 +297,154 @@ export default function Products({
   const setShowingBasketFromProductPage = () => {
     setBasketShowing(false);
     setBasketCount(0);
-    setBasket([]);  
+    setBasket([]);
+  };
+
+  const getGroupedProducts = () => {
+    let groups = [];
+
+    let productsCopy = [...products];
+
+    for (let i = 0; i < productsCopy.length; i++) {
+      if (productsCopy[i].__typename != "SubscriptionProduct") {
+        let groupFound = false;
+
+        if (
+          productsCopy[i].productTags?.nodes[0].name != "coffee machine" &&
+          productsCopy[i].productTags?.nodes[0].name != "cups/bottles" &&
+          productsCopy[i].productTags?.nodes[0].name != "old-products"
+        ) {
+          if (groups.length != 0) {
+            for (let j = 0; j < groups.length; j++) {
+              if (
+                groups[j].category == productsCopy[i].productTags?.nodes[0].name
+              ) {
+                groups[j].products.push(productsCopy[i]);
+                groupFound = true;
+
+                continue;
+              }
+            }
+
+            if (!groupFound) {
+              let tempProducts = [];
+
+              tempProducts.push(productsCopy[i]);
+
+              groups.push({
+                category: productsCopy[i].productTags.nodes[0].name,
+                products: tempProducts,
+                displayOrder:
+                  productsCopy[i].productTags.nodes[0].tagCategoryImages
+                    .displayOrder,
+              });
+
+              groupFound = true;
+
+              continue;
+            }
+          } else {
+            let tempProducts = [];
+
+            tempProducts.push(productsCopy[0]);
+
+            groups.push({
+              category: productsCopy[i].productTags.nodes[0].name,
+              products: tempProducts,
+              displayOrder:
+                productsCopy[i].productTags.nodes[0].tagCategoryImages
+                  .displayOrder,
+            });
+          }
+        }
+      } else {
+      }
+    }
+
+    console.log(groups);
+
+    return groups;
   };
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full w-full relative flex flex-col bg-erniecream">
-        {productFilter == -1 && (
+      <div className="h-full w-full relative flex flex-col bg-erniecream pt-8 pb-8 overflow-auto">
+        <div className="flex flex-col gap-8">
+          {/* {console.log(getGroupedProducts())} */}
+          {getGroupedProducts().map((group, index) => (
+            <div
+              className={`flex flex-col gap-0 px-4 pb-2 pt-4 w-full`}
+              style={{ order: group.displayOrder }}
+              key={index}
+            >
+              <p className="font-circe text-3xl text-erniegreen font-[900] uppercase mt-2">
+                {group.category}
+              </p>
+              <img src="/divider.png" className="h-1.5 w-full mt-2 mb-2"></img>
+              <div
+                className={`grid gap-4 w-full mt-4`}
+                style={{
+                  gridTemplateRows:
+                    "repeat(" + group.products.length + ", minmax(0, 1fr))",
+                }}
+              >
+                {group.products.map((product, productIndex) => (
+                  <div
+                    key={productIndex}
+                    className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea"
+                  >
+                    <img
+                      src={product.image.sourceUrl}
+                      className="w-24 aspect-square object-contain"
+                    ></img>
+                    <div className="flex flex-col flex-shrink min-w-[calc(100%-112px)] h-full">
+                      <p className="font-circe text-erniegreen uppercase text-lg truncate font-[900] w-full">
+                        {product.name}
+                      </p>
+                      <p
+                        className={`font-circular text-erniegreen font-[400] text-sm mb-4 line-clamp-3 h-[4em] ${
+                          product.description ? "block" : "hidden"
+                        }`}
+                      >
+                        {product.description}
+                      </p>
+                      <div className="flex flex-row justify-between">
+                        <p
+                          className={`font-circe text-erniegreen uppercase text-3xl font-[900] ${
+                            product.description ? "mt-0" : "mt-2"
+                          }`}
+                        >
+                          {product.price}
+                        </p>
+
+                        {/* <div className="flex flex-row">
+                          <div className="flex flex-row gap-2 flex-grow items-center justify-end">
+                            <div
+                              className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
+                              onClick={(e) => {}}
+                            >
+                              <img src="/remove.svg" className="w-4 h-4"></img>
+                            </div>
+                            <p className="text-erniegreen inline font-circe uppercase font-[900] text-xl ">
+                              0
+                            </p>
+                            <div
+                              className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
+                              onClick={(e) => {}}
+                            >
+                              <img src="/add.svg" className="w-4 h-4"></img>
+                            </div>
+                          </div>
+                        </div> */}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* {productFilter == -1 && (
           <div
             className={`w-full flex bg-erniecream flex-col flex-grow overflow-auto`}
           >
@@ -331,7 +477,7 @@ export default function Products({
               </div>
             ))}
           </div>
-        )}
+        )} */}
         {productFilter == 0 && (
           <ProductLists
             products={products}

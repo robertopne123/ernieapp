@@ -41,9 +41,15 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  const [rBusinessName, setRBusinessName] = useState("");
+  const [rEmailAddress, setREmailAddress] = useState("");
+  const [rPassword, setRPassword] = useState("");
+
   const [testingMode, setTestingMode] = useState(true);
 
   const [loginLoading, setLoginLoading] = useState(false);
+
+  const [loginType, setLoginType] = useState(0);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -206,86 +212,87 @@ export default function Login() {
           <div className="lg:flex hidden text-erniegreen px-4">
             <p>Please use a mobile phone to view this page</p>
           </div>
-          <div className="lg:hidden flex flex-col text-erniegreen relative w-full h-screen">
-            <div className="bg-loginscreen h-[45%] w-full bg-cover bg-[bottom_center] p-4 flex flex-col justify-end gap-4"></div>
-            <div className="flex flex-col gap-8 px-8 pb-[66px] flex-grow justify-end">
-              <p className="font-circe text-erniegreen font-[900] uppercase text-center text-3xl">
-                Login to continue
-              </p>
-              <form
-                name="loginform"
-                className="flex flex-col gap-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  console.log(username);
-                  console.log(password);
-                  if (localStorage.getItem("authtoken") != null) {
-                    localStorage.removeItem("authtoken");
-                  }
-                  login({
-                    variables: { password: password, username: username },
-                  });
-                }}
-              >
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="emailaddress"
-                    className="font-circular text-erniegreen text-lg font-[500]"
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    type="text"
-                    name="emailaddress"
-                    onChange={(e) => {
-                      setUsername(e.currentTarget.value);
-                    }}
-                    className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
-                  ></input>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="password"
-                    className="font-circular text-erniegreen text-lg font-[500]"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    onChange={(e) => {
-                      setPassword(e.currentTarget.value);
-                    }}
-                    className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
-                  ></input>
-                </div>
-                <button
-                  type="submit"
-                  className="bg-erniegold h-12 w-full font-circe font-[900] uppercase text-2xl pt-1"
+          {loginType == 0 ? (
+            <div className="lg:hidden flex flex-col text-erniegreen relative w-full h-screen">
+              <div className="bg-loginscreen h-[45%] w-full bg-cover bg-[bottom_center] p-4 flex flex-col justify-end gap-4"></div>
+              <div className="flex flex-col gap-8 px-8 pb-[66px] flex-grow justify-end">
+                <p className="font-circe text-erniegreen font-[900] uppercase text-center text-3xl">
+                  Login to continue
+                </p>
+                <form
+                  name="loginform"
+                  className="flex flex-col gap-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    console.log(username);
+                    console.log(password);
+                    if (localStorage.getItem("authtoken") != null) {
+                      localStorage.removeItem("authtoken");
+                    }
+                    login({
+                      variables: { password: password, username: username },
+                    });
+                  }}
                 >
-                  Login
-                </button>
-              </form>
-              {testingMode && (
-                <div>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="emailaddress"
+                      className="font-circular text-erniegreen text-lg font-[500]"
+                    >
+                      Email Address
+                    </label>
+                    <input
+                      type="text"
+                      name="emailaddress"
+                      onChange={(e) => {
+                        setUsername(e.currentTarget.value);
+                      }}
+                      className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
+                    ></input>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="password"
+                      className="font-circular text-erniegreen text-lg font-[500]"
+                    >
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      onChange={(e) => {
+                        setPassword(e.currentTarget.value);
+                      }}
+                      className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
+                    ></input>
+                  </div>
                   <button
-                    type="button"
-                    onClick={(e) => {
-                      if (localStorage.getItem("authtoken") != null) {
-                        localStorage.removeItem("authtoken");
-                      }
-                      login({
-                        variables: {
-                          password: "App1Test2Login3!",
-                          username: "apptestlogin",
-                        },
-                      });
-                    }}
-                    className="bg-erniegold h-12 w-full font-circe font-[900] uppercase text-xl pt-1"
+                    type="submit"
+                    className="bg-erniegold h-12 w-full font-circe font-[900] uppercase text-2xl pt-1"
                   >
-                    Quick Login (ADMIN)
+                    Login
                   </button>
-                  <button
+                </form>
+                {testingMode && (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        if (localStorage.getItem("authtoken") != null) {
+                          localStorage.removeItem("authtoken");
+                        }
+                        login({
+                          variables: {
+                            password: "App1Test2Login3!",
+                            username: "apptestlogin",
+                          },
+                        });
+                      }}
+                      className="bg-erniegold h-12 w-full font-circe font-[900] uppercase text-xl pt-1"
+                    >
+                      Quick Login (ADMIN)
+                    </button>
+                    {/* <button
                     type="button"
                     onClick={(e) => {
                       if (localStorage.getItem("authtoken") != null) {
@@ -301,17 +308,111 @@ export default function Login() {
                     className="bg-erniegold h-12 w-full font-circe font-[900] uppercase text-xl pt-1"
                   >
                     Quick Login (EMPLOYEE)
-                  </button>
-                </div>
-              )}
-              <p className="text-center font-circular font-[500] text-lg">
-                Don&apos;t have an account?{" "}
-                <span className="text-ernieteal cursor-pointer">
-                  Enquire now
-                </span>
-              </p>
+                  </button> */}
+                  </div>
+                )}
+                <p className="text-center font-circular font-[500] text-lg">
+                  Don&apos;t have an account?{" "}
+                  <span
+                    className="text-ernieteal cursor-pointer"
+                    onClick={() => {
+                      setLoginType(1);
+                    }}
+                  >
+                    Register here
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="lg:hidden flex flex-col text-erniegreen relative w-full h-screen">
+              <div className="bg-loginscreen h-[45%] w-full bg-cover bg-[bottom_center] p-4 flex flex-col justify-end gap-4"></div>
+              <div className="flex flex-col gap-8 px-8 pb-[66px] flex-grow justify-end">
+                <p className="font-circe text-erniegreen font-[900] uppercase text-center text-3xl">
+                  Get Started
+                </p>
+                <form
+                  name="loginform"
+                  className="flex flex-col gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    console.log(username);
+                    console.log(password);
+                    if (localStorage.getItem("authtoken") != null) {
+                      localStorage.removeItem("authtoken");
+                    }
+                    login({
+                      variables: { password: password, username: username },
+                    });
+                  }}
+                >
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="businessname"
+                      className="font-circular text-erniegreen text-lg font-[500]"
+                    >
+                      Business Name
+                    </label>
+                    <input
+                      type="text"
+                      name="businessname"
+                      onChange={(e) => {
+                        setRBusinessName(e.currentTarget.value);
+                      }}
+                      className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
+                    ></input>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="emailaddress"
+                      className="font-circular text-erniegreen text-lg font-[500]"
+                    >
+                      Email Address
+                    </label>
+                    <input
+                      type="text"
+                      name="emailaddress"
+                      onChange={(e) => {
+                        setREmailAddress(e.currentTarget.value);
+                      }}
+                      className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
+                    ></input>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="password"
+                      className="font-circular text-erniegreen text-lg font-[500]"
+                    >
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      onChange={(e) => {
+                        setRPassword(e.currentTarget.value);
+                      }}
+                      className="bg-ernieteal h-12 font-circular font-[500] px-4 text-erniecream outline-none"
+                    ></input>
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-erniegold h-12 w-full font-circe font-[900] uppercase text-2xl pt-1 mt-2"
+                  >
+                    Register
+                  </button>
+                </form>
+                <p className="text-center font-circular font-[500] text-lg">
+                  Already have an account?{" "}
+                  <span
+                    className="text-ernieteal cursor-pointer"
+                    onClick={() => setLoginType(0)}
+                  >
+                    Login here
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

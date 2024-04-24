@@ -80,6 +80,10 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [impactCertificateURL, setImpactCertificateURL] = useState("");
 
+  const [subscriptions, setSubscriptions] = useState([]);
+
+  const [orderData, setOrders] = useState([]);
+
   const loadData = (cid, code, employer) => {
     const client = graphqlClient;
 
@@ -249,6 +253,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     product {
                       node {
                         name
+                        databaseId
                         terms {
                           nodes {
                             ... on ProductTag {
@@ -308,6 +313,8 @@ export default function Dashboard({ data, categories, products, orders }) {
 
         console.log(data.data.clients.nodes[0].databaseId);
 
+        setOrders(data.data.orders.nodes);
+
         // for (let i = 0; i < data.data.orders.nodes.length; i++) {
         //   // console.log(data.data.orders.nodes[i]);
         //   for (
@@ -320,6 +327,47 @@ export default function Dashboard({ data, categories, products, orders }) {
         //     );
         //   }
         // }
+
+        client
+          .mutate({
+            mutation: gql`
+              mutation GetSubscription($employerUser: ID!) {
+                subscription(input: { id: $employerUser }) {
+                  subscription {
+                    databaseId
+                    lineItems {
+                      nodes {
+                        databaseId
+                        quantity
+                        product {
+                          node {
+                            name
+                            description(format: RAW)
+                            databaseId
+                            featuredImage {
+                              node {
+                                sourceUrl
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    billingPeriod
+                    nextPaymentDate
+                  }
+                }
+              }
+            `,
+            variables: {
+              employerUser: employerUser,
+            },
+          })
+          .then((data) => {
+            setSubscriptions(data);
+
+            console.log(data);
+          });
 
         client
           .mutate({
@@ -606,6 +654,360 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [subsidyChanged, setSubsidyChanged] = useState(false);
   const [subsidyChanging, setSubsidyChanging] = useState(false);
 
+  const updatePlan = (planDetails) => {
+    let existingSubscriptionProducts = [
+      ...subscriptions.data.subscription.subscription.lineItems.nodes,
+    ];
+
+    console.log(planDetails);
+    console.log(existingSubscriptionProducts);
+
+    let finalDetails = [...planDetails];
+
+    //COMPARISON - FIRST SCAN
+    let changes = [];
+
+    let foundProduct = false;
+
+    for (let i = 0; i < planDetails.length; i++) {
+      foundProduct = false;
+      for (let j = 0; j < existingSubscriptionProducts.length; j++) {
+        if (
+          planDetails[i].product.node.name ==
+          existingSubscriptionProducts[j].product.node.name
+        ) {
+          console.log(
+            "Comparing ",
+            planDetails[i].product.node.name,
+            " - ",
+            existingSubscriptionProducts[j].product.node.name
+          );
+          foundProduct = true;
+          if (
+            planDetails[i].quantity != existingSubscriptionProducts[j].quantity
+          ) {
+            if (
+              planDetails[i].quantity > existingSubscriptionProducts[j].quantity
+            ) {
+              changes.push({
+                action: "qty",
+                difference:
+                  planDetails[i].quantity -
+                  existingSubscriptionProducts[j].quantity,
+                product: planDetails[i],
+              });
+            } else if (
+              planDetails[i].quantity < existingSubscriptionProducts[j].quantity
+            ) {
+              changes.push({
+                action: "qty",
+                difference:
+                  existingSubscriptionProducts[j].quantity -
+                  planDetails[i].quantity,
+                product: planDetails[i],
+              });
+            }
+          }
+        }
+      }
+
+      if (!foundProduct) {
+        changes.push({
+          action: "add",
+          product: planDetails[i],
+          difference: planDetails[i].quantity,
+        });
+      }
+    }
+
+    console.log(existingSubscriptionProducts);
+
+    for (let i = 0; i < existingSubscriptionProducts.length; i++) {
+      foundProduct = false;
+      for (let j = 0; j < planDetails.length; j++) {
+        if (
+          existingSubscriptionProducts[i].product.node.name ==
+          planDetails[j].product.node.name
+        ) {
+          console.log(
+            "Comparing ",
+            existingSubscriptionProducts[j].product.node.name,
+            " - ",
+            planDetails[i].product.node.name
+          );
+          foundProduct = true;
+        }
+      }
+
+      if (!foundProduct) {
+        changes.push({
+          action: "remove",
+          product: existingSubscriptionProducts[i],
+        });
+      }
+    }
+
+    console.log(changes);
+
+    const client = graphqlClient;
+
+    for (let i = 0; i < changes.length; i++) {
+      if (changes[i].action == "add") {
+        console.log();
+
+        client
+          .mutate({
+            mutation: gql`
+              mutation MyMutation2(
+                $id: ID!
+                $productId: ID!
+                $productQuantity: Int!
+              ) {
+                addProductToSubscription(
+                  input: {
+                    id: $id
+                    productId: $productId
+                    productQuantity: $productQuantity
+                  }
+                ) {
+                  subscription {
+                    databaseId
+                    lineItems {
+                      nodes {
+                        quantity
+                        product {
+                          node {
+                            name
+                            description
+                            databaseId
+                          }
+                        }
+                        databaseId
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+            variables: {
+              id: subscriptions.data.subscription.subscription.databaseId,
+              productId: changes[i].product.product.node.databaseId + "",
+              productQuantity: changes[i].difference,
+            },
+          })
+          .then((data) => {
+            setSubscriptions(data);
+          });
+      } else if (changes[i].action == "remove") {
+        client.mutate({
+          mutation: gql`
+            mutation MyMutation2($id: ID!, $productId: ID!) {
+              removeProductFromSubscription(
+                input: { id: $id, productId: $productId }
+              ) {
+                subscription {
+                  databaseId
+                  lineItems {
+                    nodes {
+                      quantity
+                      product {
+                        node {
+                          name
+                          description
+                          databaseId
+                        }
+                      }
+                      databaseId
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            id: subscriptions.data.subscription.subscription.databaseId,
+            productId: changes[i].product.product.node.databaseId + "",
+          },
+        });
+      } else if (changes[i].action == "qty") {
+        client
+          .mutate({
+            mutation: gql`
+              mutation MyMutation2($id: ID!, $productId: ID!) {
+                removeProductFromSubscription(
+                  input: { id: $id, productId: $productId }
+                ) {
+                  subscription {
+                    databaseId
+                    lineItems {
+                      nodes {
+                        quantity
+                        product {
+                          node {
+                            name
+                            description
+                            databaseId
+                          }
+                        }
+                        databaseId
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+            variables: {
+              id: subscriptions.data.subscription.subscription.databaseId,
+              productId: changes[i].product.product.node.databaseId + "",
+            },
+          })
+          .then((data) => {
+            console.log("Old QTY Removed");
+
+            client
+              .mutate({
+                mutation: gql`
+                  mutation MyMutation2(
+                    $id: ID!
+                    $productId: ID!
+                    $productQuantity: Int!
+                  ) {
+                    addProductToSubscription(
+                      input: {
+                        id: $id
+                        productId: $productId
+                        productQuantity: $productQuantity
+                      }
+                    ) {
+                      subscription {
+                        databaseId
+                        lineItems {
+                          nodes {
+                            quantity
+                            product {
+                              node {
+                                name
+                                databaseId
+                                description
+                              }
+                            }
+                            databaseId
+                          }
+                        }
+                      }
+                    }
+                  }
+                `,
+                variables: {
+                  id: subscriptions.data.subscription.subscription.databaseId,
+                  productId: changes[i].product.product.node.databaseId + "",
+                  productQuantity: changes[i].difference,
+                },
+              })
+              .then((data) => {
+                console.log("New QTY Added");
+              });
+          });
+      }
+    }
+  };
+
+  const updateOrder = (orderDetails) => {
+    const client = graphqlClient;
+
+    console.log(orderDetails.lineItems);
+
+    for (let i = 0; i < orderDetails.lineItems.nodes.length; i++) {
+      let productExists = false;
+
+      for (
+        let j = 0;
+        j < dataObject.data.orders.nodes[0].lineItems.nodes.length;
+        j++
+      ) {
+        if (
+          orderDetails.lineItems.nodes[i].product.node.databaseId ==
+          dataObject.data.orders.nodes[0].lineItems.nodes[j].product.node
+            .databaseId
+        ) {
+          productExists = true;
+        }
+      }
+
+      if (!productExists) {
+        client
+          .mutate({
+            mutation: gql`
+              mutation updateOrder(
+                $orderId: Int!
+                $productId: Int!
+                $quantity: Int!
+              ) {
+                updateOrder(
+                  input: {
+                    orderId: $orderId
+                    lineItems: { quantity: $quantity, productId: $productId }
+                  }
+                ) {
+                  order {
+                    id
+                    lineItems {
+                      nodes {
+                        quantity
+                        product {
+                          node {
+                            name
+                            databaseId
+                            terms {
+                              nodes {
+                                ... on ProductTag {
+                                  id
+                                  name
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    customer {
+                      databaseId
+                      email
+                    }
+                    date
+                    orderNumber
+                    status
+                  }
+                }
+              }
+            `,
+            variables: {
+              orderId: parseInt(orderDetails.orderNumber),
+              productId:
+                orderDetails.lineItems.nodes[i].product.node.databaseId,
+              quantity: orderDetails.lineItems.nodes[i].quantity,
+            },
+          })
+          .then((data) => {
+            console.log(data);
+
+            // setOrders(data);
+            let ordersCopy = [...orderData];
+
+            for (let i = 0; i < ordersCopy.length; i++) {
+              if (ordersCopy[i].orderNumber == orderDetails.orderNumber) {
+                console.log(ordersCopy[i]);
+                console.log(orderDetails);
+                ordersCopy[i] = orderDetails;
+              }
+            }
+
+            setOrders(ordersCopy);
+          });
+      }
+    }
+  };
+
   const saveChanges = (val, type) => {
     const client = graphqlClient;
 
@@ -680,8 +1082,14 @@ export default function Dashboard({ data, categories, products, orders }) {
                   firstName={fn}
                   setTab={setTab}
                   setImpactDefaultTab={setImpactDefaultTab}
+                  nextDelivery={getSubscriptionPaymentDate()}
                   role={role}
                   companyName={cName}
+                  products={dataObject.data.products.nodes}
+                  orders={orderData}
+                  subscriptions={subscriptions}
+                  updateOrder={updateOrder}
+                  updatePlan={updatePlan}
                 />
               )}
               {activeTab == 1 && (
