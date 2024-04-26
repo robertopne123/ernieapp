@@ -17,6 +17,7 @@ export default function Summary({
   subscriptions,
   updateOrder,
   updatePlan,
+  employerUser,
 }) {
   const updateOrderFromSummary = (orderDetails) => {
     updateOrder(orderDetails);
@@ -25,6 +26,8 @@ export default function Summary({
   const updatePlanFromSummary = (planDetails) => {
     updatePlan(planDetails);
   };
+
+  console.log(employerUser);
 
   return (
     <div className="flex flex-col bg-erniecream overflow-auto h-full">
@@ -44,6 +47,7 @@ export default function Summary({
         subscriptions={subscriptions}
         updateOrder={updateOrderFromSummary}
         updatePlan={updatePlanFromSummary}
+        employerUser={employerUser}
       />
     </div>
   );

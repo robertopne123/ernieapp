@@ -1055,6 +1055,8 @@ export default function Dashboard({ data, categories, products, orders }) {
       });
   };
 
+  console.log(employerUserID);
+
   return (
     <div>
       {dataObject != null && (
@@ -1090,6 +1092,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   subscriptions={subscriptions}
                   updateOrder={updateOrder}
                   updatePlan={updatePlan}
+                  employerUser={employerUserID}
                 />
               )}
               {activeTab == 1 && (

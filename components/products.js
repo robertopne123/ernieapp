@@ -346,7 +346,7 @@ export default function Products({
           } else {
             let tempProducts = [];
 
-            tempProducts.push(productsCopy[0]);
+            tempProducts.push(productsCopy[i]);
 
             groups.push({
               category: productsCopy[i].productTags.nodes[0].name,

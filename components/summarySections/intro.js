@@ -18,10 +18,13 @@ export default function Intro({
   subscriptions,
   updateOrder,
   updatePlan,
+  employerUser,
 }) {
   const [summaryTab, setSummaryTab] = useState(-1);
 
   const back = () => setSummaryTab(-1);
+
+  const backToHome = () => setSummaryTab(-1);
 
   const updateOrderFromIntro = (orderDetails) => {
     updateOrder(orderDetails);
@@ -38,7 +41,7 @@ export default function Intro({
   };
 
   return (
-    <div>
+    <div className="h-full">
       {summaryTab == 0 && (
         <ManageOrder
           backAction={back}
@@ -61,6 +64,8 @@ export default function Intro({
           backAction={back}
           subscriptions={subscriptions}
           products={products}
+          employerUser={employerUser}
+          backToHome={backToHome}
         />
       )}
       {summaryTab == -1 && (
