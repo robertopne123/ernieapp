@@ -274,21 +274,19 @@ export default function Login() {
       setLoginLoading(false);
     }
 
-    if (!pushCalled) {
-      router.push(
-        "/dashboard" +
-          "?" +
-          createQueryString("id", data?.login.user?.id) +
-          "&" +
-          createQueryString("cid", data?.login?.customer?.databaseId) +
-          "&" +
-          createQueryString("fn", data?.login?.user?.firstName) +
-          "&" +
-          createQueryString("email", data?.login?.user?.email)
-      );
+    router.push(
+      "/dashboard" +
+        "?" +
+        createQueryString("id", data?.login.user?.id) +
+        "&" +
+        createQueryString("cid", data?.login?.customer?.databaseId) +
+        "&" +
+        createQueryString("fn", data?.login?.user?.firstName) +
+        "&" +
+        createQueryString("email", data?.login?.user?.email)
+    );
 
-      setPushCalled(true);
-    }
+    setPushCalled(true);
   }
 
   function isz1orz2(postcode) {
