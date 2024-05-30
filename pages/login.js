@@ -58,6 +58,8 @@ export default function Login() {
   const [showPCWarning, setShowPCWarning] = useState(false);
   const [showPCRegex, setShowPCRegex] = useState(false);
 
+  const [pushCalled, setPushCalled] = useState(false);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -268,21 +270,25 @@ export default function Login() {
 
     console.log(data);
 
-    if (!loginLoading) {
-      setLoginLoading(false);
-    }
+    // if (!loginLoading) {
+    //   setLoginLoading(false);
+    // }
 
-    router.push(
-      "/dashboard" +
-        "?" +
-        createQueryString("id", data?.login.user?.id) +
-        "&" +
-        createQueryString("cid", data?.login?.customer?.databaseId) +
-        "&" +
-        createQueryString("fn", data?.login?.user?.firstName) +
-        "&" +
-        createQueryString("email", data?.login?.user?.email)
-    );
+    if (!pushCalled) {
+      router.push(
+        "/dashboard" +
+          "?" +
+          createQueryString("id", data?.login.user?.id) +
+          "&" +
+          createQueryString("cid", data?.login?.customer?.databaseId) +
+          "&" +
+          createQueryString("fn", data?.login?.user?.firstName) +
+          "&" +
+          createQueryString("email", data?.login?.user?.email)
+      );
+
+      setPushCalled(true);
+    }
   }
 
   function isz1orz2(postcode) {
