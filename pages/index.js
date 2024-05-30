@@ -2,6 +2,8 @@ import Image from "next/image";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,27 +36,17 @@ const circerounded = localFont({
 });
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    setInterval(() => {
+      router.push("/login");
+    }, 3000);
+  }, []);
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between bg-erniecream ${circularstd.variable} font-sans ${circerounded.variable} font-sans`}
-    >
-      <div className="lg:flex hidden text-erniegreen px-4">
-        <p>Please use a mobile phone to view this page</p>
-      </div>
-      <div className="lg:hidden flex text-erniegreen relative w-full h-screen">
-        <div className="bg-welcomescreen h-full w-full bg-cover bg-[center_center] px-8 pb-[66px] flex flex-col justify-end gap-4">
-          <p className="font-circe font-[900] text-erniegreen uppercase text-5xl">
-            SUSTAINABLE WORKPLACE COFFEE DELIVERY
-          </p>
-          <Link href="/login">
-            <div className="bg-erniegold w-full h-16 flex flex-row p-4 justify-center items-center cursor-pointer">
-              <p className="font-circe font-[900] text-erniegreen uppercase text-2xl mt-1">
-                Get Started
-              </p>
-            </div>
-          </Link>
-        </div>
-      </div>
-    </main>
+    <div className="flex min-h-screen bg-ernieteal relative">
+      <div className="liquidernie w-24 h-24 mx-auto my-auto relative flex flex-row"></div>
+    </div>
   );
 }

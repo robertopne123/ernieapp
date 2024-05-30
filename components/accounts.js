@@ -26,46 +26,29 @@ export default function Accounts({
   };
 
   return (
-    <div className={`w-full h-full bg-erniemint`}>
+    <div className={`w-full h-full bg-erniemint pb-[80px]`}>
       {selectedPage == -1 && (
         <div
-          className={`flex flex-col bg-erniemint ${
+          className={`grid grid-rows-4 gap-4 px-6 pt-6 bg-erniemint overflow-auto pb-6 ${
             role == 0 ? "h-full" : "h-1/2"
           } w-full`}
         >
-          {role == 0 && (
-            <div
-              className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
-              onClick={(e) => {
-                setSelectedPage(0);
-              }}
-            >
-              <Image
-                width={100}
-                height={100}
-                src="/ordersummary.png"
-                className="w-24 h-24 object-contain"
-                priority
-              ></Image>
-              <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
-                Order
-                <br className="xlmb:hidden" /> Summary
-              </p>
-            </div>
-          )}
-          {role == 0 && (
-            <div className="h-1.5 w-full relative">
-              <Image
-                fill={true}
-                src="/divider.png"
-                className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
-                priority
-              ></Image>
-            </div>
-          )}
+          <div className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center">
+            <Image
+              width={100}
+              height={100}
+              src="/PENCIL TICKING_COLOURED.png"
+              className="w-24 h-24 object-contain"
+              priority
+            ></Image>
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+              Account
+              <br className="xlmb:hidden" /> Details
+            </p>
+          </div>
           <div
-            className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
-            onClick={(e) => {
+            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            onClick={() => {
               setSelectedPage(1);
             }}
           >
@@ -77,54 +60,26 @@ export default function Accounts({
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
-              Order <br className="xlmb:hidden" />
-              History
+              Order
+              <br className="xlmb:hidden" /> Summary
             </p>
           </div>
-          <div className="h-1.5 w-full relative">
+          <div className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center">
             <Image
-              fill={true}
-              src="/divider.png"
-              className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
+              width={100}
+              height={100}
+              src="/BIKE_COLOURED.png"
+              className="w-24 h-24 object-contain -translate-y-[10px]"
               priority
             ></Image>
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+              Delivery
+              <br className="xlmb:hidden" /> & Returns
+              <br />
+              Policy
+            </p>
           </div>
-          {role == 0 && (
-            <div
-              className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
-              onClick={(e) => {
-                setSelectedPage(2);
-              }}
-            >
-              <Image
-                width={100}
-                height={100}
-                src="/coffeetodesk.png"
-                className="w-24 h-24 object-contain"
-                priority
-              ></Image>
-              <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
-                Coffee To <br className="xlmb:hidden" />
-                Desk
-              </p>
-            </div>
-          )}
-          {role == 0 && (
-            <div className="h-1.5 w-full relative">
-              <Image
-                fill={true}
-                src="/divider.png"
-                className="min-h-[6px] max-h-[6px] h-1.5 max-w-[calc(100%-32px)] mx-4"
-                priority
-              ></Image>
-            </div>
-          )}
-          <div
-            className="bg-erniemint w-full h-full flex flex-row items-center gap-4 px-8"
-            onClick={(e) => {
-              setSelectedPage(3);
-            }}
-          >
+          <div className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center">
             <Image
               width={100}
               height={100}
@@ -133,8 +88,8 @@ export default function Accounts({
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
-              About <br className="xlmb:hidden" />
-              The App
+              About
+              <br className="xlmb:hidden" /> The App
             </p>
           </div>
         </div>

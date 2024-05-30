@@ -1,5 +1,5 @@
 import Image from "next/image";
-import ErnieImpact from "./summarySections/ernieimpact";
+import ErnieImpact from "./homeComponents/ernieimpact";
 import { useState } from "react";
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
@@ -106,20 +106,20 @@ export default function Impact({
     <div className="h-full bg-erniecream overflow-hidden">
       {!showingCert ? (
         <div className="flex flex-col h-full">
-          <div className="flex flex-row gap-0 px-2 mt-2">
+          <div className="flex flex-row gap-2 p-6 bg-erniedarkcream">
             {tabs.map((tab, index) => (
               <div
                 key={index}
-                className={`h-[8vh] w-full rounded-t-xl flex flex-col justify-center ${
-                  impactTab == index ? "bg-erniemint" : "bg-ernieteal"
+                className={`py-2 px-3 rounded-lg flex flex-col justify-center ${
+                  impactTab == index ? "bg-ernieteal" : "bg-erniecream"
                 }`}
                 onClick={(e) => {
                   setImpactTab(index);
                 }}
               >
                 <p
-                  className={`font-circe uppercase font-[900] text-base smmb:text-lg lgmb:text-xl text-center ${
-                    impactTab == index ? "text-erniegreen" : "text-erniecream"
+                  className={`font-circular  text-center text-sm ${
+                    impactTab == index ? "text-erniecream" : "text-erniegreen"
                   }`}
                 >
                   {tab.name}
@@ -129,10 +129,13 @@ export default function Impact({
           </div>
           <div className="bg-erniemint flex flex-col overflow-hidden">
             {impactTab == 0 && (
-              <div className="flex flex-col gap-6 px-4 py-12 overflow-auto flex-grow">
-                <p className="uppercase font-circe font-[900] text-center text-4xl text-erniegreen">
-                  {role == 0 ? "My Impact" : "Our Impact"}
-                </p>
+              <div className="flex flex-col gap-6 px-6 pt-6 pb-40 overflow-auto flex-grow">
+                <div className="flex flex-col">
+                  <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
+                    My Impact
+                  </p>
+                  <img src="/divider.png" className=" w-full mt-2"></img>
+                </div>
                 <div className="flex flex-row gap-2">
                   <Image
                     src="https://ernie.london/wp-content/uploads/2023/07/WASTE-COFFEE-BAG_COLOURED.gif"
@@ -240,12 +243,12 @@ export default function Impact({
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-row justify-center px-4">
+                <div className="flex flex-row justify-center absolute bg-erniedarkcream w-full left-0 bottom-[108px] py-4 px-6">
                   <div
-                    className="bg-erniegreen px-4 py-2 flex flex-col justify-center items-center"
+                    className="bg-erniegold w-full px-4 py-2 flex flex-col justify-center items-center rounded-xl"
                     onClick={(e) => setShowingCert(true)}
                   >
-                    <p className="text-erniecream font-circe font-[900] uppercase text-lg">
+                    <p className="text-erniegreen font-circe font-[900] text-lg">
                       See Impact Certificate
                     </p>
                   </div>

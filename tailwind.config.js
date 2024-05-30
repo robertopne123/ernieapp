@@ -23,8 +23,9 @@ module.exports = {
         ernieyellow: "#FFDB65",
         erniemint: "#8FD3C4",
         erniegreen: "#004A40",
-        erniegold: "#F8A740",
-        erniedarkcream: "#E4E4C4",
+        erniegold: "#f6af39",
+        ernielightgold: "#f8c069",
+        erniedarkcream: "#e7e8c7",
         erniecreamshadow: "#929277",
       },
       fontFamily: {

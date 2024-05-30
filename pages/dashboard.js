@@ -12,13 +12,15 @@ import { useQuery } from "@apollo/client";
 import createApolloClient from "@/apollo-client";
 import graphqlClient from "@/apollo-client";
 import Impact from "@/components/impact";
-import ErnieImpact from "@/components/summarySections/ernieimpact";
-import Summary from "@/components/summary";
+import ErnieImpact from "@/components/homeComponents/ernieimpact";
+import Home from "@/components/home";
 import Accounts from "@/components/accounts";
 import { motion } from "framer-motion";
 import Alert from "@/components/alert";
 import cloneDeep from "lodash.clonedeep";
 import { Capacitor } from "@capacitor/core";
+import { Tutorial } from "@/components/tutorial";
+import { StaticTopBar } from "@/components/dashboardComponents/statictopbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -82,6 +84,8 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [subscriptions, setSubscriptions] = useState([]);
 
+  const [firstTimeUser, setFirstTimeUser] = useState(false);
+
   const [orderData, setOrders] = useState([]);
 
   const loadData = (cid, code, employer) => {
@@ -93,6 +97,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     let wooSession = localStorage.getItem("woo-session");
     let companyName = localStorage.getItem("companyname");
     let eEmail = localStorage.getItem("employeremail");
+    let ftu = localStorage.getItem("first-time-user");
 
     console.log(localStorage.getItem("employeremail"));
     let employerUser = localStorage.getItem("employeruser");
@@ -105,6 +110,8 @@ export default function Dashboard({ data, categories, products, orders }) {
     setEmployerEmail(eEmail);
 
     setEmployerUserID(employerUser);
+
+    setFirstTimeUser(ftu);
 
     console.log(customer);
 
@@ -194,6 +201,17 @@ export default function Dashboard({ data, categories, products, orders }) {
                       }
                     }
                   }
+                  brands {
+                    nodes {
+                      name
+                      description
+                      brandingImage {
+                        image {
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -247,6 +265,7 @@ export default function Dashboard({ data, categories, products, orders }) {
             orders(first: 10000, where: { customerId: $employerUser }) {
               nodes {
                 id
+                createdVia
                 lineItems {
                   nodes {
                     quantity
@@ -354,6 +373,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                       }
                     }
                     billingPeriod
+                    billingInterval
                     nextPaymentDate
                   }
                 }
@@ -620,10 +640,10 @@ export default function Dashboard({ data, categories, products, orders }) {
   };
 
   const tabs = [
-    { name: "Home", index: 0, icon: "/home.svg" },
-    { name: "Products", index: 1, icon: "/mug-hot-alt.svg" },
-    { name: "Impact", index: 2, icon: "/world.svg" },
-    { name: "Account", index: 4, icon: "/circle-user.svg" },
+    { name: "Home", index: 0, icon: "/home.png" },
+    { name: "Products", index: 1, icon: "/tea.png" },
+    { name: "Impact", index: 2, icon: "/impact.png" },
+    { name: "Account", index: 4, icon: "/account.png" },
   ];
 
   const restrictedtabs = [
@@ -633,7 +653,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Account", index: 4, icon: "/circle-user.svg" },
   ];
 
-  const [testPlatform, setTestPlatform] = useState("ios");
+  const [testPlatform, setTestPlatform] = useState("");
 
   const goToTab = (tabID) => setTab(tabID);
 
@@ -653,6 +673,72 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [subsidyType, setSubsidyType] = useState(0);
   const [subsidyChanged, setSubsidyChanged] = useState(false);
   const [subsidyChanging, setSubsidyChanging] = useState(false);
+
+  const [updateSubError, setUpdateSubError] = useState("");
+
+  const updatePlanFrequency = (planDetails) => {
+    const client = graphqlClient;
+
+    client
+      .mutate({
+        mutation: gql`
+          mutation MyMutation(
+            $billingInterval: String!
+            $billingPeriod: String!
+            $id: ID!
+          ) {
+            changeSubscriptionFrequency(
+              input: {
+                billingInterval: $billingInterval
+                billingPeriod: $billingPeriod
+                id: $id
+              }
+            ) {
+              subscription {
+                databaseId
+                lineItems {
+                  nodes {
+                    databaseId
+                    quantity
+                    product {
+                      node {
+                        name
+                        description(format: RAW)
+                        databaseId
+                        featuredImage {
+                          node {
+                            sourceUrl
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                billingPeriod
+                billingInterval
+                nextPaymentDate
+              }
+            }
+          }
+        `,
+        variables: {
+          billingInterval: planDetails.billingInterval,
+          billingPeriod: planDetails.billingPeriod,
+          id: planDetails.databaseId,
+        },
+      })
+      .then((data) => {
+        let dataCopy = data.data.changeSubscriptionFrequency;
+
+        let dataNew = { data: { subscription: dataCopy } };
+
+        setSubscriptions(dataNew);
+        console.log(dataNew);
+      })
+      .catch((error) => {
+        setUpdateSubError(error);
+      });
+  };
 
   const updatePlan = (planDetails) => {
     let existingSubscriptionProducts = [
@@ -797,38 +883,45 @@ export default function Dashboard({ data, categories, products, orders }) {
           })
           .then((data) => {
             setSubscriptions(data);
+          })
+          .catch((error) => {
+            setUpdateSubError(error);
           });
       } else if (changes[i].action == "remove") {
-        client.mutate({
-          mutation: gql`
-            mutation MyMutation2($id: ID!, $productId: ID!) {
-              removeProductFromSubscription(
-                input: { id: $id, productId: $productId }
-              ) {
-                subscription {
-                  databaseId
-                  lineItems {
-                    nodes {
-                      quantity
-                      product {
-                        node {
-                          name
-                          description
-                          databaseId
+        client
+          .mutate({
+            mutation: gql`
+              mutation MyMutation2($id: ID!, $productId: ID!) {
+                removeProductFromSubscription(
+                  input: { id: $id, productId: $productId }
+                ) {
+                  subscription {
+                    databaseId
+                    lineItems {
+                      nodes {
+                        quantity
+                        product {
+                          node {
+                            name
+                            description
+                            databaseId
+                          }
                         }
+                        databaseId
                       }
-                      databaseId
                     }
                   }
                 }
               }
-            }
-          `,
-          variables: {
-            id: subscriptions.data.subscription.subscription.databaseId,
-            productId: changes[i].product.product.node.databaseId + "",
-          },
-        });
+            `,
+            variables: {
+              id: subscriptions.data.subscription.subscription.databaseId,
+              productId: changes[i].product.product.node.databaseId + "",
+            },
+          })
+          .catch((error) => {
+            setUpdateSubError(error);
+          });
       } else if (changes[i].action == "qty") {
         client
           .mutate({
@@ -907,6 +1000,9 @@ export default function Dashboard({ data, categories, products, orders }) {
               .then((data) => {
                 console.log("New QTY Added");
               });
+          })
+          .catch((error) => {
+            setUpdateSubError(error.message + "");
           });
       }
     }
@@ -1057,6 +1153,45 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   console.log(employerUserID);
 
+  const completeTutorial = () => {
+    setFirstTimeUser(false);
+  };
+
+  //Basket Functions
+
+  const [subBasket, setSubBasket] = useState([]);
+  const [oneOffBasket, setOneOffBasket] = useState([]);
+
+  const addToSubBasket = (item) => {
+    let subBasketCopy = [...subBasket];
+
+    subBasketCopy.push(item);
+
+    setSubBasket(subBasketCopy);
+  };
+
+  const addToOneOffBasket = (item) => {
+    let oneOffBasketCopy = [...oneOffBasket];
+
+    oneOffBasketCopy.push(item);
+
+    setOneOffBasket(oneOffBasketCopy);
+  };
+
+  const updateSubBasket = (basketCopy) => {
+    setSubBasket(basketCopy);
+  };
+
+  const updateOneOffBasket = (basketCopy) => {
+    setOneOffBasket(basketCopy);
+  };
+
+  const [newSubFreq, setNewSubFreq] = useState("WEEKLY");
+
+  const setNewSubFrequency = (freq) => {
+    setNewSubFreq(freq);
+  };
+
   return (
     <div>
       {dataObject != null && (
@@ -1067,17 +1202,28 @@ export default function Dashboard({ data, categories, products, orders }) {
             circularstd.variable
           } font-sans ${circerounded.variable} font-sans`}
         >
+          {/* {firstTimeUser && <Tutorial completeTutorial={completeTutorial} />} */}
           <div className="lg:flex hidden text-erniegreen px-4">
             <p>Please use a mobile phone to view this page</p>
           </div>
           <div className="lg:hidden flex flex-col text-erniegreen relative w-full flex-grow">
+            <StaticTopBar
+              addToSubBasket={addToSubBasket}
+              addToOneOffBasket={addToOneOffBasket}
+              updateSubBasket={updateSubBasket}
+              updateOneOffBasket={updateOneOffBasket}
+              setNewSubFrequency={setNewSubFrequency}
+              newSubFreq={newSubFreq}
+              subBasket={subBasket}
+              oneOffBasket={oneOffBasket}
+            />
             <div
               className={`${
                 testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
               } h-auto flex-grow w-full`}
             >
               {activeTab == 0 && (
-                <Summary
+                <Home
                   quantity={getTotalOrderQty()}
                   userQuantity={getUserNumberOrders()}
                   userTotalQuantity={getUserTotalOrderQty()}
@@ -1091,7 +1237,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                   orders={orderData}
                   subscriptions={subscriptions}
                   updateOrder={updateOrder}
+                  updateSubError={updateSubError}
                   updatePlan={updatePlan}
+                  updatePlanFrequency={updatePlanFrequency}
                   employerUser={employerUserID}
                 />
               )}
@@ -1112,6 +1260,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                   sessionToken={sessionToken}
                   cart={cartObject}
                   employerUser={employerUserID}
+                  addToSubBasket={addToSubBasket}
+                  addToOneOffBasket={addToOneOffBasket}
+                  subBasket={subBasket}
+                  oneOffBasket={oneOffBasket}
                 />
               )}
               {activeTab == 2 && (
@@ -1143,7 +1295,7 @@ export default function Dashboard({ data, categories, products, orders }) {
               )}
             </div>
             <div
-              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-auto min-h-[12vh]
+              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0
             `}
             >
               {role == 0 &&
@@ -1161,7 +1313,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     <div className="w-8 h-8 mx-auto relative">
                       <Image src={tab.icon} fill={true}></Image>
                     </div>
-                    <p className="text-erniecream text-sm text-center">
+                    <p className="text-erniecream text-sm font-circular text-center">
                       {tab.name}
                     </p>
                   </div>
@@ -1190,8 +1342,8 @@ export default function Dashboard({ data, categories, products, orders }) {
         </main>
       )}
       {dataObject == null && (
-        <div className="flex min-h-screen bg-erniecream">
-          <div className="bg-erniedarkcream w-24 h-24 mx-auto my-auto ernieloading flex flex-row before:content-[''] before:w-[100%] before:h-24 before:bg-ernieteal"></div>
+        <div className="flex min-h-screen bg-ernieteal relative">
+          <div className="liquidernie w-24 h-24 mx-auto my-auto relative flex flex-row"></div>
         </div>
       )}
     </div>

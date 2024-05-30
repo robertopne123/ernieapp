@@ -7,6 +7,8 @@ import { ApolloProvider, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import graphqlClient from "@/apollo-client";
 import CartContext from "./context/cart-context";
+import Preview from "./productPages/preview";
+import { BrandInfo } from "./productPages/brandInfo";
 
 export default function Products({
   productCategories,
@@ -20,6 +22,10 @@ export default function Products({
   sessionToken,
   cart,
   employerUser,
+  addToSubBasket,
+  addToOneOffBasket,
+  subBasket,
+  oneOffBasket,
 }) {
   function filteredCategories() {
     let filtered = [];
@@ -50,7 +56,7 @@ export default function Products({
 
   const [basketShowing, setBasketShowing] = useState(false);
 
-  const back = () => setProductFilter(-1);
+  const back = () => setPreviewing(false);
 
   const checkoutBack = () => setShowingCheckout(false);
 
@@ -311,18 +317,55 @@ export default function Products({
 
         if (
           productsCopy[i].productTags?.nodes[0].name != "coffee machine" &&
-          productsCopy[i].productTags?.nodes[0].name != "cups/bottles" &&
           productsCopy[i].productTags?.nodes[0].name != "old-products"
         ) {
           if (groups.length != 0) {
             for (let j = 0; j < groups.length; j++) {
               if (
-                groups[j].category == productsCopy[i].productTags?.nodes[0].name
+                groups[j].category == productsCopy[i].productTags?.nodes[0].name //Category match
               ) {
-                groups[j].products.push(productsCopy[i]);
-                groupFound = true;
+                console.log(productsCopy[i].brands?.nodes[0].name);
+                console.log(productsCopy[i]);
+                console.log(i);
+                console.log(groups[j]);
+                console.log(groups[j].brands);
+                let brandFound = false;
 
-                continue;
+                for (let k = 0; k < groups[j].brands?.length; k++) {
+                  if (
+                    groups[j].brands?.[k].name ==
+                    productsCopy[i].brands?.nodes[0].name
+                  ) {
+                    console.log(productsCopy[i].productTags?.nodes[0].name);
+
+                    groups[j].brands?.[k].products.push(productsCopy[i]);
+                    brandFound = true;
+
+                    groupFound = true;
+                  }
+
+                  continue;
+                }
+
+                if (!brandFound) {
+                  let products = [];
+
+                  console.log(productsCopy[i]);
+
+                  products.push(productsCopy[i]);
+
+                  groups[j].brands?.push({
+                    name: productsCopy[i].brands.nodes[0].name,
+                    description: productsCopy[i].brands.nodes[0].description,
+                    image:
+                      productsCopy[i].brands.nodes[0].brandingImage.image
+                        .sourceUrl,
+                    products: products,
+                  });
+                  groupFound = true;
+
+                  continue;
+                }
               }
             }
 
@@ -331,9 +374,20 @@ export default function Products({
 
               tempProducts.push(productsCopy[i]);
 
+              let tempBrands = [];
+
+              tempBrands.push({
+                name: productsCopy[i].brands.nodes[0].name,
+                description: productsCopy[i].brands.nodes[0].description,
+                image:
+                  productsCopy[i].brands.nodes[0].brandingImage?.image
+                    ?.sourceUrl,
+                products: tempProducts,
+              });
+
               groups.push({
                 category: productsCopy[i].productTags.nodes[0].name,
-                products: tempProducts,
+                brands: tempBrands,
                 displayOrder:
                   productsCopy[i].productTags.nodes[0].tagCategoryImages
                     .displayOrder,
@@ -348,9 +402,21 @@ export default function Products({
 
             tempProducts.push(productsCopy[i]);
 
+            let tempBrands = [];
+
+            tempBrands.push({
+              name: productsCopy[i].brands.nodes[0].name,
+              description: productsCopy[i].brands.nodes[0].description,
+              image:
+                productsCopy[i].brands.nodes[0].brandingImage.image.sourceUrl,
+              products: tempProducts,
+            });
+
+            console.log(tempProducts);
+
             groups.push({
               category: productsCopy[i].productTags.nodes[0].name,
-              products: tempProducts,
+              brands: tempBrands,
               displayOrder:
                 productsCopy[i].productTags.nodes[0].tagCategoryImages
                   .displayOrder,
@@ -361,63 +427,171 @@ export default function Products({
       }
     }
 
-    console.log(groups);
+    let sortedGroups = getSortedProducts(groups);
 
-    return groups;
+    console.log(sortedGroups);
+
+    return sortedGroups;
+  };
+
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const [previewing, setPreviewing] = useState(false);
+
+  const [selectedProduct, setSelectedProduct] = useState(0);
+
+  const [selectedBrand, setSelectedBrands] = useState(0);
+
+  const [showingInfo, setShowingInfo] = useState(false);
+
+  const [infoName, setInfoName] = useState("");
+  const [infoDesc, setInfoDesc] = useState("");
+  const [infoImage, setInfoImage] = useState("");
+
+  const close = () => {
+    setShowingInfo(false);
+  };
+
+  const getSortedProducts = (arr) => {
+    return arr.sort(function (a, b) {
+      return a.displayOrder - b.displayOrder;
+    });
+  };
+
+  const addToSubBasketFromProducts = (item) => {
+    addToSubBasket(item);
+  };
+
+  const addToOneOffBasketFromProducts = (item) => {
+    addToOneOffBasket(item);
   };
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full w-full relative flex flex-col bg-erniecream pt-8 pb-8 overflow-auto">
-        <div className="flex flex-col gap-8">
-          {/* {console.log(getGroupedProducts())} */}
-          {getGroupedProducts().map((group, index) => (
-            <div
-              className={`flex flex-col gap-0 px-4 pb-2 pt-4 w-full`}
-              style={{ order: group.displayOrder }}
-              key={index}
-            >
-              <p className="font-circe text-3xl text-erniegreen font-[900] uppercase mt-2">
-                {group.category}
-              </p>
-              <img src="/divider.png" className="h-1.5 w-full mt-2 mb-2"></img>
-              <div
-                className={`grid gap-4 w-full mt-4`}
-                style={{
-                  gridTemplateRows:
-                    "repeat(" + group.products.length + ", minmax(0, 1fr))",
-                }}
-              >
-                {group.products.map((product, productIndex) => (
-                  <div
-                    key={productIndex}
-                    className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea"
+      <div className="h-full w-full relative flex flex-col bg-erniedarkcream pt-8 pb-8 overflow-auto">
+        {showingInfo && (
+          <BrandInfo
+            close={close}
+            name={infoName}
+            description={infoDesc}
+            image={infoImage}
+          />
+        )}
+        {previewing ? (
+          <Preview
+            product={
+              getGroupedProducts()[selectedTab].brands[selectedBrand].products[
+                selectedProduct
+              ]
+            }
+            backAction={back}
+            role={1}
+            addToBasket={addToBasket}
+            category={getGroupedProducts()[selectedTab].category}
+            addToSubBasket={addToSubBasketFromProducts}
+            addToOneOffBasket={addToOneOffBasketFromProducts}
+            subBasket={subBasket}
+            oneOffBasket={oneOffBasket}
+          />
+        ) : (
+          <div className="flex flex-col gap-0 h-auto pb-16">
+            <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2">
+              {getGroupedProducts().map((group, index) => (
+                <div
+                  className={`py-2 px-3 rounded-lg text-nowrap w-full ${
+                    selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
+                  }`}
+                  key={index}
+                  onClick={() => {
+                    setSelectedTab(index);
+                  }}
+                >
+                  <p
+                    className={`font-circular font-[500] text-sm capitalize tab ${
+                      selectedTab == index
+                        ? "text-erniecream"
+                        : "text-erniegreen"
+                    }`}
                   >
+                    {group.category}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col-reverse">
+              {getGroupedProducts()[selectedTab].brands?.map((brand, index) => (
+                <div
+                  className={`flex flex-col gap-2 px-6 pb-2 pt-4 w-full`}
+                  key={index}
+                >
+                  <div className="flex flex-row justify-between">
+                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                      {brand.name}
+                    </p>
                     <img
-                      src={product.image.sourceUrl}
-                      className="w-24 aspect-square object-contain"
-                    ></img>
-                    <div className="flex flex-col flex-shrink min-w-[calc(100%-112px)] h-full">
-                      <p className="font-circe text-erniegreen uppercase text-lg truncate font-[900] w-full">
-                        {product.name}
-                      </p>
-                      <p
-                        className={`font-circular text-erniegreen font-[400] text-sm mb-4 line-clamp-3 h-[4em] ${
-                          product.description ? "block" : "hidden"
-                        }`}
+                      src="/info.svg"
+                      className="w-8 mt-1"
+                      onClick={() => {
+                        setShowingInfo(true);
+                        setInfoName(brand.name);
+                        setInfoDesc(brand.description);
+                        setInfoImage(brand.image);
+                      }}
+                    />
+                  </div>
+                  <img
+                    src="/divider.png"
+                    className="h-1.5 w-full mt-2 mb-2"
+                  ></img>
+                  <div className="flex flex-col gap-4">
+                    {brand.products.map((product, productIndex) => (
+                      <div
+                        key={productIndex}
+                        className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
                       >
-                        {product.description}
-                      </p>
-                      <div className="flex flex-row justify-between">
-                        <p
-                          className={`font-circe text-erniegreen uppercase text-3xl font-[900] ${
-                            product.description ? "mt-0" : "mt-2"
-                          }`}
-                        >
-                          {product.price}
-                        </p>
+                        <div className="flex relative aspect-[3/4] h-[100px]">
+                          <img
+                            src={product.image.sourceUrl}
+                            className={`h-[100px] w-auto aspect-[3/4] ${
+                              selectedTab == 1
+                                ? "object-contain"
+                                : "object-cover"
+                            }`}
+                          ></img>
+                          {product.productDisplayStyle.badgeImage
+                            ?.sourceUrl && (
+                            <img
+                              src={
+                                product.productDisplayStyle.badgeImage.sourceUrl
+                              }
+                              className="absolute w-10 -bottom-4 -right-4 rounded-full"
+                            ></img>
+                          )}
+                        </div>
+                        <div className="flex flex-col flex-shrink max-w-[calc(100vw-75px-48px-48px)] h-full pl-4">
+                          <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
+                            {product.name}
+                          </p>
+                          <p
+                            className={`font-circular text-erniegreen font-[400] text-xs mb-2 line-clamp-3 h-[4em] ${
+                              product.description ? "block" : "hidden"
+                            }`}
+                          >
+                            {product.description}
+                          </p>
+                          <div className="flex flex-row gap-1 items-end">
+                            <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
+                              from
+                            </p>
+                            <p
+                              className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
+                                product.description ? "mt-0" : "mt-2"
+                              }`}
+                            >
+                              {product.price}
+                            </p>
 
-                        {/* <div className="flex flex-row">
+                            {/* <div className="flex flex-row">
                           <div className="flex flex-row gap-2 flex-grow items-center justify-end">
                             <div
                               className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
@@ -436,14 +610,29 @@ export default function Products({
                             </div>
                           </div>
                         </div> */}
+                          </div>
+                          <div
+                            className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2"
+                            onClick={() => {
+                              setSelectedBrands(index);
+                              setSelectedProduct(productIndex);
+                              setPreviewing(true);
+                            }}
+                          >
+                            <p className="font-circe font-[900] text-sm">
+                              Choose Options
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+
         {/* {productFilter == -1 && (
           <div
             className={`w-full flex bg-erniecream flex-col flex-grow overflow-auto`}
@@ -511,7 +700,7 @@ export default function Products({
         {productFilter == 3 && (
           <ProductLists
             products={products}
-            category={"squirrel sisters"}
+            category={"healthy snacks"}
             backAction={back}
             role={role}
             addToBasket={addToBasketFromProductPage}
@@ -536,211 +725,209 @@ export default function Products({
         )}
         {console.log("CART")}
         {console.log(cart?.data?.cart)}
-        {role == 1 && (
-          <div className="relative h-[7%]">
-            {basketShowing && (
-              <div className="absolute w-full h-[55vh] bg-erniegreen bottom-full z-10 px-4 py-6">
-                {basket?.length == 0 ? (
-                  <div className="w-full h-full flex flex-col justify-center items-center">
-                    <p className="font-circe text-erniecream uppercase font-[900] text-xl">
-                      Your Basket Is Empty
+        {/* <div className="relative h-[7%]">
+          {basketShowing && (
+            <div className="absolute w-full h-[55vh] bg-erniegreen bottom-full z-10 px-4 py-6">
+              {basket?.length == 0 ? (
+                <div className="w-full h-full flex flex-col justify-center items-center">
+                  <p className="font-circe text-erniecream uppercase font-[900] text-xl">
+                    Your Basket Is Empty
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full h-full flex flex-col gap-2">
+                  <div className="flex flex-row justify-end gap-2">
+                    <p className="font-circe text-erniecream uppercase font-[900]">
+                      {basketEdit != 0 ? "Edit" : "Editing"}
                     </p>
-                  </div>
-                ) : (
-                  <div className="w-full h-full flex flex-col gap-2">
-                    <div className="flex flex-row justify-end gap-2">
-                      <p className="font-circe text-erniecream uppercase font-[900]">
-                        {basketEdit != 0 ? "Edit" : "Editing"}
-                      </p>
-                      <img
-                        src="/edit.svg"
-                        className="w-5 h-5"
-                        onClick={(e) => {
-                          if (basketEdit != -1) {
-                            setBasketEditing(-1);
-                          } else {
-                            setBasketEditing(0);
-                          }
-                        }}
-                      />
-                    </div>
                     <img
-                      src="/divider_cream.png"
-                      className="w-full h-2 mb-2"
-                    ></img>
-                    <div className="w-full h-full flex flex-col gap-4">
-                      {basket?.map((basketItem, index) => (
-                        <div className="flex flex-col gap-4" key={index}>
-                          <div className="flex flex-row gap-4 justify-between">
-                            <p className="text-erniecream inline font-circe uppercase font-[900] text-lg flex-shrink max-w-[50%] text-ellipsis text-nowrap whitespace-nowrap overflow-hidden">
-                              {basketItem.name}
+                      src="/edit.svg"
+                      className="w-5 h-5"
+                      onClick={(e) => {
+                        if (basketEdit != -1) {
+                          setBasketEditing(-1);
+                        } else {
+                          setBasketEditing(0);
+                        }
+                      }}
+                    />
+                  </div>
+                  <img
+                    src="/divider_cream.png"
+                    className="w-full h-2 mb-2"
+                  ></img>
+                  <div className="w-full h-full flex flex-col gap-4">
+                    {basket?.map((basketItem, index) => (
+                      <div className="flex flex-col gap-4" key={index}>
+                        <div className="flex flex-row gap-4 justify-between">
+                          <p className="text-erniecream inline font-circe uppercase font-[900] text-lg flex-shrink max-w-[50%] text-ellipsis text-nowrap whitespace-nowrap overflow-hidden">
+                            {basketItem.name}
+                          </p>
+                          <div className="flex flex-row gap-4 justify-end">
+                            <p className="text-erniecream inline font-circe uppercase font-[900] text-xl">
+                              {basketItem.price}
                             </p>
-                            <div className="flex flex-row gap-4 justify-end">
-                              <p className="text-erniecream inline font-circe uppercase font-[900] text-xl">
-                                {basketItem.price}
+                            {basketEdit == -1 && (
+                              <p className="text-erniecream inline font-circe uppercase font-[900] text-xl ">
+                                {basketItem.qty}
+                                <span className="text-sm ml-1">
+                                  {basketItem.category == "healthy snacks"
+                                    ? basketItem.qty > 1
+                                      ? "boxes"
+                                      : "box"
+                                    : basketItem.qty > 1
+                                    ? "kgs"
+                                    : "kg"}
+                                </span>
                               </p>
-                              {basketEdit == -1 && (
-                                <p className="text-erniecream inline font-circe uppercase font-[900] text-xl ">
-                                  {basketItem.qty}
-                                  <span className="text-sm ml-1">
-                                    {basketItem.category == "squirrel sisters"
-                                      ? basketItem.qty > 1
-                                        ? "boxes"
-                                        : "box"
-                                      : basketItem.qty > 1
-                                      ? "kgs"
-                                      : "kg"}
-                                  </span>
-                                </p>
-                              )}
-                            </div>
-                            {basketEdit != -1 && (
-                              <div className="flex flex-row gap-2 flex-grow items-center justify-end">
-                                <div
-                                  className="flex flex-col justify-center items-center bg-erniecream px-2 py-1 max-w-[24px] min-w-[24px]"
-                                  onClick={(e) => {
-                                    reduceQty(index);
-                                  }}
-                                >
-                                  <img
-                                    src="/remove.svg"
-                                    className="w-4 h-4 invert"
-                                  ></img>
-                                </div>
-                                <p className="text-erniecream inline font-circe uppercase font-[900] text-xl ">
-                                  {basketItem.qty}
-                                  <span className="text-sm ml-1">
-                                    {basketItem.category == "squirrel sisters"
-                                      ? basketItem.qty > 1
-                                        ? "boxes"
-                                        : "box"
-                                      : basketItem.qty > 1
-                                      ? "kgs"
-                                      : "kg"}
-                                  </span>
-                                </p>
-                                <div
-                                  className="flex flex-col justify-center items-center bg-erniecream px-2 py-1 max-w-[24px] min-w-[24px]"
-                                  onClick={(e) => {
-                                    increaseQty(index);
-                                  }}
-                                >
-                                  <img
-                                    src="/add.svg"
-                                    className="w-4 h-4 invert"
-                                  ></img>
-                                </div>
-                              </div>
                             )}
                           </div>
+                          {basketEdit != -1 && (
+                            <div className="flex flex-row gap-2 flex-grow items-center justify-end">
+                              <div
+                                className="flex flex-col justify-center items-center bg-erniecream px-2 py-1 max-w-[24px] min-w-[24px]"
+                                onClick={(e) => {
+                                  reduceQty(index);
+                                }}
+                              >
+                                <img
+                                  src="/remove.svg"
+                                  className="w-4 h-4 invert"
+                                ></img>
+                              </div>
+                              <p className="text-erniecream inline font-circe uppercase font-[900] text-xl ">
+                                {basketItem.qty}
+                                <span className="text-sm ml-1">
+                                  {basketItem.category == "healthy snacks"
+                                    ? basketItem.qty > 1
+                                      ? "boxes"
+                                      : "box"
+                                    : basketItem.qty > 1
+                                    ? "kgs"
+                                    : "kg"}
+                                </span>
+                              </p>
+                              <div
+                                className="flex flex-col justify-center items-center bg-erniecream px-2 py-1 max-w-[24px] min-w-[24px]"
+                                onClick={(e) => {
+                                  increaseQty(index);
+                                }}
+                              >
+                                <img
+                                  src="/add.svg"
+                                  className="w-4 h-4 invert"
+                                ></img>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      ))}
-                    </div>
-                    <img
-                      src="/divider_cream.png"
-                      className="w-full h-2 mb-2"
-                    ></img>
-                    <div className="flex flex-row justify-end gap-2">
-                      <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
-                        TOTAL
-                      </p>
-                      <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
-                        £{getBasketTotal()}
-                      </p>
-                    </div>
-                    <div className="flex flex-row justify-end gap-2">
-                      <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
-                        SUBSIDY ({subsidy?.amount ? subsidy.amount : subsidy}%)
-                      </p>
-                      <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
-                        £
-                        {(
-                          (getBasketTotal()
-                            ? getBasketTotal().replace("£", "")
-                            : 0) *
-                          ((subsidy?.amount ? subsidy.amount : subsidy) * 0.01)
-                        ).toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="flex flex-row justify-end gap-2 pb-2">
-                      <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
-                        SUBTOTAL
-                      </p>
-                      <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
-                        £
-                        {(
-                          getBasketTotal() -
-                          (
-                            (subsidy?.amount ? subsidy.amount : subsidy) *
-                            0.01 *
-                            getBasketTotal()
-                          ).toFixed(2)
-                        ).toFixed(2)}
-                      </p>
-                    </div>
-                    <div className="flex flex-row justify-end gap-4">
-                      <div
-                        className={`bg-erniecream px-4 py-2 justify-center items-center ${
-                          basket?.length == 0 ? "opacity-50" : ""
-                        }`}
-                        onClick={(e) => {
-                          if (basket?.length != 0) {
-                            clearBasket();
-                          }
-                        }}
-                      >
-                        <p className="font-circe text-erniegreen font-[900] uppercase">
-                          Clear
-                        </p>
                       </div>
-                      <div
-                        className="bg-erniecream px-4 py-2 justify-center items-center"
-                        onClick={(e) => {
-                          if (basket?.length != 0) {
-                            setShowingCheckout(true);
-                          }
-                        }}
-                      >
-                        <p className="font-circe text-erniegreen font-[900] uppercase">
-                          Checkout
-                        </p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                )}
-              </div>
-            )}
-            <div
-              className="bg-erniegreen h-full w-full flex-grow py-2 px-3 flex flex-row items-center justify-between"
-              onClick={(e) => {
-                if (basketShowing) {
-                  setBasketShowing(false);
-                } else {
-                  setBasketShowing(true);
-                }
-              }}
-            >
-              <div className="flex flex-row">
-                <p className="font-circe text-erniecream uppercase text-xl inline mt-0.5">
-                  Basket
-                </p>
-                <div className="flex flex-col aspect-square p-1 mt-0.5">
-                  <div className="bg-erniecream rounded-full flex flex-col items-center justify-center aspect-square p-1">
-                    <p className="font-circular text-erniegreen text-xs w-3 h-3 text-center line-[12px] -mt-1">
-                      {basketCount}
+                  <img
+                    src="/divider_cream.png"
+                    className="w-full h-2 mb-2"
+                  ></img>
+                  <div className="flex flex-row justify-end gap-2">
+                    <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
+                      TOTAL
+                    </p>
+                    <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
+                      £{getBasketTotal()}
                     </p>
                   </div>
+                  <div className="flex flex-row justify-end gap-2">
+                    <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
+                      SUBSIDY ({subsidy?.amount ? subsidy.amount : subsidy}%)
+                    </p>
+                    <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
+                      £
+                      {(
+                        (getBasketTotal()
+                          ? getBasketTotal().replace("£", "")
+                          : 0) *
+                        ((subsidy?.amount ? subsidy.amount : subsidy) * 0.01)
+                      ).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex flex-row justify-end gap-2 pb-2">
+                    <p className="font-circe text-erniecream font-[900] uppercase mt-1.5">
+                      SUBTOTAL
+                    </p>
+                    <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
+                      £
+                      {(
+                        getBasketTotal() -
+                        (
+                          (subsidy?.amount ? subsidy.amount : subsidy) *
+                          0.01 *
+                          getBasketTotal()
+                        ).toFixed(2)
+                      ).toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="flex flex-row justify-end gap-4">
+                    <div
+                      className={`bg-erniecream px-4 py-2 justify-center items-center ${
+                        basket?.length == 0 ? "opacity-50" : ""
+                      }`}
+                      onClick={(e) => {
+                        if (basket?.length != 0) {
+                          clearBasket();
+                        }
+                      }}
+                    >
+                      <p className="font-circe text-erniegreen font-[900] uppercase">
+                        Clear
+                      </p>
+                    </div>
+                    <div
+                      className="bg-erniecream px-4 py-2 justify-center items-center"
+                      onClick={(e) => {
+                        if (basket?.length != 0) {
+                          setShowingCheckout(true);
+                        }
+                      }}
+                    >
+                      <p className="font-circe text-erniegreen font-[900] uppercase">
+                        Checkout
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <div
+            className="bg-erniegreen h-full w-full flex-grow py-2 px-3 flex flex-row items-center justify-between"
+            onClick={(e) => {
+              if (basketShowing) {
+                setBasketShowing(false);
+              } else {
+                setBasketShowing(true);
+              }
+            }}
+          >
+            <div className="flex flex-row">
+              <p className="font-circe text-erniecream uppercase text-xl inline mt-0.5">
+                Basket
+              </p>
+              <div className="flex flex-col aspect-square p-1 mt-0.5">
+                <div className="bg-erniecream rounded-full flex flex-col items-center justify-center aspect-square p-1">
+                  <p className="font-circular text-erniegreen text-xs w-3 h-3 text-center line-[12px] -mt-1">
+                    {basketCount}
+                  </p>
                 </div>
               </div>
-              <img
-                src="/left-arrow-cream.svg"
-                className={`w-5 h-5 ${
-                  basketShowing == true ? "rotate-90" : "-rotate-90"
-                }`}
-              />
             </div>
+            <img
+              src="/left-arrow-cream.svg"
+              className={`w-5 h-5 ${
+                basketShowing == true ? "rotate-90" : "-rotate-90"
+              }`}
+            />
           </div>
-        )}
+        </div> */}
         {showingAlert && (
           <Alert
             message={alertMessage}
