@@ -60,6 +60,17 @@ export default function Login() {
 
   const [pushCalled, setPushCalled] = useState(false);
 
+  const [onChanging, setOnChanging] = useState(false);
+
+  // safePush is used to avoid route pushing errors when users click multiple times or when the network is slow:  "Error: Abort fetching component for route"
+  const safePush = (path) => {
+    if (onChanging) {
+      return;
+    }
+    setOnChanging(true);
+    router.push(path);
+  };
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -226,6 +237,67 @@ export default function Login() {
     });
   };
 
+  useEffect(() => {
+    if (data) {
+      console.log("Login");
+      console.log(data);
+
+      localStorage.setItem("authtoken", data?.login?.authToken);
+      localStorage.setItem("refreshtoken", data?.login?.refreshToken);
+      localStorage.setItem("role", data?.login?.user.roles.nodes[0].name);
+      localStorage.setItem("customer", JSON.stringify(data?.login?.customer));
+      localStorage.setItem("woo-session", data?.login?.customer?.sessionToken);
+      localStorage.setItem(
+        "employeruser",
+        data?.login?.user.userCompanyField.parentUser
+      );
+      localStorage.setItem(
+        "first-time-user",
+        data?.login?.user.userCompanyField.usedApp == null ? true : false
+      );
+      localStorage.setItem(
+        "employeremail",
+        data?.login?.user.userCompanyField.company.clientInformation
+          .pointOfContactEmail
+      );
+
+      localStorage.setItem(
+        "companyname",
+        data?.login?.user.userCompanyField.company.title
+      );
+
+      console.log(data);
+
+      // if (!loginLoading) {
+      //   setLoginLoading(false);
+      // }
+
+      safePush(
+        "/dashboard" +
+          "?" +
+          createQueryString("id", data?.login.user?.id) +
+          "&" +
+          createQueryString("cid", data?.login?.customer?.databaseId) +
+          "&" +
+          createQueryString("fn", data?.login?.user?.firstName) +
+          "&" +
+          createQueryString("email", data?.login?.user?.email)
+      );
+
+      // router.push(
+      //   "/dashboard" +
+      //     "?" +
+      //     createQueryString("id", data?.login.user?.id) +
+      //     "&" +
+      //     createQueryString("cid", data?.login?.customer?.databaseId) +
+      //     "&" +
+      //     createQueryString("fn", data?.login?.user?.firstName) +
+      //     "&" +
+      //     createQueryString("email", data?.login?.user?.email)
+      // );
+    }
+  }, [createQueryString, data, loginLoading, router]);
+
   if (loading) {
     console.log("Loading");
     if (!loginLoading) {
@@ -239,54 +311,6 @@ export default function Login() {
   }
   if (error) {
     return `Submission error! ${error.message}`;
-  }
-  if (data) {
-    console.log("Login");
-    console.log(data);
-
-    localStorage.setItem("authtoken", data?.login?.authToken);
-    localStorage.setItem("refreshtoken", data?.login?.refreshToken);
-    localStorage.setItem("role", data?.login?.user.roles.nodes[0].name);
-    localStorage.setItem("customer", JSON.stringify(data?.login?.customer));
-    localStorage.setItem("woo-session", data?.login?.customer?.sessionToken);
-    localStorage.setItem(
-      "employeruser",
-      data?.login?.user.userCompanyField.parentUser
-    );
-    localStorage.setItem(
-      "first-time-user",
-      data?.login?.user.userCompanyField.usedApp == null ? true : false
-    );
-    localStorage.setItem(
-      "employeremail",
-      data?.login?.user.userCompanyField.company.clientInformation
-        .pointOfContactEmail
-    );
-
-    localStorage.setItem(
-      "companyname",
-      data?.login?.user.userCompanyField.company.title
-    );
-
-    console.log(data);
-
-    if (!loginLoading) {
-      setLoginLoading(false);
-    }
-
-    router.push(
-      "/dashboard" +
-        "?" +
-        createQueryString("id", data?.login.user?.id) +
-        "&" +
-        createQueryString("cid", data?.login?.customer?.databaseId) +
-        "&" +
-        createQueryString("fn", data?.login?.user?.firstName) +
-        "&" +
-        createQueryString("email", data?.login?.user?.email)
-    );
-
-    setPushCalled(true);
   }
 
   function isz1orz2(postcode) {
