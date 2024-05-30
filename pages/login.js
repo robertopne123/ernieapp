@@ -267,23 +267,11 @@ export default function Login() {
 
     console.log(data);
 
-    // if (!loginLoading) {
-    //   setLoginLoading(false);
-    // }
+    if (!loginLoading) {
+      setLoginLoading(false);
+    }
 
-    safePush(
-      "/dashboard" +
-        "?" +
-        createQueryString("id", data?.login.user?.id) +
-        "&" +
-        createQueryString("cid", data?.login?.customer?.databaseId) +
-        "&" +
-        createQueryString("fn", data?.login?.user?.firstName) +
-        "&" +
-        createQueryString("email", data?.login?.user?.email)
-    );
-
-    // router.push(
+    // safePush(
     //   "/dashboard" +
     //     "?" +
     //     createQueryString("id", data?.login.user?.id) +
@@ -294,6 +282,18 @@ export default function Login() {
     //     "&" +
     //     createQueryString("email", data?.login?.user?.email)
     // );
+
+    router.push(
+      "/dashboard" +
+        "?" +
+        createQueryString("id", data?.login.user?.id) +
+        "&" +
+        createQueryString("cid", data?.login?.customer?.databaseId) +
+        "&" +
+        createQueryString("fn", data?.login?.user?.firstName) +
+        "&" +
+        createQueryString("email", data?.login?.user?.email)
+    );
   }
 
   if (loading) {
