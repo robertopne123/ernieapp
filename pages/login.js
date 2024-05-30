@@ -237,66 +237,64 @@ export default function Login() {
     });
   };
 
-  useEffect(() => {
-    if (data) {
-      console.log("Login");
-      console.log(data);
+  if (data) {
+    console.log("Login");
+    console.log(data);
 
-      localStorage.setItem("authtoken", data?.login?.authToken);
-      localStorage.setItem("refreshtoken", data?.login?.refreshToken);
-      localStorage.setItem("role", data?.login?.user.roles.nodes[0].name);
-      localStorage.setItem("customer", JSON.stringify(data?.login?.customer));
-      localStorage.setItem("woo-session", data?.login?.customer?.sessionToken);
-      localStorage.setItem(
-        "employeruser",
-        data?.login?.user.userCompanyField.parentUser
-      );
-      localStorage.setItem(
-        "first-time-user",
-        data?.login?.user.userCompanyField.usedApp == null ? true : false
-      );
-      localStorage.setItem(
-        "employeremail",
-        data?.login?.user.userCompanyField.company.clientInformation
-          .pointOfContactEmail
-      );
+    localStorage.setItem("authtoken", data?.login?.authToken);
+    localStorage.setItem("refreshtoken", data?.login?.refreshToken);
+    localStorage.setItem("role", data?.login?.user.roles.nodes[0].name);
+    localStorage.setItem("customer", JSON.stringify(data?.login?.customer));
+    localStorage.setItem("woo-session", data?.login?.customer?.sessionToken);
+    localStorage.setItem(
+      "employeruser",
+      data?.login?.user.userCompanyField.parentUser
+    );
+    localStorage.setItem(
+      "first-time-user",
+      data?.login?.user.userCompanyField.usedApp == null ? true : false
+    );
+    localStorage.setItem(
+      "employeremail",
+      data?.login?.user.userCompanyField.company.clientInformation
+        .pointOfContactEmail
+    );
 
-      localStorage.setItem(
-        "companyname",
-        data?.login?.user.userCompanyField.company.title
-      );
+    localStorage.setItem(
+      "companyname",
+      data?.login?.user.userCompanyField.company.title
+    );
 
-      console.log(data);
+    console.log(data);
 
-      // if (!loginLoading) {
-      //   setLoginLoading(false);
-      // }
+    // if (!loginLoading) {
+    //   setLoginLoading(false);
+    // }
 
-      safePush(
-        "/dashboard" +
-          "?" +
-          createQueryString("id", data?.login.user?.id) +
-          "&" +
-          createQueryString("cid", data?.login?.customer?.databaseId) +
-          "&" +
-          createQueryString("fn", data?.login?.user?.firstName) +
-          "&" +
-          createQueryString("email", data?.login?.user?.email)
-      );
+    safePush(
+      "/dashboard" +
+        "?" +
+        createQueryString("id", data?.login.user?.id) +
+        "&" +
+        createQueryString("cid", data?.login?.customer?.databaseId) +
+        "&" +
+        createQueryString("fn", data?.login?.user?.firstName) +
+        "&" +
+        createQueryString("email", data?.login?.user?.email)
+    );
 
-      // router.push(
-      //   "/dashboard" +
-      //     "?" +
-      //     createQueryString("id", data?.login.user?.id) +
-      //     "&" +
-      //     createQueryString("cid", data?.login?.customer?.databaseId) +
-      //     "&" +
-      //     createQueryString("fn", data?.login?.user?.firstName) +
-      //     "&" +
-      //     createQueryString("email", data?.login?.user?.email)
-      // );
-    }
-  }, [createQueryString, data, loginLoading, router]);
+    // router.push(
+    //   "/dashboard" +
+    //     "?" +
+    //     createQueryString("id", data?.login.user?.id) +
+    //     "&" +
+    //     createQueryString("cid", data?.login?.customer?.databaseId) +
+    //     "&" +
+    //     createQueryString("fn", data?.login?.user?.firstName) +
+    //     "&" +
+    //     createQueryString("email", data?.login?.user?.email)
+    // );
+  }
 
   if (loading) {
     console.log("Loading");
