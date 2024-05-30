@@ -247,41 +247,31 @@ export default function Login() {
         username: "apptestlogin",
       },
     }).then((data) => {
-      if (!loginLoading) {
-        setLoginLoading(false);
-      }
-
       console.log("Login");
       console.log(data);
 
-      localStorage.setItem("authtoken", data?.data?.login?.authToken);
-      localStorage.setItem("refreshtoken", data?.data?.login?.refreshToken);
-      localStorage.setItem("role", data?.data?.login?.user.roles.nodes[0].name);
-      localStorage.setItem(
-        "customer",
-        JSON.stringify(data?.data?.login?.customer)
-      );
-      localStorage.setItem(
-        "woo-session",
-        data?.data?.login?.customer?.sessionToken
-      );
+      localStorage.setItem("authtoken", data?.login?.authToken);
+      localStorage.setItem("refreshtoken", data?.login?.refreshToken);
+      localStorage.setItem("role", data?.login?.user.roles.nodes[0].name);
+      localStorage.setItem("customer", JSON.stringify(data?.login?.customer));
+      localStorage.setItem("woo-session", data?.login?.customer?.sessionToken);
       localStorage.setItem(
         "employeruser",
-        data?.data?.login?.user.userCompanyField.parentUser
+        data?.login?.user.userCompanyField.parentUser
       );
       localStorage.setItem(
         "first-time-user",
-        data?.data?.login?.user.userCompanyField.usedApp == null ? true : false
+        data?.login?.user.userCompanyField.usedApp == null ? true : false
       );
       localStorage.setItem(
         "employeremail",
-        data?.data?.login?.user.userCompanyField.company.clientInformation
+        data?.login?.user.userCompanyField.company.clientInformation
           .pointOfContactEmail
       );
 
       localStorage.setItem(
         "companyname",
-        data?.data?.login?.user.userCompanyField.company.title
+        data?.login?.user.userCompanyField.company.title
       );
 
       console.log(data);
@@ -298,23 +288,23 @@ export default function Login() {
       //     createQueryString("email", data?.login?.user?.email)
       // );
 
-      safePush(
+      if (!loginLoading) {
+        setLoginLoading(false);
+      }
+
+      router.push(
         "/dashboard" +
           "?" +
-          createQueryString("id", data?.data?.login.user?.id) +
+          createQueryString("id", data?.login.user?.id) +
           "&" +
-          createQueryString("cid", data?.data?.login?.customer?.databaseId) +
+          createQueryString("cid", data?.login?.customer?.databaseId) +
           "&" +
-          createQueryString("fn", data?.data?.login?.user?.firstName) +
+          createQueryString("fn", data?.login?.user?.firstName) +
           "&" +
-          createQueryString("email", data?.data?.login?.user?.email)
+          createQueryString("email", data?.login?.user?.email)
       );
     });
   };
-
-  if (data) {
-    ("use server");
-  }
 
   if (loading) {
     console.log("Loading");
@@ -852,7 +842,15 @@ export default function Login() {
                   className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
                   onClick={(e) => {
                     e.preventDefault();
-                    loginUser();
+                    if (localStorage.getItem("authtoken") != null) {
+                      localStorage.removeItem("authtoken");
+                    }
+                    login({
+                      variables: {
+                        password: "App1Test2Login3!",
+                        username: "apptestlogin",
+                      },
+                    });
                   }}
                 >
                   Test Login

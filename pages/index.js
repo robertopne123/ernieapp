@@ -38,11 +38,11 @@ const circerounded = localFont({
 export default function Home() {
   const router = useRouter();
 
-  useEffect(() => {
-    setInterval(() => {
-      router.push("/login");
-    }, 3000);
-  }, []);
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     router.push("/login");
+  //   }, 3000);
+  // }, []);
 
   return (
     <div className="flex min-h-screen bg-ernieteal relative">

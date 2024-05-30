@@ -3,6 +3,7 @@ import { Inter, Oi } from "next/font/google";
 import localFont from "next/font/local";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useSearchParams } from "next/navigation";
 import Products from "@/components/products";
@@ -93,9 +94,16 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     let token = localStorage.getItem("refresh");
     let role = localStorage.getItem("role");
-    let customerData = JSON.parse(localStorage.getItem("customer"));
+    let customerData = {};
+
+    if (localStorage.getItem("customer") != undefined) {
+      customerData = JSON?.parse(
+        localStorage.getItem("customer") ? localStorage.getItem("customer") : {}
+      );
+    }
+
     let wooSession = localStorage.getItem("woo-session");
-    let companyName = localStorage.getItem("companyname");
+    let companyName = localStorage?.getItem("companyname");
     let eEmail = localStorage.getItem("employeremail");
     let ftu = localStorage.getItem("first-time-user");
 
