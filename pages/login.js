@@ -270,9 +270,9 @@ export default function Login() {
 
     console.log(data);
 
-    // if (!loginLoading) {
-    //   setLoginLoading(false);
-    // }
+    if (!loginLoading) {
+      setLoginLoading(false);
+    }
 
     if (!pushCalled) {
       router.push(
