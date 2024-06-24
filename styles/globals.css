@@ -63,7 +63,17 @@ body {
 }
 
 .rpv-core__inner-page {
-  background-color: #44b69c !important;
+  background-color: transparent !important;
+}
+
+.rpv-core__viewer {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: #ffffec !important;
+}
+
+.rpv-core__doc-loading {
+  background-color: #e7e8c7 !important;
 }
 
 .alert {
@@ -162,4 +172,16 @@ body {
 
 .tab {
   text-wrap: nowrap;
+}
+
+@keyframes pingsmall {
+  75%,
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-ping-once {
+  animation: pingsmall 1s cubic-bezier(0, 0, 0.1, 1) normal;
 }

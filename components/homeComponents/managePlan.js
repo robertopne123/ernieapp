@@ -457,7 +457,7 @@ export const ManagePlan = ({
         />
       )}
 
-      <div className="bg-erniedarkcream flex flex-col gap-6 pb-8 px-6">
+      <div className="bg-erniedarkcream h-full flex flex-col gap-6 pb-8 px-6">
         <div
           className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
           onClick={backAction}
@@ -750,27 +750,7 @@ export const ManagePlan = ({
             </p>
           </div>
         </div>
-        <div className="bg-erniecream p-6 rounded-lg flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
-              My One Off Purchases
-            </p>
-            <img src="/divider.png" className="w-full"></img>
-          </div>
-          <div className="flex flex-col py-2 w-full">
-            {console.log(orders)}
-            {orders.map((order, index) => (
-              <div className="flex flex-row justify-between w-full" key={index}>
-                <p className="font-circular text-erniegreen font-[500] w-full text-sm">
-                  {order.product.node.name}
-                </p>
-                <p className="font-circular text-erniegreen font-[500] text-sm">
-                  {order.quantity}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
+
         <div className="bg-erniecream p-6 rounded-lg flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <p className="font-circe font-[900] text-lg text-erniegreen uppercase">

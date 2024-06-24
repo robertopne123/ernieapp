@@ -28,9 +28,9 @@ export const ConfirmSubscription = ({
           <div className="flex flex-col gap-2">
             {console.log(difference)}
             {difference.map((lineItem, index) => (
-              <>
+              <div key={index}>
                 {lineItem.quantity != 0 && (
-                  <div className="flex flex-row justify-between" key={index}>
+                  <div className="flex flex-row justify-between">
                     <p className="font-circular text-sm font-[500] text-erniegreen">
                       {lineItem.product.node.name}
                     </p>
@@ -39,13 +39,14 @@ export const ConfirmSubscription = ({
                     </p>
                   </div>
                 )}
-              </>
+              </div>
             ))}
           </div>
           <div
             className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
             onClick={() => {
               update();
+              close();
             }}
           >
             <p className="font-circe text-erniegreen font-[900] text-xl text-center">

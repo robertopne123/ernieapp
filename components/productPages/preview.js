@@ -13,6 +13,7 @@ export default function Preview({
   addToOneOffBasket,
   subBasket,
   oneOffBasket,
+  pType,
 }) {
   const addToBasketFromPreviewPage = (item, category) => {
     addToBasket(item, category);
@@ -23,6 +24,16 @@ export default function Preview({
   const [subQuantity, setSubQuantity] = useState(1);
 
   const [oneOffQuantity, setOneOffQuantity] = useState(1);
+
+  const isInOneOffBasket = () => {
+    for (let i = 0; i < oneOffBasket.length; i++) {
+      if (oneOffBasket[i].product.databaseId == product.databaseId) {
+        return true;
+      }
+    }
+
+    return false;
+  };
 
   return (
     <div
@@ -39,7 +50,11 @@ export default function Preview({
           Back
         </p>
       </div>
-      <div className="flex flex-col gap-6 bg-erniecream rounded-xl p-6 h-auto ">
+      <div
+        className={`flex flex-col gap-6 bg-erniecream rounded-xl p-6 h-auto ${
+          pType != 0 && pType != 1 ? "mb-10" : "mb-0"
+        }`}
+      >
         <div className="w-full bg-cover h-[300px] relative">
           <div className="z-10 h-[300px]">
             {product.productTags.nodes[0].name != "squirrel sisters" && (
@@ -135,28 +150,65 @@ export default function Preview({
           </div>
         </div>
       </div>
-      <div className="flex flex-col bg-erniecream rounded-xl mb-10 p-6">
-        <p className="font-circular font-[300] text-erniegreen text-sm italic">
-          Required
-        </p>
-        <div className="flex flex-row justify-between gap-2 py-1">
-          <label
-            htmlFor="purchasetype"
-            className="font-circe font-[900] text-erniegreen uppercase"
-          >
-            Add To Subscription
-          </label>
-          <input
-            type="radio"
-            name="purchasetype"
-            className="w-6 accent-erniegreen"
-            onClick={() => {
-              setPurchaseType(0);
-            }}
-          ></input>
+      {pType == 0 && (
+        <div>
+          <div className="bg-erniecream rounded-xl p-6 mb-10">
+            <div className="flex flex-col gap-4 order-b-[1px] border-erniegreen">
+              <div className="w-full flex flex-row gap-6">
+                <div
+                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
+                  onClick={() => {
+                    if (oneOffQuantity > 1) {
+                      setOneOffQuantity(oneOffQuantity - 1);
+                    }
+                  }}
+                >
+                  <p className="font-circular text-center text-erniegreen text-xl">
+                    -
+                  </p>
+                </div>
+                <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
+                  {oneOffQuantity + "kg"}
+                </p>
+                <div
+                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
+                  onClick={() => {
+                    setOneOffQuantity(oneOffQuantity + 1);
+                  }}
+                >
+                  <p className="font-circular text-center text-erniegreen text-xl">
+                    +
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-row justify-between gap-8">
+                <p className="font-circe font-[900] text-erniegreen text-2xl">
+                  {product.price == null ? "£0.00" : product.price}
+                </p>
+                <div
+                  className="bg-erniegold rounded-xl py-1 px-3 flex-grow"
+                  onClick={() =>
+                    addToOneOffBasket({
+                      product: product,
+                      quantity: oneOffQuantity,
+                    })
+                  }
+                >
+                  <p className="font-circe font-[900] text-erniegreen text-center">
+                    Add to basket
+                  </p>
+                </div>
+              </div>
+              <p className="font-circular text-erniegreen italic text-xs">
+                You save 50p per kg when you subscribe!
+              </p>
+            </div>
+          </div>
         </div>
-        {purchaseType == 0 && (
-          <div className="flex flex-col gap-4 py-4 border-b-[1px] border-erniegreen mb-4">
+      )}
+      {pType == 1 && (
+        <div className="bg-erniecream rounded-xl p-6 mb-10">
+          <div className="flex flex-col gap-4 py-4">
             <div className="w-full flex flex-row gap-6">
               <div
                 className="bg-erniedarkcream p-1 rounded-lg flex-grow"
@@ -208,76 +260,8 @@ export default function Preview({
               automatically be added onto your next order.
             </p>
           </div>
-        )}
-        <div className="flex flex-row justify-between gap-2 py-1">
-          <label
-            htmlFor="purchasetype"
-            className="font-circe font-[900] text-erniegreen uppercase"
-          >
-            One Off Purchase
-          </label>
-          <input
-            type="radio"
-            name="purchasetype"
-            className="w-6 accent-erniegreen"
-            onClick={() => {
-              setPurchaseType(1);
-            }}
-          ></input>
         </div>
-        {purchaseType == 1 && (
-          <div className="flex flex-col gap-4 py-4 border-b-[1px] border-erniegreen mb-4">
-            <div className="w-full flex flex-row gap-6">
-              <div
-                className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                onClick={() => {
-                  if (oneOffQuantity > 1) {
-                    setOneOffQuantity(oneOffQuantity - 1);
-                  }
-                }}
-              >
-                <p className="font-circular text-center text-erniegreen text-xl">
-                  -
-                </p>
-              </div>
-              <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
-                {oneOffQuantity + "kg"}
-              </p>
-              <div
-                className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                onClick={() => {
-                  setOneOffQuantity(oneOffQuantity + 1);
-                }}
-              >
-                <p className="font-circular text-center text-erniegreen text-xl">
-                  +
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-row justify-between gap-8">
-              <p className="font-circe font-[900] text-erniegreen text-2xl">
-                {product.price == null ? "£0.00" : product.price}
-              </p>
-              <div
-                className="bg-erniegold rounded-xl py-1 px-3 flex-grow"
-                onClick={() =>
-                  addToOneOffBasket({
-                    product: product,
-                    quantity: oneOffQuantity,
-                  })
-                }
-              >
-                <p className="font-circe font-[900] text-erniegreen text-center">
-                  Add to basket
-                </p>
-              </div>
-            </div>
-            <p className="font-circular text-erniegreen italic text-xs">
-              You save 50p per kg when you subscribe!
-            </p>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

@@ -89,6 +89,14 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [orderData, setOrders] = useState([]);
 
+  const [hasSubscription, setHasSubscription] = useState(false);
+
+  const [purchaseType, setPurchaseType] = useState(-1); //0 - ONE OFF, 1 - SUB
+
+  const [purchasing, setPurchasing] = useState(false);
+
+  const [newPurchase, setNewPurchase] = useState(false);
+
   const loadData = (cid, code, employer) => {
     const client = graphqlClient;
 
@@ -104,6 +112,7 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     let wooSession = localStorage.getItem("woo-session");
     let companyName = localStorage?.getItem("companyname");
+
     let eEmail = localStorage.getItem("employeremail");
     let ftu = localStorage.getItem("first-time-user");
 
@@ -133,6 +142,8 @@ export default function Dashboard({ data, categories, products, orders }) {
     }
 
     let tempDataObject = null;
+
+    console.log(companyName);
 
     client
       .query({
@@ -355,6 +366,8 @@ export default function Dashboard({ data, categories, products, orders }) {
         //   }
         // }
 
+        console.log(employerUser);
+
         client
           .mutate({
             mutation: gql`
@@ -395,6 +408,15 @@ export default function Dashboard({ data, categories, products, orders }) {
             setSubscriptions(data);
 
             console.log(data);
+
+            if (data?.data?.subscription?.subscription != null) {
+              setHasSubscription(true);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+
+            setHasSubscription(false);
           });
 
         client
@@ -1186,6 +1208,14 @@ export default function Dashboard({ data, categories, products, orders }) {
     setOneOffBasket(oneOffBasketCopy);
   };
 
+  const clearOneOffBasket = () => {
+    setOneOffBasket([]);
+  };
+
+  const clearSubBasket = () => {
+    setSubBasket([]);
+  };
+
   const updateSubBasket = (basketCopy) => {
     setSubBasket(basketCopy);
   };
@@ -1198,6 +1228,13 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const setNewSubFrequency = (freq) => {
     setNewSubFreq(freq);
+  };
+
+  const setPType = (type) => {
+    setTab(1);
+    setPurchasing(true);
+    setPurchaseType(type);
+    setNewPurchase(true);
   };
 
   return (
@@ -1220,10 +1257,16 @@ export default function Dashboard({ data, categories, products, orders }) {
               addToOneOffBasket={addToOneOffBasket}
               updateSubBasket={updateSubBasket}
               updateOneOffBasket={updateOneOffBasket}
+              clearSubBasket={clearSubBasket}
+              clearOneOffBasket={clearOneOffBasket}
               setNewSubFrequency={setNewSubFrequency}
               newSubFreq={newSubFreq}
               subBasket={subBasket}
               oneOffBasket={oneOffBasket}
+              purchaseType={purchaseType}
+              hasSubscription={hasSubscription}
+              customerId={employerUserID}
+              setSubscriptions={setSubscriptions}
             />
             <div
               className={`${
@@ -1235,7 +1278,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                   quantity={getTotalOrderQty()}
                   userQuantity={getUserNumberOrders()}
                   userTotalQuantity={getUserTotalOrderQty()}
-                  firstName={fn}
                   setTab={setTab}
                   setImpactDefaultTab={setImpactDefaultTab}
                   nextDelivery={getSubscriptionPaymentDate()}
@@ -1249,6 +1291,14 @@ export default function Dashboard({ data, categories, products, orders }) {
                   updatePlan={updatePlan}
                   updatePlanFrequency={updatePlanFrequency}
                   employerUser={employerUserID}
+                  hasSubscription={hasSubscription}
+                  setPurchaseType={setPType}
+                  purchaseType={purchaseType}
+                  newPurchase={newPurchase}
+                  setNewPurchase={setNewPurchase}
+                  purchasing={purchasing}
+                  setPurchasing={setPurchasing}
+                  firstName={fn}
                 />
               )}
               {activeTab == 1 && (
@@ -1272,6 +1322,12 @@ export default function Dashboard({ data, categories, products, orders }) {
                   addToOneOffBasket={addToOneOffBasket}
                   subBasket={subBasket}
                   oneOffBasket={oneOffBasket}
+                  purchaseType={purchaseType}
+                  purchasing={purchasing}
+                  newPurchase={newPurchase}
+                  setPurchaseType={setPurchaseType}
+                  setPurchasing={setPurchasing}
+                  setNewPurchase={setNewPurchase}
                 />
               )}
               {activeTab == 2 && (
@@ -1315,6 +1371,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     } `}
                     onClick={(e) => {
                       setTab(tab.index);
+                      setNewPurchase(false);
                       console.log(tab.index, activeTab);
                     }}
                   >

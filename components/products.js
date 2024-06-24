@@ -9,6 +9,7 @@ import graphqlClient from "@/apollo-client";
 import CartContext from "./context/cart-context";
 import Preview from "./productPages/preview";
 import { BrandInfo } from "./productPages/brandInfo";
+import { Purchasing } from "./productPages/purchasing";
 
 export default function Products({
   productCategories,
@@ -26,6 +27,12 @@ export default function Products({
   addToOneOffBasket,
   subBasket,
   oneOffBasket,
+  purchaseType,
+  purchasing,
+  setPurchaseType,
+  setPurchasing,
+  newPurchase,
+  setNewPurchase,
 }) {
   function filteredCategories() {
     let filtered = [];
@@ -466,6 +473,18 @@ export default function Products({
     addToOneOffBasket(item);
   };
 
+  const setPType = (val) => {
+    setPurchaseType(val);
+  };
+
+  const setP = (val) => {
+    setPurchasing(val);
+  };
+
+  const setNewP = (val) => {
+    setNewPurchase(val);
+  };
+
   return (
     <ApolloProvider client={graphqlClient}>
       <div className="h-full w-full relative flex flex-col bg-erniedarkcream pt-8 pb-8 overflow-auto">
@@ -475,6 +494,15 @@ export default function Products({
             name={infoName}
             description={infoDesc}
             image={infoImage}
+          />
+        )}
+        {purchasing && !newPurchase && (
+          <Purchasing
+            close={close}
+            purchaseType={purchaseType}
+            setPurchaseType={setPType}
+            setPurchasing={setP}
+            setNewPurchase={setNewP}
           />
         )}
         {previewing ? (
@@ -492,9 +520,38 @@ export default function Products({
             addToOneOffBasket={addToOneOffBasketFromProducts}
             subBasket={subBasket}
             oneOffBasket={oneOffBasket}
+            pType={purchaseType}
           />
         ) : (
           <div className="flex flex-col gap-0 h-auto pb-16">
+            {purchaseType == 0 && (
+              <div className="flex flex-col gap-0 mx-6 mb-4">
+                <div className="flex flex-row justify-between">
+                  <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                    One-off Purchase
+                  </p>
+                </div>
+                <img
+                  src="/divider.png"
+                  className="h-1.5 w-full mt-2 mb-2"
+                ></img>
+              </div>
+            )}
+
+            {purchaseType == 1 && (
+              <div className="flex flex-col gap-0 mx-6 mb-4">
+                <div className="flex flex-row justify-between">
+                  <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                    Managing Subscription
+                  </p>
+                </div>
+                <img
+                  src="/divider.png"
+                  className="h-1.5 w-full mt-2 mb-2"
+                ></img>
+              </div>
+            )}
+
             <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2">
               {getGroupedProducts().map((group, index) => (
                 <div
@@ -521,7 +578,7 @@ export default function Products({
             <div className="flex flex-col-reverse">
               {getGroupedProducts()[selectedTab].brands?.map((brand, index) => (
                 <div
-                  className={`flex flex-col gap-2 px-6 pb-2 pt-4 w-full`}
+                  className={`flex flex-col gap-0 pb-4 px-6 pb-2 pt-4 w-full`}
                   key={index}
                 >
                   <div className="flex flex-row justify-between">
@@ -543,7 +600,7 @@ export default function Products({
                     src="/divider.png"
                     className="h-1.5 w-full mt-2 mb-2"
                   ></img>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-4 mt-4">
                     {brand.products.map((product, productIndex) => (
                       <div
                         key={productIndex}
@@ -616,6 +673,9 @@ export default function Products({
                             onClick={() => {
                               setSelectedBrands(index);
                               setSelectedProduct(productIndex);
+                              console.log(brand.products[productIndex]);
+                              console.log(oneOffBasket);
+
                               setPreviewing(true);
                             }}
                           >

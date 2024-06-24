@@ -29,6 +29,13 @@ export default function Home({
   updatePlan,
   updatePlanFrequency,
   employerUser,
+  hasSubscription,
+  setPurchaseType,
+  newPurchase,
+  setNewPurchase,
+  purchasing,
+  setPurchasing,
+  purchaseType,
 }) {
   const updateOrderFromSummary = (orderDetails) => {
     updateOrder(orderDetails);
@@ -116,16 +123,71 @@ export default function Home({
     return grouped;
   };
 
+  const setPurchaseTypeFromHome = (val) => {
+    setPurchaseType(val);
+  };
+
+  const setPurchasingFromHome = (val) => {
+    setPurchasing(val);
+  };
+
+  const setNewPurchaseFromHome = (val) => {
+    setNewPurchase(val);
+  };
+
   return (
     <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh)] ">
       {homeTab == -1 && (
         <div className="flex flex-col">
           <WelcomeMsg name={firstName} />
-          <MySubscription
-            subscriptions={subscriptions}
-            manageSubscription={manageSubscription}
-            quickOrderView={quickOrderView}
-          />
+          {hasSubscription ? (
+            <MySubscription
+              subscriptions={subscriptions}
+              manageSubscription={manageSubscription}
+              quickOrderView={quickOrderView}
+              setPurchasingType={setPurchaseTypeFromHome}
+              setPurchasing={setPurchasingFromHome}
+              setNewPurchase={setNewPurchaseFromHome}
+            />
+          ) : (
+            <div className="flex flex-col p-6">
+              <div className="bg-erniegold p-6 rounded-xl">
+                <div className="flex flex-col gap-2">
+                  <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+                    My Subscription
+                  </p>
+                  <img src="/divider.png" className="w-full"></img>
+                </div>
+                <p className="font-circular text-erniegreen font-[500] mt-2">
+                  You currently don&apos;t have an active subscription
+                </p>
+                <div
+                  className="bg-ernielightgold rounded-xl p-2 mt-4"
+                  onClick={() => {
+                    setPurchaseType(1);
+                    setPurchasing(true);
+                    setNewPurchase(true);
+                  }}
+                >
+                  <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                    Start Subscription
+                  </p>
+                </div>
+                <div
+                  className="bg-ernielightgold rounded-xl p-2 mt-4"
+                  onClick={() => {
+                    setPurchaseType(0);
+                    setPurchasing(true);
+                    setNewPurchase(true);
+                  }}
+                >
+                  <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                    Quick Order
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <About />
           <HowItWorks />
         </div>

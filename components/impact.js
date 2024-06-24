@@ -52,8 +52,8 @@ export default function Impact({
     const { CurrentScale, ZoomIn, ZoomOut } = zoomPluginInstance;
 
     return (
-      <div className="h-full w-full bg-ernieteal flex flex-col">
-        <div className="max-h-pdfinner flex-grow">
+      <div className="h-[calc(100%-37px)] w-full bg-erniedarkcream flex flex-col gap-6 justify-between relative">
+        <div className="max-h-pdfinner flex-grow px-6 rounded-xl overflow-hidden">
           <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
             <Viewer
               fileUrl={url}
@@ -67,21 +67,48 @@ export default function Impact({
             />
           </Worker>
         </div>
-        <div className="flex flex-row w-full bottom-0 left-0 justify-center bg-erniegreen p-2 gap-4">
+        <div className="flex flex-row mx-6 mb-6 rounded-lg bottom-0 left-0 justify-center bg-erniecream p-6 gap-4">
+          {/* <div className="w-full flex flex-row gap-6">
+              <div
+                className="bg-erniedarkcream p-1 rounded-lg flex-grow"
+                onClick={() => {
+                  if (subQuantity > 1) {
+                    setSubQuantity(subQuantity - 1);
+                  }
+                }}
+              >
+                <p className="font-circular text-center text-erniegreen text-xl">
+                  -
+                </p>
+              </div>
+              <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
+                {subQuantity + "kg"}
+              </p>
+              <div
+                className="bg-erniedarkcream p-1 rounded-lg flex-grow"
+                onClick={() => {
+                  setSubQuantity(subQuantity + 1);
+                }}
+              >
+                <p className="font-circular text-center text-erniegreen text-xl">
+                  +
+                </p>
+              </div>
+            </div> */}
           <ZoomOut>
             {(props) => (
               <button
-                className="bg-erniegold border-none rounded-none text-erniegreen cursor-pointer py-2 px-4 font-circular font-[500]"
+                className="bg-erniedarkcream p-1 rounded-xl flex-grow font-circular text-center text-erniegreen text-xl"
                 onClick={props.onClick}
               >
-                Zoom out
+                -
               </button>
             )}
           </ZoomOut>
           <CurrentScale>
             {(props) => (
               <div className="flex flex-col justify-center">
-                <p className="text-erniecream font-circe font-[900] text-lg">{`${Math.round(
+                <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">{`${Math.round(
                   props.scale * 100
                 )}%`}</p>
               </div>
@@ -90,46 +117,65 @@ export default function Impact({
           <ZoomIn>
             {(props) => (
               <button
-                className="bg-erniegold border-none rounded-none text-erniegreen cursor-pointer py-2 px-4 font-circular font-[500]"
+                className="bg-erniedarkcream p-1 rounded-lg flex-grow font-circular text-center text-erniegreen text-xl"
                 onClick={props.onClick}
               >
-                Zoom in
+                +
               </button>
             )}
           </ZoomIn>
+          <a
+            href={impactCertificateURL}
+            download
+            className="py-2 px-3 rounded-lg flex flex-col justify-center bg-erniegold w-auto self-start font-circular text-center text-sm text-erniegreen text-[600]"
+          >
+            Download
+          </a>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="h-full bg-erniecream overflow-hidden">
+    <div className="h-[calc(88vh-80px)] bg-erniecream overflow-hidden">
       {!showingCert ? (
         <div className="flex flex-col h-full">
-          <div className="flex flex-row gap-2 p-6 bg-erniedarkcream">
-            {tabs.map((tab, index) => (
-              <div
-                key={index}
-                className={`py-2 px-3 rounded-lg flex flex-col justify-center ${
-                  impactTab == index ? "bg-ernieteal" : "bg-erniecream"
-                }`}
-                onClick={(e) => {
-                  setImpactTab(index);
-                }}
-              >
-                <p
-                  className={`font-circular  text-center text-sm ${
-                    impactTab == index ? "text-erniecream" : "text-erniegreen"
+          <div className="flex flex-col gap-4 bg-erniedarkcream p-6">
+            <div className="flex flex-row gap-2 bg-erniedarkcream">
+              {tabs.map((tab, index) => (
+                <div
+                  key={index}
+                  className={`py-2 px-3 rounded-lg flex flex-col justify-center ${
+                    impactTab == index ? "bg-ernieteal" : "bg-erniecream"
                   }`}
+                  onClick={(e) => {
+                    setImpactTab(index);
+                  }}
                 >
-                  {tab.name}
+                  <p
+                    className={`font-circular  text-center text-sm ${
+                      impactTab == index ? "text-erniecream" : "text-erniegreen"
+                    }`}
+                  >
+                    {tab.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {impactTab == 0 && (
+              <div
+                className="py-2 px-3 rounded-lg flex flex-col justify-center bg-erniegold w-auto self-start"
+                onClick={(e) => setShowingCert(true)}
+              >
+                <p className="font-circular text-center text-sm text-erniegreen text-[600]">
+                  See Impact Certificate
                 </p>
               </div>
-            ))}
+            )}
           </div>
           <div className="bg-erniemint flex flex-col overflow-hidden">
             {impactTab == 0 && (
-              <div className="flex flex-col gap-6 px-6 pt-6 pb-40 overflow-auto flex-grow">
+              <div className="flex flex-col gap-6 px-6 pt-6 pb-6 overflow-auto flex-grow">
                 <div className="flex flex-col">
                   <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
                     My Impact
@@ -243,7 +289,7 @@ export default function Impact({
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-row justify-center absolute bg-erniedarkcream w-full left-0 bottom-[108px] py-4 px-6">
+                {/* <div className="flex flex-row justify-center absolute bg-erniedarkcream w-full left-0 bottom-[108px] py-4 px-6">
                   <div
                     className="bg-erniegold w-full px-4 py-2 flex flex-col justify-center items-center rounded-xl"
                     onClick={(e) => setShowingCert(true)}
@@ -252,23 +298,24 @@ export default function Impact({
                       See Impact Certificate
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
             {impactTab == 1 && <ErnieImpact quantity={quantity} role={role} />}
           </div>
         </div>
       ) : (
-        <div className="h-full w-full relative pt-[72px]">
-          <div className="absolute top-0 left-0 p-6 bg-erniemint w-full flex flex-row justify-between">
-            <img
-              src="/left-arrow.svg"
-              className="w-6"
-              onClick={backAction}
-            ></img>
-            <a href={impactCertificateURL} download>
-              <img src="/download.svg" className="w-6"></img>
-            </a>
+        <div className="h-full w-full relative flex flex-col gap-6 bg-erniedarkcream">
+          <div
+            className="py-2 mx-6 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
+            onClick={backAction}
+          >
+            <div className="h-3 w-3 relative">
+              <Image src="/left-arrow.svg" fill={true} className="h-6"></Image>
+            </div>
+            <p className="font-circular font-[500] text-center text-sm text-erniegreen">
+              Back
+            </p>
           </div>
           <PdfViewer url={impactCertificateURL}></PdfViewer>
         </div>

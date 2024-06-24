@@ -19,6 +19,10 @@ export default function CheckoutForm({
   orderComplete,
   setOrderComplete,
   employerUser,
+  setOrderDetails,
+  purchaseType,
+  billingPeriod,
+  billingInterval,
 }) {
   const stripe = useStripe();
 
@@ -43,18 +47,45 @@ export default function CheckoutForm({
     }
   `;
 
+  const ADDSUBSCRIPTION = gql`
+    mutation MyMutation($input: CreateSubscriptionInput!) {
+      createSubscription(input: $input) {
+        subscription {
+          databaseId
+          lineItems {
+            nodes {
+              databaseId
+              quantity
+              product {
+                node {
+                  name
+                  description(format: RAW)
+                  databaseId
+                  featuredImage {
+                    node {
+                      sourceUrl
+                    }
+                  }
+                }
+              }
+            }
+          }
+          billingPeriod
+          billingInterval
+          nextPaymentDate
+        }
+      }
+    }
+  `;
+
   console.log(customer);
 
   const [checkout] = useMutation(CHECKOUT, {
     client: graphqlClient,
-    onCompleted({ checkout }) {
-      console.log("Order Received (", checkout, ")");
+  });
 
-      setOrderComplete();
-    },
-    onError(error) {
-      console.error(error);
-    },
+  const [addSubscription] = useMutation(ADDSUBSCRIPTION, {
+    client: graphqlClient,
   });
 
   async function handleSubmit(event) {
@@ -66,35 +97,89 @@ export default function CheckoutForm({
 
     for (let i = 0; i < basket.length; i++) {
       lineItems.push({
-        productId: basket[i].databaseId,
-        quantity: basket[i].qty,
+        name: basket[i].product.name,
+        productId: basket[i].product.databaseId,
+        quantity: basket[i].quantity,
       });
     }
 
     console.log(lineItems);
 
-    try {
-      const source = await handleStripe();
+    if (purchaseType == 0) {
+      try {
+        const source = await handleStripe();
 
-      await checkout({
-        variables: {
-          input: {
-            paymentMethod: "stripe",
-            lineItems: lineItems,
-            customerId: parseInt(employerUser),
-            customerNote:
-              customer.billing.firstName + " " + customer.billing.lastName,
-            metaData: [
-              {
-                key: `_stripe_source_id`,
-                value: source.id,
-              },
-            ],
+        await checkout({
+          variables: {
+            input: {
+              paymentMethod: "stripe",
+              lineItems: lineItems,
+              customerId: parseInt(employerUser),
+              customerNote: "Ernie App Order",
+              billing: billing,
+              shipping: shipping,
+              metaData: [
+                {
+                  key: `_stripe_source_id`,
+                  value: source.id,
+                },
+              ],
+            },
           },
-        },
-      });
-    } catch (error) {
-      console.error("hi", error);
+        })
+          .then((data) => {
+            console.log("Order Received (", data, ")");
+
+            setOrderComplete(true);
+            setOrderDetails(data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error) {
+        console.error("hi", error);
+      }
+    } else {
+      try {
+        const source = await handleStripe();
+
+        console.log(billingPeriod);
+        console.log(billingInterval);
+        console.log(employerUser);
+        console.log(lineItems);
+        console.log(billing);
+        console.log(shipping);
+
+        await addSubscription({
+          variables: {
+            input: {
+              paymentMethod: "stripe",
+              lineItems: lineItems,
+              customerId: parseInt(employerUser),
+              customerNote: "Ernie App Order",
+              billing: billing,
+              shipping: shipping,
+              metaData: [
+                {
+                  key: `_stripe_source_id`,
+                  value: source.id,
+                },
+              ],
+              billingInterval: billingInterval + "",
+              billingPeriod: billingPeriod,
+            },
+          },
+        })
+          .then((data) => {
+            console.log("New Subscription (", data, ")");
+
+            setOrderComplete(true);
+            setOrderDetails(data);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (error) {}
     }
   }
 
@@ -131,16 +216,14 @@ export default function CheckoutForm({
       onSubmit={handleSubmit}
       className="h-full flex flex-col gap-4 justify-between"
     >
-      <div className="border-2 border-erniegreen px-4 py-6 relative flex flex-col gap-4">
-        <p className="absolute left-1 -top-[22px] font-circe font-[900] text-lg uppercase text-erniegreen bg-erniecream p-2">
-          Payment
-        </p>
+      <div className="relative flex flex-col gap-4 bg-erniecream p-2 rounded-lg">
         <CardElement
           options={{
             style: {
               base: {
                 fontFamily: "var(--font-circularstd)",
                 fontSize: "16px",
+                backgroundColor: "#FFFFEC",
               },
             },
             hidePostalCode: true,
@@ -149,7 +232,7 @@ export default function CheckoutForm({
       </div>
       <button
         disabled={!stripe}
-        className="bg-erniegreen w-full h-14 text-erniecream font-circe uppercase font-[900] text-lg"
+        className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-xl rounded-xl absolute bottom-6 left-0 mx-6"
       >
         Pay
       </button>

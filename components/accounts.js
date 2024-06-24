@@ -4,6 +4,8 @@ import OrderHistory from "./accountPages/orderhistory";
 import Image from "next/image";
 import CoffeeToDesk from "./accountPages/coffeetodesk";
 import About from "./accountPages/about";
+import { AccountDetails } from "./accountPages/accountDetails";
+import { DeliveryAndReturns } from "./accountPages/deliveryAndReturns";
 
 export default function Accounts({
   userQuantity,
@@ -33,7 +35,12 @@ export default function Accounts({
             role == 0 ? "h-full" : "h-1/2"
           } w-full`}
         >
-          <div className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center">
+          <div
+            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            onClick={() => {
+              setSelectedPage(4);
+            }}
+          >
             <Image
               width={100}
               height={100}
@@ -64,7 +71,12 @@ export default function Accounts({
               <br className="xlmb:hidden" /> Summary
             </p>
           </div>
-          <div className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center">
+          <div
+            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            onClick={() => {
+              setSelectedPage(5);
+            }}
+          >
             <Image
               width={100}
               height={100}
@@ -79,7 +91,12 @@ export default function Accounts({
               Policy
             </p>
           </div>
-          <div className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center">
+          <div
+            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            onClick={() => {
+              setSelectedPage(3);
+            }}
+          >
             <Image
               width={100}
               height={100}
@@ -119,6 +136,8 @@ export default function Accounts({
           subsidyChanging={subsidyChanging}
         />
       )}
+      {selectedPage == 4 && <AccountDetails backAction={back} />}
+      {selectedPage == 5 && <DeliveryAndReturns backAction={back} />}
       {selectedPage == 3 && <About backAction={back} />}
     </div>
   );

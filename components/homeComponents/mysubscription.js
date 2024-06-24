@@ -2,6 +2,9 @@ export const MySubscription = ({
   subscriptions,
   manageSubscription,
   quickOrderView,
+  setPurchaseType,
+  setPurchasing,
+  setNewPurchase,
 }) => {
   const getFormattedDate = (date) => {
     let dateParts = date?.split("-");
@@ -10,6 +13,10 @@ export const MySubscription = ({
     let yearShort = yearFull?.[2] + yearFull?.[3];
 
     return date ? dateParts[2] + "/" + dateParts[1] + "/" + yearShort : "//";
+  };
+
+  const setPurchaseTypeFromSub = (val) => {
+    setPurchaseType(val);
   };
 
   return (
@@ -33,25 +40,27 @@ export const MySubscription = ({
           <div className="bg-erniegreen h-[1px] w-full"></div>
           <div className="grid grid-cols-2 gap-6">
             <p className="font-circe font-[900] text-3xl text-erniegreen uppercase">
-              {subscriptions?.data?.subscription?.subscription.billingPeriod ==
+              {subscriptions?.data?.subscription?.subscription?.billingPeriod ==
               "week"
                 ? "Weekly"
                 : subscriptions?.data?.subscription?.subscription
-                    .billingPeriod == "month"
+                    ?.billingPeriod == "month"
                 ? "Monthly"
                 : subscriptions?.data?.subscription?.subscription
-                    .billingPeriod == ""
+                    ?.billingPeriod == ""
                 ? "One-Off"
                 : "Loading"}
             </p>
             <p className="font-circe font-[900] text-3xl text-erniegreen uppercase">
-              {subscriptions
-                ? getFormattedDate(
-                    subscriptions?.data?.subscription?.subscription.nextPaymentDate.split(
-                      " "
-                    )[0]
-                  )
-                : ""}
+              {subscriptions?.data?.subscription?.subscription
+                ?.nextPaymentDate &&
+                (subscriptions
+                  ? getFormattedDate(
+                      subscriptions?.data?.subscription?.subscription?.nextPaymentDate.split(
+                        " "
+                      )[0]
+                    )
+                  : "")}
             </p>
           </div>
         </div>
@@ -69,11 +78,13 @@ export const MySubscription = ({
           <div
             className="bg-ernielightgold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
             onClick={() => {
-              quickOrderView();
+              setPurchaseType(0);
+              setPurchasing(true);
+              setNewPurchase(true);
             }}
           >
             <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-              Quick Order View
+              Quick Order
             </p>
           </div>
         </div>

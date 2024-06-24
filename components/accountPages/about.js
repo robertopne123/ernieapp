@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function About({ backAction }) {
   const router = useRouter();
@@ -8,40 +9,54 @@ export default function About({ backAction }) {
   };
 
   return (
-    <div className="flex flex-col flex-grow pt-12 gap-4 h-full bg-erniecream">
+    <div className="flex flex-col flex-grow gap-6 h-full bg-erniedarkcream px-6">
       <div
-        className="absolute top-0 left-0 p-6 bg-erniemint w-full"
+        className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
         onClick={backAction}
       >
-        <img src="/left-arrow.svg" className="w-6"></img>
+        <div className="h-3 w-3 relative">
+          <Image src="/left-arrow.svg" fill={true} className="h-6"></Image>
+        </div>
+        <p className="font-circular font-[500] text-center text-sm text-erniegreen">
+          Back
+        </p>
       </div>
-      <div className="flex flex-col gap-4 px-4 pt-8 justify-between flex-grow pb-8">
-        <div className="flex flex-col gap-2">
-          <p className="uppercase font-circe font-[900] text-4xl text-erniegreen mt-6">
+      <div className="flex flex-col gap-6 flex-grow">
+        <div className="rounded-xl bg-erniecream p-6">
+          <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
             About
           </p>
-          <p className="font-circular text-erniegreen font-[500]">
+          <img src="/divider.png" className="w-full"></img>
+          <p className="font-circular text-sm text-erniegreen font-[500] mt-4">
             Welcome to the Ernie London App
           </p>
-          <p className="font-circular text-erniegreen font-[500] pb-3">
-            Version {process.env.NEXT_PUBLIC_APP_VERSION}
+          <p className="font-circular text-sm text-erniegreen italic mt-2">
+            <span className="font-[500]">App Version: </span>
+            {process.env.NEXT_PUBLIC_APP_VERSION}
           </p>
-          <div
-            className="bg-erniegreen w-full px-4 py-6"
-            onClick={() => {
-              logout();
-            }}
-          >
-            <p className="font-circe text-erniecream font-[900] uppercase text-center text-xl">
-              Log Out
-            </p>
-          </div>
+          <p className="font-circular text-sm text-erniegreen italic">
+            <span className="font-[500]">Build Number: </span>
+            {process.env.NEXT_PUBLIC_BUILD_NUMBER}
+          </p>
+          <p className="font-circular text-sm text-erniegreen font-[500] mt-2">
+            © 2024 Ernie London Ltd
+          </p>
         </div>
-        <div className="flex flex-col gap-3">
-          <img src="/dolcearch.svg" className="w-10"></img>
+        <div
+          className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+          onClick={() => {
+            logout();
+          }}
+        >
+          <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+            Log Out
+          </p>
+        </div>
+        <div className="rounded-xl bg-erniecream p-6 flex flex-col gap-3">
+          <img src="/dolcearch.svg" className="w-8"></img>
           <p className="font-circular text-erniegreen font-[500] text-sm">
-            The Ernie App was designed, developed and is maintained by
-            We&apos;re Digital Ltd t/a Dolce Studios. 2024 Ernie London Ltd
+            The Ernie App was designed, developed and is maintained by Dolce
+            Studios.
           </p>
         </div>
       </div>
