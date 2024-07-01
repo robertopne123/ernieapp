@@ -36,6 +36,7 @@ export default function Home({
   purchasing,
   setPurchasing,
   purchaseType,
+  setManagingSubscription,
 }) {
   const updateOrderFromSummary = (orderDetails) => {
     updateOrder(orderDetails);
@@ -135,6 +136,10 @@ export default function Home({
     setNewPurchase(val);
   };
 
+  const setManagingSubFromHome = (val) => {
+    setManagingSubscription(val);
+  };
+
   return (
     <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh)] ">
       {homeTab == -1 && (
@@ -202,6 +207,10 @@ export default function Home({
           updatePlan={updatePlanFromSummary}
           updatePlanFrequency={updatePlanFreqFromSummary}
           updateSubError={updateSubError}
+          setPurchaseType={setPurchaseTypeFromHome}
+          setPurchasing={setPurchasingFromHome}
+          setNewPurchase={setNewPurchaseFromHome}
+          setManagingSubscription={setManagingSubFromHome}
         />
       )}
 

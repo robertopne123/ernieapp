@@ -792,7 +792,7 @@ export default function Login() {
                         htmlFor="address"
                         className="font-circular text-erniegreen text-sm font-[500]"
                       >
-                        Address *
+                        Delivery Address *
                       </label>
                       <input
                         type="text"
@@ -821,21 +821,24 @@ export default function Login() {
                         className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
                       ></input>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      {showPCRegex && (
-                        <label className="font-circular text-erniegreen text-sm">
-                          Your postcode isn&apos;t valid. Please format it as
-                          follows, SE17 1BA
-                        </label>
-                      )}
-                      {showPCWarning && (
-                        <label className="font-circular text-erniegreen text-sm">
-                          We only deliver to London Zone 1 &amp; 2, and you seem
-                          to be outside of our delivery zone. We may still be
-                          able to deliver to you.
-                        </label>
-                      )}
-                    </div>
+                    {showPCRegex ||
+                      (showPCWarning && (
+                        <div className="flex flex-col gap-2">
+                          {showPCRegex && (
+                            <label className="font-circular text-erniegreen text-sm">
+                              Your postcode isn&apos;t valid. Please format it
+                              as follows, SE17 1BA
+                            </label>
+                          )}
+                          {showPCWarning && (
+                            <label className="font-circular text-erniegreen text-sm">
+                              We only deliver to London Zone 1 &amp; 2, and you
+                              seem to be outside of our delivery zone. We may
+                              still be able to deliver to you.
+                            </label>
+                          )}
+                        </div>
+                      ))}
                     <div className="flex flex-col gap-2">
                       <label
                         htmlFor="contactnumber"

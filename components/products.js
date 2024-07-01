@@ -331,11 +331,11 @@ export default function Products({
               if (
                 groups[j].category == productsCopy[i].productTags?.nodes[0].name //Category match
               ) {
-                console.log(productsCopy[i].brands?.nodes[0].name);
-                console.log(productsCopy[i]);
-                console.log(i);
-                console.log(groups[j]);
-                console.log(groups[j].brands);
+                // console.log(productsCopy[i].brands?.nodes[0].name);
+                // console.log(productsCopy[i]);
+                // console.log(i);
+                // console.log(groups[j]);
+                // console.log(groups[j].brands);
                 let brandFound = false;
 
                 for (let k = 0; k < groups[j].brands?.length; k++) {

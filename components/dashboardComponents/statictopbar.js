@@ -15,6 +15,13 @@ export const StaticTopBar = ({
   hasSubscription,
   customerId,
   setSubscriptions,
+  setHasSubscription,
+  subscriptions,
+  managingSubscription,
+  updatePlanFrequency,
+  updatePlan,
+  orderComplete,
+  setOrderComplete,
 }) => {
   const addToSubBasketFromBar = (item) => {
     addToSubBasket(item);
@@ -48,6 +55,22 @@ export const StaticTopBar = ({
     setSubscriptions(sub);
   };
 
+  const setHasSubscriptionFromBar = (val) => {
+    setHasSubscription(val);
+  };
+
+  const updatePlanFromBar = (val) => {
+    updatePlan(val);
+  };
+
+  const updatePlanFreqFromBar = (val) => {
+    updatePlanFrequency(val);
+  };
+
+  const setOrderCompleteFromBar = (val) => {
+    setOrderComplete(val);
+  };
+
   return (
     <div className="h-20 w-full bg-ernieteal py-4 px-6 flex flex-row justify-between z-[999]">
       <img src="/Asset-1@2x2.png" className="w-32 my-auto"></img>
@@ -66,6 +89,11 @@ export const StaticTopBar = ({
         hasSubscription={hasSubscription}
         customerId={customerId}
         setSubscriptions={setSubscriptionsFromBar}
+        setHasSubscription={setHasSubscriptionFromBar}
+        subscriptions={subscriptions}
+        managingSubscription={managingSubscription}
+        updatePlan={updatePlanFromBar}
+        updatePlanFrequency={updatePlanFreqFromBar}
       />
     </div>
   );

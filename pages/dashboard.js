@@ -97,6 +97,10 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [newPurchase, setNewPurchase] = useState(false);
 
+  useEffect(() => {
+    console.log(subscriptions);
+  }, [subscriptions]);
+
   const loadData = (cid, code, employer) => {
     const client = graphqlClient;
 
@@ -388,6 +392,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                               node {
                                 sourceUrl
                               }
+                            }
+                            ... on SimpleProduct {
+                              id
+                              name
+                              price
                             }
                           }
                         }
@@ -740,6 +749,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                             sourceUrl
                           }
                         }
+                        ... on SimpleProduct {
+                          id
+                          name
+                          price
+                        }
                       }
                     }
                   }
@@ -896,6 +910,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                             name
                             description
                             databaseId
+                            ... on SimpleProduct {
+                              id
+                              name
+                              price
+                            }
                           }
                         }
                         databaseId
@@ -935,6 +954,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                             name
                             description
                             databaseId
+                            ... on SimpleProduct {
+                              id
+                              name
+                              price
+                            }
                           }
                         }
                         databaseId
@@ -970,6 +994,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                             name
                             description
                             databaseId
+                            ... on SimpleProduct {
+                              id
+                              name
+                              price
+                            }
                           }
                         }
                         databaseId
@@ -1012,6 +1041,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 name
                                 databaseId
                                 description
+                                ... on SimpleProduct {
+                                  id
+                                  name
+                                  price
+                                }
                               }
                             }
                             databaseId
@@ -1192,6 +1226,8 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [subBasket, setSubBasket] = useState([]);
   const [oneOffBasket, setOneOffBasket] = useState([]);
 
+  const [orderComplete, setOrderComplete] = useState(false);
+
   const addToSubBasket = (item) => {
     let subBasketCopy = [...subBasket];
 
@@ -1237,6 +1273,8 @@ export default function Dashboard({ data, categories, products, orders }) {
     setNewPurchase(true);
   };
 
+  const [managingSubscription, setManagingSubscription] = useState(false);
+
   return (
     <div>
       {dataObject != null && (
@@ -1267,6 +1305,13 @@ export default function Dashboard({ data, categories, products, orders }) {
               hasSubscription={hasSubscription}
               customerId={employerUserID}
               setSubscriptions={setSubscriptions}
+              setHasSubscription={setHasSubscription}
+              subscriptions={subscriptions}
+              managingSubscription={managingSubscription}
+              updatePlan={updatePlan}
+              updatePlanFrequency={updatePlanFrequency}
+              orderComplete={orderComplete}
+              setOrderComplete={setOrderComplete}
             />
             <div
               className={`${
@@ -1299,6 +1344,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   purchasing={purchasing}
                   setPurchasing={setPurchasing}
                   firstName={fn}
+                  setManagingSubscription={setManagingSubscription}
                 />
               )}
               {activeTab == 1 && (

@@ -23,6 +23,21 @@ export default function CheckoutForm({
   purchaseType,
   billingPeriod,
   billingInterval,
+  setProcessingOrder,
+  setBAddressError,
+  setBPostcodeError,
+  setBusinessNameError,
+  setContactNumberError,
+  setSAddressError,
+  setSPostcodeError,
+  bAddress,
+  bPostcode,
+  contactNumber,
+  sAddress,
+  sPostcode,
+  businessName,
+  scrollToTop,
+  processingOrder,
 }) {
   const stripe = useStripe();
 
@@ -89,6 +104,78 @@ export default function CheckoutForm({
   });
 
   async function handleSubmit(event) {
+    setProcessingOrder(true);
+
+    console.log(contactNumber);
+
+    if (businessName == "") {
+      setBusinessNameError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setBusinessNameError(false);
+    }
+
+    if (sAddress == "") {
+      setSAddressError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setSAddressError(false);
+    }
+
+    if (bAddress == "") {
+      setBAddressError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setBAddressError(false);
+    }
+
+    if (sPostcode == "") {
+      setSPostcodeError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setSPostcodeError(false);
+    }
+
+    if (bPostcode == "") {
+      setBPostcodeError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setBPostcodeError(false);
+    }
+
+    if (contactNumber == "") {
+      setContactNumberError(true);
+      setProcessingOrder(false);
+
+      console.log("error");
+
+      scrollToTop();
+
+      return;
+    } else {
+      setContactNumberError(false);
+    }
+
     event.preventDefault();
 
     let lineItems = [];
@@ -212,10 +299,7 @@ export default function CheckoutForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="h-full flex flex-col gap-4 justify-between"
-    >
+    <form className="h-full flex flex-col gap-4 justify-between">
       <div className="relative flex flex-col gap-4 bg-erniecream p-2 rounded-lg">
         <CardElement
           options={{
@@ -230,12 +314,40 @@ export default function CheckoutForm({
           }}
         />
       </div>
-      <button
-        disabled={!stripe}
-        className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-xl rounded-xl absolute bottom-6 left-0 mx-6"
+      <div
+        className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-lg rounded-xl absolute bottom-6 left-0 mx-6"
+        onClick={(e) => {
+          handleSubmit(e);
+        }}
       >
-        Pay
-      </button>
+        {processingOrder && (
+          <svg
+            className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen`}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        )}
+        <p
+          className={`font-circe font-[900] text-erniegreen text-center text-lg`}
+        >
+          Pay Now
+        </p>
+      </div>
     </form>
   );
 }

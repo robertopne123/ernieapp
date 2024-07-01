@@ -11,6 +11,10 @@ export const ManagePlan = ({
   updatePlan,
   updatePlanFrequency,
   updateSubError,
+  setPurchaseType,
+  setPurchasing,
+  setNewPurchase,
+  setManagingSubscription,
 }) => {
   const [currentSubscription, setCurrentSubscription] = useState(
     subscriptions.data?.subscription?.subscription
@@ -437,6 +441,8 @@ export const ManagePlan = ({
     setShowingFreqConfirmation(false);
   };
 
+  console.log(productsContext);
+
   return (
     <>
       {console.log(updateSubError)}
@@ -736,6 +742,19 @@ export const ManagePlan = ({
                 )}
               </div>
             ))}
+          </div>
+          <div
+            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+            onClick={() => {
+              setPurchaseType(1);
+              setPurchasing(true);
+              setNewPurchase(true);
+              setManagingSubscription(true);
+            }}
+          >
+            <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+              Add More Products
+            </p>
           </div>
           <div
             className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"

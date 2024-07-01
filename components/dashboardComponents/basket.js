@@ -22,6 +22,13 @@ export const Basket = ({
   hasSubscription,
   customerId,
   setSubscriptions,
+  setHasSubscription,
+  subscriptions,
+  managingSubscription,
+  updatePlanFrequency,
+  updatePlan,
+  orderComplete,
+  setOrderComplete,
 }) => {
   const stripePromise = loadStripe(
     "pk_test_51O0NO7LwuJxcpy0DUCBdVnyXLjG6MSeqeHo8Z14rufA6W77rc6wkGqTvbPVHGpI3JSLl2z5yvCCxQfcS9CrdXWxq008NvyqULO"
@@ -32,9 +39,18 @@ export const Basket = ({
   const [showingCheckout, setShowingCheckout] = useState(false);
 
   const [businessName, setBusinessName] = useState("");
-  const [address, setAddress] = useState("");
-  const [postcode, setPostcode] = useState("");
+  const [sAddress, setSAddress] = useState("");
+  const [bAddress, setBAddress] = useState("");
+  const [sPostcode, setSPostcode] = useState("");
+  const [bPostcode, setBPostcode] = useState("");
   const [contactNumber, setContactNumber] = useState("");
+
+  const [businessNameError, setBusinessNameError] = useState(false);
+  const [sAddressError, setSAddressError] = useState(false);
+  const [bAddressError, setBAddressError] = useState(false);
+  const [sPostcodeError, setSPostcodeError] = useState(false);
+  const [bPostcodeError, setBPostcodeError] = useState(false);
+  const [contactNumberError, setContactNumberError] = useState(false);
 
   const decSubQuantity = (index) => {
     let subBasketCopy = [...subBasket];
@@ -85,6 +101,21 @@ export const Basket = ({
     return subtotal;
   };
 
+  const getCurSubSubTotal = () => {
+    let subtotal = 0;
+
+    let arr = subscriptions.data.subscription.subscription.lineItems.nodes;
+
+    for (let i = 0; i < arr.length; i++) {
+      subtotal =
+        subtotal +
+        parseFloat(arr[i].product.node.price.replace("£", "")) *
+          arr[i].quantity;
+    }
+
+    return subtotal;
+  };
+
   const getOneOffSubtotal = () => {
     let subtotal = 0;
 
@@ -97,6 +128,8 @@ export const Basket = ({
 
     return subtotal;
   };
+
+  const [subAdjBasket, setSubAdjBasket] = useState([]);
 
   const NEWORDER = gql`
     mutation newOrder($input: CreateOrderInput!) {
@@ -142,11 +175,89 @@ export const Basket = ({
     }
   `;
 
+  const [checkout] = useMutation(NEWORDER, {
+    client: graphqlClient,
+  });
+
   const [addSubscription] = useMutation(ADDSUBSCRIPTION, {
     client: graphqlClient,
   });
 
+  const [processingOrder, setProcessingOrder] = useState(false);
+
   function handleSubmit(event) {
+    setProcessingOrder(true);
+
+    console.log(contactNumber);
+
+    if (businessName == "") {
+      setBusinessNameError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setBusinessNameError(false);
+    }
+
+    if (sAddress == "") {
+      setSAddressError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setSAddressError(false);
+    }
+
+    if (bAddress == "") {
+      setBAddressError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setBAddressError(false);
+    }
+
+    if (sPostcode == "") {
+      setSPostcodeError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setSPostcodeError(false);
+    }
+
+    if (bPostcode == "") {
+      setBPostcodeError(true);
+      setProcessingOrder(false);
+
+      scrollToTop();
+
+      return;
+    } else {
+      setBPostcodeError(false);
+    }
+
+    if (contactNumber == "") {
+      setContactNumberError(true);
+      setProcessingOrder(false);
+
+      console.log("error");
+
+      scrollToTop();
+
+      return;
+    } else {
+      setContactNumberError(false);
+    }
+
     event.preventDefault();
 
     let lineItems = [];
@@ -181,15 +292,15 @@ export const Basket = ({
               customerId: parseInt(customerId),
               customerNote: "Ernie App Order",
               billing: {
-                address1: address,
+                address1: bAddress,
                 company: businessName,
-                postcode: postcode,
+                postcode: bPostcode,
                 phone: contactNumber,
               },
               shipping: {
-                address1: address,
+                address1: sAddress,
                 company: businessName,
-                postcode: postcode,
+                postcode: sPostcode,
                 phone: contactNumber,
               },
             },
@@ -213,18 +324,6 @@ export const Basket = ({
         console.log(period);
         console.log(customerId);
         console.log(lineItems);
-        console.log({
-          address1: address,
-          company: businessName,
-          postcode: postcode,
-          phone: contactNumber,
-        });
-        console.log({
-          address1: address,
-          company: businessName,
-          postcode: postcode,
-          phone: contactNumber,
-        });
 
         addSubscription({
           variables: {
@@ -234,15 +333,15 @@ export const Basket = ({
               customerId: parseInt(customerId),
               customerNote: "Ernie App Order",
               billing: {
-                address1: address,
+                address1: bAddress,
                 company: businessName,
-                postcode: postcode,
+                postcode: bPostcode,
                 phone: contactNumber,
               },
               shipping: {
-                address1: address,
+                address1: sAddress,
                 company: businessName,
-                postcode: postcode,
+                postcode: sPostcode,
                 phone: contactNumber,
               },
               billingInterval: interval + "",
@@ -281,8 +380,9 @@ export const Basket = ({
 
   const [ping, setPing] = useState(false);
 
-  const [orderComplete, setOrderComplete] = useState(false);
   const [orderDetails, setOrderDetails] = useState({});
+
+  const [showBillingAddress, setShowBillingAddress] = useState(true);
 
   useEffect(() => {
     let basketIndicator = document.getElementById("indicator");
@@ -294,8 +394,26 @@ export const Basket = ({
     }, 1000);
   }, [subBasket]);
 
-  const [interval, setInterval] = useState(1);
-  const [period, setPeriod] = useState("week");
+  const [interval, setInterval] = useState(
+    parseInt(subscriptions.data?.subscription?.subscription?.billingInterval)
+  );
+  const [period, setPeriod] = useState(
+    subscriptions.data?.subscription?.subscription?.billingPeriod
+  );
+
+  useEffect(() => {
+    setInterval(
+      parseInt(subscriptions.data?.subscription?.subscription?.billingInterval)
+    );
+    setPeriod(subscriptions.data?.subscription?.subscription?.billingPeriod);
+  }, [subscriptions]);
+
+  const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
+
+  function scrollToTop() {
+    if (!isBrowser()) return;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   return (
     <div className="flex flex-col justify-center z-[999]">
@@ -354,7 +472,6 @@ export const Basket = ({
                     className="bg-erniegold py-2 w-full rounded-xl"
                     onClick={() => {
                       setOrderComplete(false);
-                      setShowingBasket(false);
 
                       if (purchaseType == 0) {
                         clearOneOffBasket();
@@ -371,7 +488,11 @@ export const Basket = ({
                           },
                         };
 
+                        console.log(data);
+
                         setSubscriptions(data);
+                        setShowingBasket(false);
+                        setHasSubscription(true);
                       }
                     }}
                   >
@@ -408,7 +529,11 @@ export const Basket = ({
                       <div className="flex flex-col gap-2">
                         <label
                           htmlFor="businessname"
-                          className="font-circular text-erniegreen text-sm font-[500]"
+                          className={`font-circular ${
+                            businessNameError
+                              ? "text-red-400"
+                              : "text-erniegreen"
+                          } text-sm font-[500]`}
                         >
                           Name of Company *
                         </label>
@@ -418,45 +543,141 @@ export const Basket = ({
                           onChange={(e) => {
                             setBusinessName(e.currentTarget.value);
                           }}
-                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                          className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
+                            businessNameError
+                              ? "border-red-400"
+                              : "border-erniegreen"
+                          } rounded-lg outline-erniegold outline-[1px]`}
                         ></input>
                       </div>
+
                       <div className="flex flex-col gap-2">
                         <label
-                          htmlFor="address"
-                          className="font-circular text-erniegreen text-sm font-[500]"
+                          htmlFor="sAddress"
+                          className={`font-circular text-sm font-[500] ${
+                            sAddressError ? "text-red-400" : "text-erniegreen"
+                          }`}
                         >
-                          Address *
+                          Shipping Address *
                         </label>
                         <input
                           type="text"
-                          name="address"
+                          name="sAddress"
                           onChange={(e) => {
-                            setAddress(e.currentTarget.value);
+                            setSAddress(e.currentTarget.value);
+                            if (showBillingAddress) {
+                              setBAddress(e.currentTarget.value);
+                            }
                           }}
-                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                          className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
+                            sAddressError
+                              ? "border-red-400"
+                              : "border-erniegreen"
+                          } rounded-lg outline-erniegold outline-[1px]`}
                         ></input>
                       </div>
                       <div className="flex flex-col gap-2">
                         <label
-                          htmlFor="postcode"
-                          className="font-circular text-erniegreen text-sm font-[500]"
+                          htmlFor="sPostcode"
+                          className={`font-circular ${
+                            sPostcodeError ? "text-red-400" : "text-erniegreen"
+                          } text-sm font-[500]`}
                         >
                           Postcode *
                         </label>
                         <input
                           type="text"
-                          name="postcode"
+                          name="sPostcode"
                           onChange={(e) => {
-                            setPostcode(e.currentTarget.value);
+                            setSPostcode(e.currentTarget.value);
+                            if (showBillingAddress) {
+                              setBPostcode(e.currentTarget.value);
+                            }
                           }}
-                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                          className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
+                            sPostcodeError
+                              ? "border-red-400"
+                              : "border-erniegreen"
+                          } rounded-lg outline-erniegold outline-[1px]`}
                         ></input>
                       </div>
+                      <div className="flex flex-row gap-2">
+                        <label
+                          htmlFor="isAddressSame"
+                          className="font-circular font-[500] text-erniegreen text-sm"
+                        >
+                          Is this the same as the billing address?
+                        </label>
+                        <input
+                          type="checkbox"
+                          name="isAddressSame"
+                          className="w-6 h-6 bg-erniecream border-[1px] border-erniegreen rounded-sm outline-none appearance-none checked:bg-erniegold"
+                          checked={showBillingAddress}
+                          onChange={(e) => {
+                            setShowBillingAddress(!showBillingAddress);
+                          }}
+                        ></input>
+                      </div>
+                      {!showBillingAddress && (
+                        <>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="bAddress"
+                              className={`font-circular ${
+                                bAddressError
+                                  ? "text-red-400"
+                                  : "text-erniegreen"
+                              } text-sm font-[500]`}
+                            >
+                              Billing Address *
+                            </label>
+                            <input
+                              type="text"
+                              name="bAddress"
+                              onChange={(e) => {
+                                setBAddress(e.currentTarget.value);
+                              }}
+                              defaultValue={!showBillingAddress && sAddress}
+                              className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
+                                bAddressError
+                                  ? "border-red-400"
+                                  : "border-erniegreen"
+                              } rounded-lg outline-erniegold outline-[1px]`}
+                            ></input>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="bPostcode"
+                              className={`font-circular ${
+                                bPostcode ? "text-red-400" : "text-erniegreen"
+                              } text-sm font-[500]`}
+                            >
+                              Postcode *
+                            </label>
+                            <input
+                              type="text"
+                              name="bPostcode"
+                              onChange={(e) => {
+                                setBPostcode(e.currentTarget.value);
+                              }}
+                              defaultValue={!showBillingAddress && sPostcode}
+                              className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
+                                bPostcodeError
+                                  ? "border-red-400"
+                                  : "border-erniegreen"
+                              } rounded-lg outline-erniegold outline-[1px]`}
+                            ></input>
+                          </div>
+                        </>
+                      )}
                       <div className="flex flex-col gap-2">
                         <label
                           htmlFor="contactnumber"
-                          className="font-circular text-erniegreen text-sm font-[500]"
+                          className={`font-circular ${
+                            contactNumberError
+                              ? "text-red-400"
+                              : "text-erniegreen"
+                          } text-sm font-[500]`}
                         >
                           Contact Number *
                         </label>
@@ -466,7 +687,11 @@ export const Basket = ({
                           onChange={(e) => {
                             setContactNumber(e.currentTarget.value);
                           }}
-                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                          className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
+                            contactNumberError
+                              ? "border-red-400"
+                              : "border-erniegreen"
+                          } rounded-lg outline-erniegold outline-[1px]`}
                         ></input>
                       </div>
                     </div>
@@ -490,65 +715,86 @@ export const Basket = ({
                       </div>
                     </div>
                   </div>
-                  <div className="bg-erniecream rounded-xl p-6 flex flex-col">
-                    <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
-                      Payment Options
-                    </p>
-                    <img src="/divider.png" className=" w-full mt-2"></img>
-                    <div className="flex flex-col gap-2 mt-4">
-                      {paymentOptions.map((option, index) => (
-                        <div className="" key={index}>
-                          <div
-                            className={`flex flex-row justify-between p-2 rounded-lg ${
-                              selectedPayment == index
-                                ? "bg-erniedarkcream rounded"
-                                : "border-[1px] border-erniegreen"
-                            }`}
-                            onClick={() => {
-                              setSelectedPayment(index);
-                            }}
-                          >
-                            <img className="h-6" src={option.image} />
-                            <p className="font-circular text-erniegreen">
-                              {">"}
-                            </p>
+                  {!managingSubscription && (
+                    <div className="bg-erniecream rounded-xl p-6 flex flex-col">
+                      <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
+                        Payment Options
+                      </p>
+                      <img src="/divider.png" className=" w-full mt-2"></img>
+                      <div className="flex flex-col gap-2 mt-4">
+                        {paymentOptions.map((option, index) => (
+                          <div className="" key={index}>
+                            <div
+                              className={`flex flex-row justify-between p-2 rounded-lg ${
+                                selectedPayment == index
+                                  ? "bg-erniedarkcream rounded"
+                                  : "border-[1px] border-erniegreen"
+                              }`}
+                              onClick={() => {
+                                setSelectedPayment(index);
+                              }}
+                            >
+                              <img className="h-6" src={option.image} />
+                              <p className="font-circular text-erniegreen">
+                                {">"}
+                              </p>
+                            </div>
+                            {selectedPayment == index && (
+                              <>
+                                {index == 0 && (
+                                  <div className="bg-erniedarkcream p-4">
+                                    {console.log(period)}
+                                    <Elements stripe={stripePromise}>
+                                      <CheckoutForm
+                                        basket={oneOffBasket}
+                                        employerUser={customerId}
+                                        billing={{
+                                          address1: bAddress,
+                                          company: businessName,
+                                          postcode: bPostcode,
+                                          phone: contactNumber,
+                                        }}
+                                        shipping={{
+                                          address1: sAddress,
+                                          company: businessName,
+                                          postcode: sPostcode,
+                                          phone: contactNumber,
+                                        }}
+                                        setOrderComplete={setOrderComplete}
+                                        setOrderDetails={setOrderDetails}
+                                        purchaseType={purchaseType}
+                                        billingInterval={interval}
+                                        billingPeriod={period}
+                                        setProcessingOrder={setProcessingOrder}
+                                        setBAddressError={setBAddressError}
+                                        setBPostcodeError={setBPostcodeError}
+                                        setBusinessNameError={
+                                          setBusinessNameError
+                                        }
+                                        setContactNumberError={
+                                          setContactNumberError
+                                        }
+                                        setSAddressError={setSAddressError}
+                                        setSPostcodeError={setSPostcodeError}
+                                        bAddress={bAddress}
+                                        sAddress={sAddress}
+                                        bPostcode={bPostcode}
+                                        sPostcode={sPostcode}
+                                        contactNumber={contactNumber}
+                                        businessName={businessName}
+                                        scrollToTop={scrollToTop}
+                                        processingOrder={processingOrder}
+                                      />
+                                    </Elements>
+                                  </div>
+                                )}
+                              </>
+                            )}
                           </div>
-                          {selectedPayment == index && (
-                            <>
-                              {index == 0 && (
-                                <div className="bg-erniedarkcream p-4">
-                                  {console.log(period)}
-                                  <Elements stripe={stripePromise}>
-                                    <CheckoutForm
-                                      basket={oneOffBasket}
-                                      employerUser={customerId}
-                                      billing={{
-                                        address1: address,
-                                        company: businessName,
-                                        postcode: postcode,
-                                        phone: contactNumber,
-                                      }}
-                                      shipping={{
-                                        address1: address,
-                                        company: businessName,
-                                        postcode: postcode,
-                                        phone: contactNumber,
-                                      }}
-                                      setOrderComplete={setOrderComplete}
-                                      setOrderDetails={setOrderDetails}
-                                      purchaseType={purchaseType}
-                                      billingInterval={interval}
-                                      billingPeriod={period}
-                                    />
-                                  </Elements>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                   <div className="bg-erniecream rounded-xl p-6 flex flex-col">
                     <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
                       Order Summary
@@ -601,28 +847,63 @@ export const Basket = ({
                       ))}
                       {purchaseType == 1 && (
                         <p className="font-circular font-[500] text-erniegreen text-right">
-                          Per{" "}
-                          {newSubFreq == "WEEKLY"
-                            ? "week"
-                            : newSubFreq == "BI-WEEKLY"
-                            ? "every other week"
-                            : newSubFreq == "MONTHLY"
-                            ? "month"
-                            : newSubFreq == "BI-MONTHLY"
-                            ? "every other month"
+                          {period == "week" && interval == 1
+                            ? "Every week"
+                            : period == "week" && interval == 2
+                            ? "Every other week"
+                            : period == "month" && interval == 1
+                            ? "Every month"
+                            : period == "month" && interval == 2
+                            ? "Every other month"
                             : ""}
                         </p>
                       )}
                     </div>
                   </div>
                   <div
-                    className="bg-erniegold rounded-xl w-full p-2"
+                    className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center"
                     onClick={(e) => {
-                      handleSubmit(e);
+                      if (managingSubscription) {
+                        console.log(subAdjBasket);
+
+                        updatePlan(subAdjBasket);
+                        updatePlanFrequency({
+                          id: subscriptions.data.subscription.subscription
+                            .databaseId,
+                          billingInterval: interval + "",
+                          billingPeriod: period,
+                        });
+                      } else {
+                        handleSubmit(e);
+                      }
                     }}
                   >
-                    <p className="font-circe font-[900] text-erniegreen text-center text-lg">
-                      Pay Now
+                    {processingOrder && (
+                      <svg
+                        className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen`}
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    )}
+                    <p
+                      className={`font-circe font-[900] text-erniegreen text-center text-lg`}
+                    >
+                      {managingSubscription ? "Update Subscription" : "Pay Now"}
                     </p>
                   </div>
                 </div>
@@ -647,14 +928,47 @@ export const Basket = ({
                   {(hasSubscription || subBasket.length != 0) &&
                     purchaseType == 1 && (
                       <>
+                        {managingSubscription && (
+                          <div className="bg-erniecream rounded-xl p-6 flex flex-col">
+                            <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
+                              Current Subscription
+                            </p>
+                            <img
+                              src="/divider.png"
+                              className="w-fill mt-2"
+                            ></img>
+                            <div className="flex flex-col gap-1 mt-4">
+                              {subscriptions.data.subscription.subscription.lineItems.nodes.map(
+                                (item, index) => (
+                                  <div
+                                    className="w-full grid grid-cols-4 items-center"
+                                    key={index}
+                                  >
+                                    <p className="font-circular text-erniegreen col-span-2 text-sm">
+                                      {item.product.node.name}
+                                    </p>
+                                    <p className="font-circular text-erniegreen col-span-1 text-sm">
+                                      {item.product.node.price}
+                                    </p>
+                                    <p className="font-circular text-erniegreen col-span-1 text-sm text-right">
+                                      {item.quantity}
+                                    </p>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          </div>
+                        )}
                         <div className="bg-erniecream rounded-xl p-6 flex flex-col">
                           <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
-                            My Subscription Basket
+                            Add To Subscription
                           </p>
+                          {console.log(subscriptions)}
                           <img
                             src="/divider.png"
                             className=" w-full mt-2"
                           ></img>
+
                           <div className="flex flex-col gap-1 mt-4">
                             {subBasket.map((item, index) => (
                               <div
@@ -707,6 +1021,12 @@ export const Basket = ({
                             src="/divider.png"
                             className=" w-full mt-2"
                           ></img>
+                          {managingSubscription && (
+                            <p className="font-circular text-erniegreen font-[500] text-sm mt-2">
+                              Note: This is change your entire subscriptions
+                              frequency.
+                            </p>
+                          )}
                           <select
                             name="frequency"
                             onChange={(e) => {
@@ -734,14 +1054,48 @@ export const Basket = ({
                             }}
                             className="mt-4 border-[1px] border-erniegreen bg-erniecream rounded-lg font-circular px-2 py-2 text-erniegreen text-sm font-[500]"
                           >
-                            <option value="weekly" selected={true}>
+                            <option
+                              value="weekly"
+                              selected={
+                                subscriptions.data.subscription.subscription
+                                  .billingPeriod == "week" &&
+                                subscriptions.data.subscription.subscription
+                                  .billingInterval == "1"
+                              }
+                            >
                               Weekly
                             </option>
-                            <option value="bi-weekly">
+                            <option
+                              value="bi-weekly"
+                              selected={
+                                subscriptions.data.subscription.subscription
+                                  .billingPeriod == "week" &&
+                                subscriptions.data.subscription.subscription
+                                  .billingInterval == "2"
+                              }
+                            >
                               {"Bi-weekly (once every two weeks)"}
                             </option>
-                            <option value="monthly">Monthly</option>
-                            <option value="bi-monthly">
+                            <option
+                              value="monthly"
+                              selected={
+                                subscriptions.data.subscription.subscription
+                                  .billingPeriod == "month" &&
+                                subscriptions.data.subscription.subscription
+                                  .billingInterval == "1"
+                              }
+                            >
+                              Monthly
+                            </option>
+                            <option
+                              value="bi-monthly"
+                              selected={
+                                subscriptions.data.subscription.subscription
+                                  .billingPeriod == "month" &&
+                                subscriptions.data.subscription.subscription
+                                  .billingInterval == "2"
+                              }
+                            >
                               {"Bi-monthly (once every two months)"}
                             </option>
                           </select>
@@ -805,10 +1159,24 @@ export const Basket = ({
                 <p className="font-circular font-[900] text-erniegreen">
                   Subtotal
                 </p>
+
+                {managingSubscription && (
+                  <div className="flex flex-row justify-between mt-2">
+                    <p className="font-circular text-erniegreen text-sm">
+                      Current subscription
+                    </p>
+
+                    <p className="font-circular font-[900] text-erniegreen text-sm">
+                      £{getCurSubSubTotal().toFixed(2)}
+                    </p>
+                  </div>
+                )}
                 {purchaseType == 1 && (
                   <div className="flex flex-row justify-between mt-2">
                     <p className="font-circular text-erniegreen text-sm">
-                      Subscription items
+                      {managingSubscription
+                        ? "New items"
+                        : "Subscription items"}
                     </p>
 
                     <p className="font-circular font-[900] text-erniegreen text-sm">
@@ -833,11 +1201,19 @@ export const Basket = ({
                   </p>
                   <p className="font-circular font-[900] text-erniegreen text-sm">
                     £
-                    {purchaseType == 0
+                    {managingSubscription
+                      ? (
+                          parseFloat(getCurSubSubTotal().toFixed(2)) +
+                          parseFloat(getSubSubtotal().toFixed(2))
+                        ).toFixed(2)
+                      : purchaseType == 0
                       ? getOneOffSubtotal().toFixed(2)
                       : getSubSubtotal().toFixed(2)}
                   </p>
                 </div>
+                <p className="font-circular tedt-erniegreen italic text-sm text-right">
+                  Every {interval == 2 && "other"} {period}
+                </p>
               </div>
               <div
                 className={`bg-erniegold rounded-xl w-full p-2 ${
@@ -850,6 +1226,29 @@ export const Basket = ({
                 onClick={() => {
                   if (purchaseType == 1) {
                     setShowingCheckout(true);
+
+                    let tempSubAdj = [];
+
+                    let arr =
+                      subscriptions.data.subscription.subscription.lineItems
+                        .nodes;
+
+                    if (managingSubscription) {
+                      for (let i = 0; i < arr.length; i++) {
+                        tempSubAdj.push(arr[i]);
+                      }
+
+                      for (let j = 0; j < subBasket.length; j++) {
+                        tempSubAdj.push({
+                          product: { node: subBasket[j].product },
+                          quantity: subBasket[j].quantity,
+                        });
+                      }
+
+                      console.log(tempSubAdj);
+
+                      setSubAdjBasket(tempSubAdj);
+                    }
                   } else {
                     setShowingCheckout(true);
                   }
