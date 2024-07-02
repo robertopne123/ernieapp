@@ -648,7 +648,7 @@ export const Basket = ({
                           htmlFor="isAddressSame"
                           className="font-circular font-[500] text-erniegreen text-sm"
                         >
-                          Is this the same as the billing address?
+                          Is this the same as the shipping address?
                         </label>
                         <input
                           type="checkbox"
