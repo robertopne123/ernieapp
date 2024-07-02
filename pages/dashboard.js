@@ -85,11 +85,14 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [subscriptions, setSubscriptions] = useState([]);
 
+  const [originalSubscriptions, setOriginalSubscriptions] = useState([]);
+
   const [firstTimeUser, setFirstTimeUser] = useState(false);
 
   const [orderData, setOrders] = useState([]);
 
   const [hasSubscription, setHasSubscription] = useState(false);
+  const [subscriptionAttempt, setSubAttempt] = useState(false);
 
   const [purchaseType, setPurchaseType] = useState(-1); //0 - ONE OFF, 1 - SUB
 
@@ -99,7 +102,7 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   useEffect(() => {
     console.log(subscriptions);
-  }, [subscriptions]);
+  }, [subscriptions?.data?.subscription?.subscription?.lineItems?.nodes]);
 
   const loadData = (cid, code, employer) => {
     const client = graphqlClient;
@@ -415,17 +418,22 @@ export default function Dashboard({ data, categories, products, orders }) {
           })
           .then((data) => {
             setSubscriptions(data);
+            setOriginalSubscriptions(data);
 
             console.log(data);
 
             if (data?.data?.subscription?.subscription != null) {
               setHasSubscription(true);
+              setSubAttempt(true);
+            } else {
+              setSubAttempt(true);
             }
           })
           .catch((error) => {
             console.log(error);
 
             setHasSubscription(false);
+            setSubAttempt(true);
           });
 
         client
@@ -789,6 +797,56 @@ export default function Dashboard({ data, categories, products, orders }) {
       ...subscriptions.data.subscription.subscription.lineItems.nodes,
     ];
 
+    console.log(originalSubscriptions);
+
+    let newChanges = [];
+
+    let planDetailsTemp = [...planDetails];
+
+    for (let i = 0; i < planDetailsTemp.length; i++) {
+      console.log(i);
+
+      if (newChanges.length > 0) {
+        console.log("newChanges");
+
+        for (let j = 0; j < newChanges.length; j++) {
+          console.log(j);
+
+          console.log(
+            planDetailsTemp[i].product.node.name +
+              " - " +
+              newChanges[j].product.node.name
+          );
+
+          if (
+            planDetailsTemp[i].product.node.name ==
+            newChanges[j].product.node.name
+          ) {
+            console.log("product already exists");
+
+            newChanges[j].quantity =
+              newChanges[j].quantity + planDetailsTemp[i].quantity;
+
+            planDetailsTemp.splice(i, 1);
+
+            break;
+          } else {
+            newChanges.push(planDetailsTemp[i]);
+
+            console.log("new - " + planDetailsTemp[i].product.node.name);
+
+            break;
+          }
+        }
+      } else {
+        newChanges.push(planDetailsTemp[i]);
+
+        console.log("new - " + planDetailsTemp[i].product.node.name);
+      }
+    }
+
+    console.log(newChanges);
+
     console.log(planDetails);
     console.log(existingSubscriptionProducts);
 
@@ -799,44 +857,54 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     let foundProduct = false;
 
-    for (let i = 0; i < planDetails.length; i++) {
+    for (let i = 0; i < newChanges.length; i++) {
       foundProduct = false;
       for (let j = 0; j < existingSubscriptionProducts.length; j++) {
         if (
-          planDetails[i].product.node.name ==
+          newChanges[i].product.node.name ==
           existingSubscriptionProducts[j].product.node.name
         ) {
           console.log(
             "Comparing ",
-            planDetails[i].product.node.name,
+            newChanges[i].product.node.name,
             " - ",
             existingSubscriptionProducts[j].product.node.name
           );
+
           foundProduct = true;
+          console.log(
+            newChanges[i].quantity +
+              " - " +
+              existingSubscriptionProducts[j].quantity
+          );
+
           if (
-            planDetails[i].quantity != existingSubscriptionProducts[j].quantity
+            newChanges[i].quantity != existingSubscriptionProducts[j].quantity
           ) {
             if (
-              planDetails[i].quantity > existingSubscriptionProducts[j].quantity
+              newChanges[i].quantity > existingSubscriptionProducts[j].quantity
             ) {
+              console.log("qty");
               changes.push({
                 action: "qty",
                 difference:
-                  planDetails[i].quantity -
+                  newChanges[i].quantity -
                   existingSubscriptionProducts[j].quantity,
-                product: planDetails[i],
+                product: newChanges[i],
               });
             } else if (
-              planDetails[i].quantity < existingSubscriptionProducts[j].quantity
+              newChanges[i].quantity < existingSubscriptionProducts[j].quantity
             ) {
               changes.push({
                 action: "qty",
                 difference:
                   existingSubscriptionProducts[j].quantity -
-                  planDetails[i].quantity,
-                product: planDetails[i],
+                  newChanges[i].quantity,
+                product: newChanges[i],
               });
             }
+          } else {
+            console.log("qty same");
           }
         }
       }
@@ -844,8 +912,8 @@ export default function Dashboard({ data, categories, products, orders }) {
       if (!foundProduct) {
         changes.push({
           action: "add",
-          product: planDetails[i],
-          difference: planDetails[i].quantity,
+          product: newChanges[i],
+          difference: newChanges[i].quantity,
         });
       }
     }
@@ -854,16 +922,16 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     for (let i = 0; i < existingSubscriptionProducts.length; i++) {
       foundProduct = false;
-      for (let j = 0; j < planDetails.length; j++) {
+      for (let j = 0; j < newChanges.length; j++) {
         if (
           existingSubscriptionProducts[i].product.node.name ==
-          planDetails[j].product.node.name
+          newChanges[j].product.node.name
         ) {
           console.log(
             "Comparing ",
-            existingSubscriptionProducts[j].product.node.name,
+            existingSubscriptionProducts[i].product.node.name,
             " - ",
-            planDetails[i].product.node.name
+            newChanges[j].product.node.name
           );
           foundProduct = true;
         }
@@ -879,11 +947,13 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     console.log(changes);
 
+    console.log(subscriptions);
+
     const client = graphqlClient;
 
     for (let i = 0; i < changes.length; i++) {
       if (changes[i].action == "add") {
-        console.log();
+        console.log("add");
 
         client
           .mutate({
@@ -932,6 +1002,12 @@ export default function Dashboard({ data, categories, products, orders }) {
           })
           .then((data) => {
             setSubscriptions(data);
+
+            setOrderComplete(true);
+
+            setOrderDetails(data);
+
+            console.log(data);
           })
           .catch((error) => {
             setUpdateSubError(error);
@@ -973,8 +1049,15 @@ export default function Dashboard({ data, categories, products, orders }) {
               productId: changes[i].product.product.node.databaseId + "",
             },
           })
+          .then((data) => {
+            setSubscriptions(data);
+
+            setOrderComplete(true);
+          })
           .catch((error) => {
             setUpdateSubError(error);
+
+            console.log("remove product error");
           });
       } else if (changes[i].action == "qty") {
         client
@@ -1063,10 +1146,19 @@ export default function Dashboard({ data, categories, products, orders }) {
               })
               .then((data) => {
                 console.log("New QTY Added");
+
+                setSubscriptions(data);
+
+                setOrderComplete(true);
+              })
+              .catch((error) => {
+                console.log("new Qty error");
               });
           })
           .catch((error) => {
             setUpdateSubError(error.message + "");
+
+            console.log("error");
           });
       }
     }
@@ -1168,6 +1260,8 @@ export default function Dashboard({ data, categories, products, orders }) {
     }
   };
 
+  const [showingBasket, setShowingBasket] = useState(false);
+
   const saveChanges = (val, type) => {
     const client = graphqlClient;
 
@@ -1227,6 +1321,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [oneOffBasket, setOneOffBasket] = useState([]);
 
   const [orderComplete, setOrderComplete] = useState(false);
+  const [orderDetails, setOrderDetails] = useState({});
 
   const addToSubBasket = (item) => {
     let subBasketCopy = [...subBasket];
@@ -1312,6 +1407,10 @@ export default function Dashboard({ data, categories, products, orders }) {
               updatePlanFrequency={updatePlanFrequency}
               orderComplete={orderComplete}
               setOrderComplete={setOrderComplete}
+              orderDetails={orderDetails}
+              setOrderDetails={setOrderDetails}
+              showingBasket={showingBasket}
+              setShowingBasket={setShowingBasket}
             />
             <div
               className={`${
@@ -1337,6 +1436,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   updatePlanFrequency={updatePlanFrequency}
                   employerUser={employerUserID}
                   hasSubscription={hasSubscription}
+                  subscriptionAttempt={subscriptionAttempt}
                   setPurchaseType={setPType}
                   purchaseType={purchaseType}
                   newPurchase={newPurchase}
@@ -1374,6 +1474,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setPurchaseType={setPurchaseType}
                   setPurchasing={setPurchasing}
                   setNewPurchase={setNewPurchase}
+                  subscriptions={subscriptions}
                 />
               )}
               {activeTab == 2 && (
@@ -1419,6 +1520,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                       setTab(tab.index);
                       setNewPurchase(false);
                       console.log(tab.index, activeTab);
+                      setShowingBasket(false);
                     }}
                   >
                     <div className="w-8 h-8 mx-auto relative">

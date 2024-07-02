@@ -22,6 +22,10 @@ export const StaticTopBar = ({
   updatePlan,
   orderComplete,
   setOrderComplete,
+  orderDetails,
+  setOrderDetails,
+  showingBasket,
+  setShowingBasket,
 }) => {
   const addToSubBasketFromBar = (item) => {
     addToSubBasket(item);
@@ -71,6 +75,14 @@ export const StaticTopBar = ({
     setOrderComplete(val);
   };
 
+  const setOrderDetailsFromBar = (val) => {
+    setOrderDetails(val);
+  };
+
+  const setShowingBasketFromBar = (val) => {
+    setShowingBasket(val);
+  };
+
   return (
     <div className="h-20 w-full bg-ernieteal py-4 px-6 flex flex-row justify-between z-[999]">
       <img src="/Asset-1@2x2.png" className="w-32 my-auto"></img>
@@ -94,6 +106,12 @@ export const StaticTopBar = ({
         managingSubscription={managingSubscription}
         updatePlan={updatePlanFromBar}
         updatePlanFrequency={updatePlanFreqFromBar}
+        orderComplete={orderComplete}
+        setOrderComplete={setOrderCompleteFromBar}
+        orderDetails={orderDetails}
+        setOrderDetails={setOrderDetailsFromBar}
+        showingBasket={showingBasket}
+        setShowingBasket={setShowingBasketFromBar}
       />
     </div>
   );

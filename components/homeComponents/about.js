@@ -15,9 +15,9 @@ export const About = () => {
           <img src="/divider.png" className="w-full"></img>
         </div>
         <p className="font-circular text-sm text-erniegreen">
-          We operate exclusively in London, delivering a range of coffees and
-          other beverages to workplaces, using pedal or electric power. We
-          always strive to make a positive impact on our environment.
+          We deliver locally roasted, specialty coffee and office pantry goodies
+          via cargo bikes with zero reusable, recyclable packaging exclusively
+          in London.
         </p>
       </div>
     </div>

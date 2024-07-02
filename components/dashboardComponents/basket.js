@@ -29,14 +29,20 @@ export const Basket = ({
   updatePlan,
   orderComplete,
   setOrderComplete,
+  orderDetails,
+  setOrderDetails,
+  showingBasket,
+  setShowingBasket,
 }) => {
   const stripePromise = loadStripe(
     "pk_test_51O0NO7LwuJxcpy0DUCBdVnyXLjG6MSeqeHo8Z14rufA6W77rc6wkGqTvbPVHGpI3JSLl2z5yvCCxQfcS9CrdXWxq008NvyqULO"
   );
 
-  const [showingBasket, setShowingBasket] = useState(false);
-
   const [showingCheckout, setShowingCheckout] = useState(false);
+
+  useEffect(() => {
+    console.log("complete");
+  }, [orderComplete]);
 
   const [businessName, setBusinessName] = useState("");
   const [sAddress, setSAddress] = useState("");
@@ -380,8 +386,6 @@ export const Basket = ({
 
   const [ping, setPing] = useState(false);
 
-  const [orderDetails, setOrderDetails] = useState({});
-
   const [showBillingAddress, setShowBillingAddress] = useState(true);
 
   useEffect(() => {
@@ -415,6 +419,14 @@ export const Basket = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  const setOrderCompleteFromBasket = (val) => {
+    setOrderComplete(val);
+  };
+
+  useEffect(() => {
+    setProcessingOrder(false);
+  }, [orderComplete]);
+
   return (
     <div className="flex flex-col justify-center z-[999]">
       <div className="relative">
@@ -443,7 +455,9 @@ export const Basket = ({
                     Thank you
                   </p>
                   <p className="font-circular font-[500] text-erniegreen text-center">
-                    {purchaseType == 0
+                    {managingSubscription
+                      ? "Your subscription has been updated"
+                      : purchaseType == 0
                       ? "Your one-off order is now complete"
                       : "Your new subscription is now active"}
                   </p>
@@ -454,16 +468,18 @@ export const Basket = ({
                     <img src="/divider.png" className="w-full"></img>
                     <div className="mt-2 flex flex-col">
                       <p className="font-circular font-[500] text-erniegreen">
-                        Order Number:{" "}
+                        {managingSubscription ? "Subscription " : "Order "}{" "}
+                        Number: {console.log(orderDetails)}
+                        {/*                         
                         {purchaseType == 0
                           ? orderDetails.data.createOrder.order.databaseId
                           : orderDetails.data.createSubscription.subscription
-                              .orderNumber}
+                              .orderNumber} */}
                       </p>
                       {purchaseType == 0 && (
                         <p className="font-circular font-[400] text-erniegreen">
                           Order Total:{" "}
-                          {orderDetails.data.createOrder.order.total}
+                          {/* {orderDetails.data.createOrder.order.total} */}
                         </p>
                       )}
                     </div>
@@ -473,17 +489,43 @@ export const Basket = ({
                     onClick={() => {
                       setOrderComplete(false);
 
-                      if (purchaseType == 0) {
-                        clearOneOffBasket();
+                      if (!managingSubscription) {
+                        if (purchaseType == 0) {
+                          clearOneOffBasket();
+
+                          setShowingBasket(false);
+                        } else {
+                          clearSubBasket();
+
+                          let data = {
+                            data: {
+                              subscription: {
+                                subscription:
+                                  orderDetails.data.createSubscription
+                                    .subscription,
+                              },
+                            },
+                          };
+
+                          console.log(data);
+
+                          setSubscriptions(data);
+                          setShowingBasket(false);
+                          setHasSubscription(true);
+                        }
                       } else {
                         clearSubBasket();
 
                         let data = {
                           data: {
                             subscription: {
-                              subscription:
-                                orderDetails.data.createSubscription
-                                  .subscription,
+                              subscription: orderDetails.data
+                                .addProductToSubscription
+                                ? orderDetails.data.addProductToSubscription
+                                    ?.subscription
+                                : orderDetails.data
+                                    .removeProductFromSubscription
+                                    ?.subscription,
                             },
                           },
                         };
@@ -760,7 +802,9 @@ export const Basket = ({
                                           postcode: sPostcode,
                                           phone: contactNumber,
                                         }}
-                                        setOrderComplete={setOrderComplete}
+                                        setOrderComplete={
+                                          setOrderCompleteFromBasket
+                                        }
                                         setOrderDetails={setOrderDetails}
                                         purchaseType={purchaseType}
                                         billingInterval={interval}
@@ -867,12 +911,13 @@ export const Basket = ({
                         console.log(subAdjBasket);
 
                         updatePlan(subAdjBasket);
-                        updatePlanFrequency({
-                          id: subscriptions.data.subscription.subscription
-                            .databaseId,
-                          billingInterval: interval + "",
-                          billingPeriod: period,
-                        });
+                        // updatePlanFrequency({
+                        //   id: subscriptions.data.subscription.subscription
+                        //     .databaseId,
+                        //   billingInterval: interval + "",
+                        //   billingPeriod: period,
+                        // });
+                        setProcessingOrder(true);
                       } else {
                         handleSubmit(e);
                       }
@@ -900,6 +945,7 @@ export const Basket = ({
                         ></path>
                       </svg>
                     )}
+
                     <p
                       className={`font-circe font-[900] text-erniegreen text-center text-lg`}
                     >
@@ -911,7 +957,7 @@ export const Basket = ({
             </div>
           ) : (
             <div className="absolute right-0 top-20 h-[calc(88vh-80px)] w-full bg-erniedarkcream px-6 z-[999] py-6 flex flex-col gap-4 overflow-auto">
-              {subBasket == null && oneOffBasket == null ? (
+              {subBasket.length == 0 && oneOffBasket.length == 0 ? (
                 <p className="font-circular text-erniegreen text-center">
                   Your basket is currently empty
                 </p>
@@ -1194,8 +1240,21 @@ export const Basket = ({
                     </p>
                   </div>
                 )}
+
                 <div className="w-full h-[1px] bg-erniegreen mt-4"></div>
                 <div className="flex flex-row justify-between mt-4">
+                  <p className="font-circular text-erniegreen text-sm">
+                    Delivery Fee
+                  </p>
+                  <p className="font-circular text-erniegreen text-sm">
+                    {parseFloat(getCurSubSubTotal().toFixed(2)) +
+                      parseFloat(getSubSubtotal().toFixed(2)) <
+                    80.0
+                      ? "£8.95"
+                      : "FREE"}
+                  </p>
+                </div>
+                <div className="flex flex-row justify-between mt-2">
                   <p className="font-circular font-[900] text-erniegreen">
                     Total
                   </p>
@@ -1204,7 +1263,12 @@ export const Basket = ({
                     {managingSubscription
                       ? (
                           parseFloat(getCurSubSubTotal().toFixed(2)) +
-                          parseFloat(getSubSubtotal().toFixed(2))
+                          parseFloat(getSubSubtotal().toFixed(2)) +
+                          (parseFloat(getCurSubSubTotal().toFixed(2)) +
+                            parseFloat(getSubSubtotal().toFixed(2)) <
+                          80.0
+                            ? 8.95
+                            : 0.0)
                         ).toFixed(2)
                       : purchaseType == 0
                       ? getOneOffSubtotal().toFixed(2)
@@ -1215,49 +1279,53 @@ export const Basket = ({
                   Every {interval == 2 && "other"} {period}
                 </p>
               </div>
-              <div
-                className={`bg-erniegold rounded-xl w-full p-2 ${
-                  hasSubscription
-                    ? "opacity-100 cursor-pointer"
-                    : purchaseType != -1
-                    ? "opacity-100 cursor-pointer"
-                    : "opacity-50"
-                }`}
-                onClick={() => {
-                  if (purchaseType == 1) {
-                    setShowingCheckout(true);
+              {subBasket.length == 0 && oneOffBasket.length == 0 ? (
+                <></>
+              ) : (
+                <div
+                  className={`bg-erniegold rounded-xl w-full p-2 ${
+                    hasSubscription
+                      ? "opacity-100 cursor-pointer"
+                      : purchaseType != -1
+                      ? "opacity-100 cursor-pointer"
+                      : "opacity-50"
+                  }`}
+                  onClick={() => {
+                    if (purchaseType == 1) {
+                      setShowingCheckout(true);
 
-                    let tempSubAdj = [];
+                      let tempSubAdj = [];
 
-                    let arr =
-                      subscriptions.data.subscription.subscription.lineItems
-                        .nodes;
+                      let arr =
+                        subscriptions.data.subscription.subscription.lineItems
+                          .nodes;
 
-                    if (managingSubscription) {
-                      for (let i = 0; i < arr.length; i++) {
-                        tempSubAdj.push(arr[i]);
+                      if (managingSubscription) {
+                        for (let i = 0; i < arr.length; i++) {
+                          tempSubAdj.push(arr[i]);
+                        }
+
+                        for (let j = 0; j < subBasket.length; j++) {
+                          tempSubAdj.push({
+                            product: { node: subBasket[j].product },
+                            quantity: subBasket[j].quantity,
+                          });
+                        }
+
+                        console.log(tempSubAdj);
+
+                        setSubAdjBasket(tempSubAdj);
                       }
-
-                      for (let j = 0; j < subBasket.length; j++) {
-                        tempSubAdj.push({
-                          product: { node: subBasket[j].product },
-                          quantity: subBasket[j].quantity,
-                        });
-                      }
-
-                      console.log(tempSubAdj);
-
-                      setSubAdjBasket(tempSubAdj);
+                    } else {
+                      setShowingCheckout(true);
                     }
-                  } else {
-                    setShowingCheckout(true);
-                  }
-                }}
-              >
-                <p className="font-circe font-[900] text-erniegreen text-center text-lg">
-                  Checkout
-                </p>
-              </div>
+                  }}
+                >
+                  <p className="font-circe font-[900] text-erniegreen text-center text-lg">
+                    Checkout
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </>

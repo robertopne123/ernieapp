@@ -33,11 +33,12 @@ export default function Products({
   setPurchasing,
   newPurchase,
   setNewPurchase,
+  subscriptions,
 }) {
   function filteredCategories() {
     let filtered = [];
 
-    console.log(productCategories);
+    // console.log(productCategories);
 
     for (let i = 0; i < productCategories.length; i++) {
       if (
@@ -48,7 +49,7 @@ export default function Products({
       }
     }
 
-    console.log(filtered);
+    // console.log(filtered);
 
     filtered.sort(function (a, b) {
       return (
@@ -79,7 +80,7 @@ export default function Products({
     setBasket(item);
   };
 
-  console.log(subsidy);
+  // console.log(subsidy);
 
   const ADD_TO_CART = gql`
     mutation addtocart(
@@ -124,13 +125,13 @@ export default function Products({
   const [addToCartMutation] = useMutation(ADD_TO_CART, {
     client: graphqlClient,
     onCompleted: (data) => {
-      console.log(data);
+      // console.log(data);
       addToCart(data?.cart);
     },
   });
 
   const addToBasketFromProductPage = (item, category) => {
-    console.log(category);
+    // console.log(category);
 
     let basketObj = {
       id: item.id,
@@ -173,7 +174,7 @@ export default function Products({
   };
 
   useEffect(() => {
-    console.log(basket);
+    // console.log(basket);
   }, [basket]);
 
   const [basketCount, setBasketCount] = useState(0);
@@ -189,7 +190,7 @@ export default function Products({
 
     newBasket.splice(index, 1, basketObj);
 
-    console.log(newBasket);
+    // console.log(newBasket);
 
     setBasket([...newBasket]);
 
@@ -207,7 +208,7 @@ export default function Products({
 
     let basketObj = newBasket[index];
 
-    console.log(category);
+    // console.log(category);
 
     if (basketObj.qty > 1) {
       basketObj.qty = basketObj.qty - 1;
@@ -221,7 +222,7 @@ export default function Products({
 
     newBasket.splice(index, 1, basketObj);
 
-    console.log(newBasket);
+    // console.log(newBasket);
 
     setBasket([...newBasket]);
 
@@ -255,7 +256,7 @@ export default function Products({
   };
 
   useEffect(() => {
-    console.log(basket);
+    // console.log(basket);
   }, [basket]);
 
   const [showingAlert, setShowingAlert] = useState(false);
@@ -343,7 +344,7 @@ export default function Products({
                     groups[j].brands?.[k].name ==
                     productsCopy[i].brands?.nodes[0].name
                   ) {
-                    console.log(productsCopy[i].productTags?.nodes[0].name);
+                    // console.log(productsCopy[i].productTags?.nodes[0].name);
 
                     groups[j].brands?.[k].products.push(productsCopy[i]);
                     brandFound = true;
@@ -357,7 +358,7 @@ export default function Products({
                 if (!brandFound) {
                   let products = [];
 
-                  console.log(productsCopy[i]);
+                  // console.log(productsCopy[i]);
 
                   products.push(productsCopy[i]);
 
@@ -419,7 +420,7 @@ export default function Products({
               products: tempProducts,
             });
 
-            console.log(tempProducts);
+            // console.log(tempProducts);
 
             groups.push({
               category: productsCopy[i].productTags.nodes[0].name,
@@ -436,7 +437,7 @@ export default function Products({
 
     let sortedGroups = getSortedProducts(groups);
 
-    console.log(sortedGroups);
+    // console.log(sortedGroups);
 
     return sortedGroups;
   };
@@ -521,6 +522,7 @@ export default function Products({
             subBasket={subBasket}
             oneOffBasket={oneOffBasket}
             pType={purchaseType}
+            subscriptions={subscriptions}
           />
         ) : (
           <div className="flex flex-col gap-0 h-auto pb-16">
@@ -673,8 +675,8 @@ export default function Products({
                             onClick={() => {
                               setSelectedBrands(index);
                               setSelectedProduct(productIndex);
-                              console.log(brand.products[productIndex]);
-                              console.log(oneOffBasket);
+                              // console.log(brand.products[productIndex]);
+                              // console.log(oneOffBasket);
 
                               setPreviewing(true);
                             }}
@@ -783,8 +785,8 @@ export default function Products({
             employerUser={employerUser}
           />
         )}
-        {console.log("CART")}
-        {console.log(cart?.data?.cart)}
+        {/* {console.log("CART")}
+        {console.log(cart?.data?.cart)} */}
         {/* <div className="relative h-[7%]">
           {basketShowing && (
             <div className="absolute w-full h-[55vh] bg-erniegreen bottom-full z-10 px-4 py-6">

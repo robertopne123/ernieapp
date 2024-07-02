@@ -14,6 +14,7 @@ export default function Preview({
   subBasket,
   oneOffBasket,
   pType,
+  subscriptions,
 }) {
   const addToBasketFromPreviewPage = (item, category) => {
     addToBasket(item, category);
@@ -21,7 +22,47 @@ export default function Preview({
 
   const [purchaseType, setPurchaseType] = useState(-1);
 
-  const [subQuantity, setSubQuantity] = useState(1);
+  const isInSubscription = () => {
+    for (
+      let i = 0;
+      i < subscriptions.data.subscription.subscription.lineItems.nodes.length;
+      i++
+    ) {
+      if (
+        subscriptions.data.subscription.subscription.lineItems.nodes[i].product
+          .node.name == product.name
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const whereInSubscription = () => {
+    for (
+      let i = 0;
+      i < subscriptions.data.subscription.subscription.lineItems.nodes.length;
+      i++
+    ) {
+      if (
+        subscriptions.data.subscription.subscription.lineItems.nodes[i].product
+          .node.name == product.name
+      ) {
+        return i;
+      }
+    }
+
+    return -1;
+  };
+
+  const [subQuantity, setSubQuantity] = useState(
+    purchaseType == 1 && isInSubscription()
+      ? subscriptions.data.subscription.subscription.lineItems.nodes[
+          whereInSubscription()
+        ].quantity
+      : 1
+  );
 
   const [oneOffQuantity, setOneOffQuantity] = useState(1);
 

@@ -436,12 +436,40 @@ export const ManagePlan = ({
   const [showSubConfirmation, setShowingSubConfirmation] = useState(false);
   const [showFreqConfirmation, setShowingFreqConfirmation] = useState(false);
 
+  const [processingOrder, setProcessingOrder] = useState(false);
+
   const close = () => {
     setShowingSubConfirmation(false);
     setShowingFreqConfirmation(false);
   };
 
   console.log(productsContext);
+
+  const getFilteredGroupProduct = (group) => {
+    let products = [];
+
+    for (let i = 0; i < group.products.length; i++) {
+      if (group.products[i].highlighted) {
+        products.push(group.products[i]);
+      }
+    }
+
+    return products;
+  };
+
+  const getFilteredLoc = (group, index) => {
+    let unfiltered = group.products;
+
+    let filtered = getFilteredGroupProduct(group);
+
+    let unfilteredProduct = group.products[index].product.name;
+
+    for (let i = 0; i < filtered.length; i++) {
+      if (filtered[i].product.name == unfilteredProduct) {
+        return i;
+      }
+    }
+  };
 
   return (
     <>
@@ -500,6 +528,7 @@ export const ManagePlan = ({
                         gap: "",
                       }}
                     >
+                      {}
                       {group.products.map((product, productIndex) => (
                         <div key={productIndex}>
                           {product.highlighted ? (
@@ -523,10 +552,16 @@ export const ManagePlan = ({
                                           className="w-3 h-3"
                                         ></img>
                                       </div>
-                                      {console.log(productIndex)}
-                                      {product.quantity <
+                                      {console.log(product.quantity)}
+                                      {console.log(
                                         existingSubscription?.lineItems.nodes[
-                                          productIndex - 1
+                                          getFilteredLoc(group, productIndex)
+                                        ]?.quantity
+                                      )}
+                                      {/* {product.quantity <
+                                        existingSubscription?.lineItems.nodes[
+                                          getFilteredLoc(group, productIndex) -
+                                            1
                                         ]?.quantity && (
                                         <p
                                           className={`
@@ -534,21 +569,21 @@ export const ManagePlan = ({
                                         >
                                           {product.quantity}
                                         </p>
-                                      )}
-                                      {product.quantity ==
+                                      )} */}
+                                      {/* {product.quantity ==
                                         existingSubscription?.lineItems.nodes[
-                                          productIndex - 1
-                                        ]?.quantity && (
-                                        <p
-                                          className={`
+                                          getFilteredLoc(group, productIndex) - 1
+                                        ]?.quantity && ( */}
+                                      <p
+                                        className={`
+                                          
                                           text-erniegreen inline font-circular text-sm font-[500] w-3 text-center`}
-                                        >
-                                          {product.quantity}
-                                        </p>
-                                      )}
-                                      {product.quantity >
+                                      >
+                                        {product.quantity}
+                                      </p>
+                                      {/* {product.quantity >
                                         existingSubscription?.lineItems.nodes[
-                                          productIndex - 1
+                                          getFilteredLoc(group, productIndex) - 1
                                         ]?.quantity && (
                                         <p
                                           className={`
@@ -556,7 +591,7 @@ export const ManagePlan = ({
                                         >
                                           {product.quantity}
                                         </p>
-                                      )}
+                                      )} */}
                                       <div
                                         className="flex flex-col justify-center items-center border-[1px] border-erniegreen rounded-full aspect-[1/1] p-1 min-w-[22px] max-h-[20px] cursor-pointer"
                                         onClick={(e) => {
@@ -757,13 +792,36 @@ export const ManagePlan = ({
             </p>
           </div>
           <div
-            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer flex flex-row justify-center items-center"
             onClick={() => {
               getChangesItems();
               setShowingSubConfirmation(true);
               // runOrderUpdate();
+              setProcessingOrder(true);
             }}
           >
+            {processingOrder && (
+              <svg
+                className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            )}
             <p className="font-circe text-erniegreen font-[900] text-xl text-center">
               Save Selection
             </p>
@@ -834,14 +892,14 @@ export const ManagePlan = ({
             </p>
           </div>
         </div>
-        <div
+        {/* <div
           className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
           onClick={() => {}}
         >
           <p className="font-circe text-erniegreen font-[900] text-xl text-center">
             Skip Next Subscription Delivery
           </p>
-        </div>
+        </div> */}
       </div>
     </>
   );

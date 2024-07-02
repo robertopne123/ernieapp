@@ -30,6 +30,17 @@ export default function About({ backAction }) {
           <p className="font-circular text-sm text-erniegreen font-[500] mt-4">
             Welcome to the Ernie London App
           </p>
+          <p className="font-circular text-sm text-erniegreen font-[400] mt-2">
+            We deliver locally roasted, specialty coffee and office pantry
+            goodies via cargo bikes with zero reusable, recyclable packaging
+            exclusively in London.
+          </p>
+          <p className="font-circular text-sm text-erniegreen font-[500] mt-2">
+            Contact us:{" "}
+            <a className="text-ernieteal" href="mailto:hello@ernie.london">
+              hello@ernie.london
+            </a>
+          </p>
           <p className="font-circular text-sm text-erniegreen italic mt-2">
             <span className="font-[500]">App Version: </span>
             {process.env.NEXT_PUBLIC_APP_VERSION}
