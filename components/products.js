@@ -363,8 +363,8 @@ export default function Products({
                   products.push(productsCopy[i]);
 
                   groups[j].brands?.push({
-                    name: productsCopy[i].brands.nodes[0].name,
-                    description: productsCopy[i].brands.nodes[0].description,
+                    name: productsCopy[i].brands.nodes[0]?.name,
+                    description: productsCopy[i].brands.nodes[0]?.description,
                     image:
                       productsCopy[i].brands.nodes[0].brandingImage.image
                         ?.sourceUrl,
@@ -413,8 +413,8 @@ export default function Products({
             let tempBrands = [];
 
             tempBrands.push({
-              name: productsCopy[i].brands.nodes[0].name,
-              description: productsCopy[i].brands.nodes[0].description,
+              name: productsCopy[i].brands.nodes[0]?.name,
+              description: productsCopy[i].brands.nodes[0]?.description,
               image:
                 productsCopy[i].brands.nodes[0].brandingImage.image?.sourceUrl,
               products: tempProducts,
