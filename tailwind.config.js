@@ -32,6 +32,10 @@ module.exports = {
         circular: ["var(--font-circularstd)"],
         circe: ["var(--font-circerounded)"],
       },
+      fontSize: {
+        bodylg: "1.8rem",
+        bodyxl: "2.5rem",
+      },
       maxHeight: {
         ios: "calc(88vh - 34px - 59px)",
         pdf: "calc(88vh - 34px - 59px - 72px)",
@@ -42,6 +46,7 @@ module.exports = {
         mdmb: "390px",
         lgmb: "430px",
         xlmb: "460px",
+        shortmb: "(max-height: 708px)",
       },
     },
   },

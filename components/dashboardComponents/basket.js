@@ -110,13 +110,17 @@ export const Basket = ({
   const getCurSubSubTotal = () => {
     let subtotal = 0;
 
-    let arr = subscriptions.data.subscription.subscription.lineItems.nodes;
+    let arr = [];
 
-    for (let i = 0; i < arr.length; i++) {
-      subtotal =
-        subtotal +
-        parseFloat(arr[i].product.node.price.replace("£", "")) *
-          arr[i].quantity;
+    arr = subscriptions?.data?.subscription?.subscription?.lineItems?.nodes;
+
+    if (arr?.length > 0) {
+      for (let i = 0; i < arr.length; i++) {
+        subtotal =
+          subtotal +
+          parseFloat(arr[i].product.node.price.replace("£", "")) *
+            arr[i].quantity;
+      }
     }
 
     return subtotal;
@@ -1104,9 +1108,11 @@ export const Basket = ({
                               value="weekly"
                               selected={
                                 subscriptions.data.subscription.subscription
-                                  .billingPeriod == "week" &&
-                                subscriptions.data.subscription.subscription
-                                  .billingInterval == "1"
+                                  ? subscriptions.data.subscription.subscription
+                                      ?.billingPeriod == "week" &&
+                                    subscriptions.data.subscription.subscription
+                                      .billingInterval == "1"
+                                  : true
                               }
                             >
                               Weekly
@@ -1115,7 +1121,7 @@ export const Basket = ({
                               value="bi-weekly"
                               selected={
                                 subscriptions.data.subscription.subscription
-                                  .billingPeriod == "week" &&
+                                  ?.billingPeriod == "week" &&
                                 subscriptions.data.subscription.subscription
                                   .billingInterval == "2"
                               }
@@ -1126,7 +1132,7 @@ export const Basket = ({
                               value="monthly"
                               selected={
                                 subscriptions.data.subscription.subscription
-                                  .billingPeriod == "month" &&
+                                  ?.billingPeriod == "month" &&
                                 subscriptions.data.subscription.subscription
                                   .billingInterval == "1"
                               }
@@ -1137,7 +1143,7 @@ export const Basket = ({
                               value="bi-monthly"
                               selected={
                                 subscriptions.data.subscription.subscription
-                                  .billingPeriod == "month" &&
+                                  ?.billingPeriod == "month" &&
                                 subscriptions.data.subscription.subscription
                                   .billingInterval == "2"
                               }
@@ -1296,20 +1302,24 @@ export const Basket = ({
 
                       let tempSubAdj = [];
 
-                      let arr =
-                        subscriptions.data.subscription.subscription.lineItems
-                          .nodes;
+                      let arr = [];
+
+                      arr =
+                        subscriptions?.data?.subscription?.subscription
+                          ?.lineItems?.nodes;
 
                       if (managingSubscription) {
-                        for (let i = 0; i < arr.length; i++) {
-                          tempSubAdj.push(arr[i]);
-                        }
+                        if (arr?.length > 0) {
+                          for (let i = 0; i < arr.length; i++) {
+                            tempSubAdj.push(arr[i]);
+                          }
 
-                        for (let j = 0; j < subBasket.length; j++) {
-                          tempSubAdj.push({
-                            product: { node: subBasket[j].product },
-                            quantity: subBasket[j].quantity,
-                          });
+                          for (let j = 0; j < subBasket.length; j++) {
+                            tempSubAdj.push({
+                              product: { node: subBasket[j].product },
+                              quantity: subBasket[j].quantity,
+                            });
+                          }
                         }
 
                         console.log(tempSubAdj);

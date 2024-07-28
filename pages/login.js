@@ -291,10 +291,6 @@ export default function Login() {
         username: "apptestlogin",
       },
     }).then((data) => {
-      if (!loginLoading) {
-        setLoginLoading(false);
-      }
-
       console.log("Login");
       console.log(data);
 
@@ -358,7 +354,15 @@ export default function Login() {
             },
           }).then((data) => {
             console.log(data);
+
+            console.log("complete");
+
             setRegisterComplete(true);
+
+            if (!loginLoading) {
+              setLoginLoading(false);
+              setLoginType(2);
+            }
           });
         })
         .catch((error) => {
@@ -587,7 +591,7 @@ export default function Login() {
 
   return (
     <div>
-      {registerComplete && <Alert message={"Hi"}></Alert>}
+      {registerComplete && <Alert message={"Register Complete"}></Alert>}
       {registerError != "" && <Alert message={registerError}></Alert>}
       {loginLoading && (
         <div className="flex min-h-screen bg-ernieteal relative">
@@ -714,7 +718,7 @@ export default function Login() {
                 ></img>
               </div>
               <div className="p-6 flex flex-col gap-4">
-                <p className="font-circe font-[900] text-5xl text-erniegreen uppercase leading-[50px]">
+                <p className="font-circe font-[900] text-bodylg text-erniegreen uppercase  [@media(max-height:708px)]:leading-[1.8rem] [@media(min-height:900px)]:text-bodyxl">
                   Sustainable Workplace Delivery Services
                 </p>
                 <img src="/divider.png" className="w-full"></img>
@@ -722,7 +726,7 @@ export default function Login() {
                   Coffee / Hot Chocolate / Tea / Snacks / Drinkware
                 </p>
                 <div
-                  className="bg-erniegold p-4 rounded-lg cursor-pointer"
+                  className="bg-erniegold p-4 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer"
                   onClick={() => setLoginType(1)}
                 >
                   <p className="font-circe text-erniegreen font-[900] text-xl uppercase text-center">
@@ -730,7 +734,7 @@ export default function Login() {
                   </p>
                 </div>
                 <div
-                  className="bg-erniegold p-4 rounded-lg cursor-pointer"
+                  className="bg-erniegold p-4 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer"
                   onClick={() => setLoginType(2)}
                 >
                   <p className="font-circe text-erniegreen font-[900] text-xl uppercase text-center">
@@ -776,7 +780,7 @@ export default function Login() {
                         htmlFor="poifirstname"
                         className="font-circular text-erniegreen text-sm font-[500]"
                       >
-                        Point of Contact First Time *
+                        Point of Contact First Name *
                       </label>
                       <input
                         type="text"
@@ -1141,23 +1145,16 @@ export default function Login() {
                     </div>
                   </div>
                 </div>
-                <div
-                  className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                <button
+                  className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
                   onClick={(e) => {
                     e.preventDefault();
-                    if (localStorage.getItem("authtoken") != null) {
-                      localStorage.removeItem("authtoken");
-                    }
-                    login({
-                      variables: { password: password, username: username },
-                    });
+                    loginUser(username, password);
                   }}
                 >
-                  <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-                    Login
-                  </p>
-                </div>
-                <button
+                  Login
+                </button>
+                {/* <button
                   type="button"
                   className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
                   onClick={(e) => {
@@ -1176,7 +1173,7 @@ export default function Login() {
                   }}
                 >
                   Test Login (no sub)
-                </button>
+                </button> */}
                 <p
                   className="font-circular font-[500] text-erniegreen text-sm text-center cursor-pointer"
                   onClick={(e) => {
