@@ -35,7 +35,7 @@ export const Basket = ({
   setShowingBasket,
 }) => {
   const stripePromise = loadStripe(
-    "pk_test_51O0NO7LwuJxcpy0DUCBdVnyXLjG6MSeqeHo8Z14rufA6W77rc6wkGqTvbPVHGpI3JSLl2z5yvCCxQfcS9CrdXWxq008NvyqULO"
+    "pk_live_51Pglrw2Kqe9gzhhxqUyBOvx7Zfyn7z51eC6170fBY07jjDRD6wro4hyDYtvjfQyOwhxAxsGLFV6X0N8UMqo40n4d00LXY8HJl4"
   );
 
   const [showingCheckout, setShowingCheckout] = useState(false);

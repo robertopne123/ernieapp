@@ -180,6 +180,12 @@ export default function Login() {
       $postcode: String!
       $wfh: Boolean!
       $title: String!
+      $bags: Int!
+      $carbon: Int!
+      $coffee: Int!
+      $m25: Int!
+      $phones: Int!
+      $trees: Int!
     ) {
       createClient(
         input: {
@@ -193,6 +199,12 @@ export default function Login() {
           postcode: $postcode
           wfh: $wfh
           title: $title
+          bags: $bags
+          carbon: $carbon
+          coffee: $coffee
+          m25: $m25
+          phones: $phones
+          trees: $trees
           status: PUBLISH
         }
       ) {
@@ -351,6 +363,12 @@ export default function Login() {
               poiEmail: email,
               postcode: rPostcode,
               wfh: rWFH == "Yes" ? true : false,
+              bags: 0,
+              carbon: 0,
+              coffee: 0,
+              m25: 0,
+              phones: 0,
+              trees: 0,
             },
           }).then((data) => {
             console.log(data);

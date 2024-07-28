@@ -346,7 +346,7 @@ export default function Dashboard({ data, categories, products, orders }) {
           employerEmail: employer,
           company: companyName,
           employerEmailID: employer,
-          employerUser: parseInt(employerUserID),
+          employerUser: parseInt(employerUser),
         },
       })
       .then((data) => {
