@@ -6,6 +6,8 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { useMutation } from "@apollo/client";
 import graphqlClient from "@/apollo-client";
+import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 
 export const Basket = ({
   addToSubBasket,
@@ -58,11 +60,15 @@ export const Basket = ({
   const [bPostcodeError, setBPostcodeError] = useState(false);
   const [contactNumberError, setContactNumberError] = useState(false);
 
+  const router = useRouter();
+
   const decSubQuantity = (index) => {
     let subBasketCopy = [...subBasket];
 
     if (subBasketCopy[index].quantity > 1) {
       subBasketCopy[index].quantity = subBasketCopy[index].quantity - 1;
+    } else if (subBasketCopy[index].quantity == 1) {
+      subBasketCopy.splice(index, 1);
     }
 
     updateSubBasket(subBasketCopy);
@@ -81,6 +87,8 @@ export const Basket = ({
 
     if (oneOffBasketCopy[index].quantity > 1) {
       oneOffBasketCopy[index].quantity = oneOffBasketCopy[index].quantity - 1;
+    } else if (oneOffBasketCopy[index].quantity == 1) {
+      oneOffBasketCopy.splice(index, 1);
     }
 
     updateOneOffBasket(oneOffBasketCopy);
@@ -195,7 +203,9 @@ export const Basket = ({
 
   const [processingOrder, setProcessingOrder] = useState(false);
 
-  function handleSubmit(event) {
+  const [url, setUrl] = useState("");
+
+  function handleSubmit() {
     setProcessingOrder(true);
 
     console.log(contactNumber);
@@ -292,6 +302,55 @@ export const Basket = ({
 
     console.log(purchaseType);
 
+    let mId =
+      purchaseType == 0
+        ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
+          ? "flat_rate"
+          : "free_shipping"
+        : managingSubscription
+        ? parseFloat(getCurSubSubTotal().toFixed(2)) +
+            parseFloat(getSubSubtotal().toFixed(2)) <
+          80.0
+          ? "flat_rate"
+          : "free_shipping"
+        : parseFloat(
+            parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+              ? "flat_rate"
+              : "free_shipping"
+          );
+
+    let mTitle =
+      purchaseType == 0
+        ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
+          ? "Flat Rate"
+          : "Free Shipping"
+        : managingSubscription
+        ? parseFloat(getCurSubSubTotal().toFixed(2)) +
+            parseFloat(getSubSubtotal().toFixed(2)) <
+          80.0
+          ? "Flat Rate"
+          : "Free Shipping"
+        : parseFloat(
+            parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+              ? "Flat Rate"
+              : "Free Shipping"
+          );
+
+    let total =
+      purchaseType == 0
+        ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
+          ? "8.95"
+          : "0.0"
+        : managingSubscription
+        ? parseFloat(getCurSubSubTotal().toFixed(2)) +
+            parseFloat(getSubSubtotal().toFixed(2)) <
+          80.0
+          ? "8.95"
+          : "0.0"
+        : parseFloat(
+            parseFloat(getSubSubtotal().toFixed(2)) < 80.0 ? "8.95" : "0.0"
+          );
+
     if (purchaseType == 0) {
       try {
         checkout({
@@ -313,6 +372,13 @@ export const Basket = ({
                 postcode: sPostcode,
                 phone: contactNumber,
               },
+              shippingLines: [
+                {
+                  methodId: mId,
+                  methodTitle: mTitle,
+                  total: total,
+                },
+              ],
             },
           },
         })
@@ -354,6 +420,13 @@ export const Basket = ({
                 postcode: sPostcode,
                 phone: contactNumber,
               },
+              shippingLines: [
+                {
+                  methodId: mId,
+                  methodTitle: mTitle,
+                  total: total,
+                },
+              ],
               billingInterval: interval + "",
               billingPeriod: "month",
             },
@@ -377,6 +450,8 @@ export const Basket = ({
   const backAction = () => {
     setShowingCheckout(false);
   };
+
+  const pathname = usePathname();
 
   const paymentOptions = [
     { image: "/Visa_Inc._logo.svg", name: "stripe" },
@@ -788,52 +863,157 @@ export const Basket = ({
                             {selectedPayment == index && (
                               <>
                                 {index == 0 && (
-                                  <div className="bg-erniedarkcream p-4">
+                                  <div className="bg-erniedarkcream">
                                     {console.log(period)}
-                                    <Elements stripe={stripePromise}>
-                                      <CheckoutForm
-                                        basket={oneOffBasket}
-                                        employerUser={customerId}
-                                        billing={{
-                                          address1: bAddress,
-                                          company: businessName,
-                                          postcode: bPostcode,
-                                          phone: contactNumber,
-                                        }}
-                                        shipping={{
-                                          address1: sAddress,
-                                          company: businessName,
-                                          postcode: sPostcode,
-                                          phone: contactNumber,
-                                        }}
-                                        setOrderComplete={
-                                          setOrderCompleteFromBasket
-                                        }
-                                        setOrderDetails={setOrderDetails}
-                                        purchaseType={purchaseType}
-                                        billingInterval={interval}
-                                        billingPeriod={period}
-                                        setProcessingOrder={setProcessingOrder}
-                                        setBAddressError={setBAddressError}
-                                        setBPostcodeError={setBPostcodeError}
-                                        setBusinessNameError={
-                                          setBusinessNameError
-                                        }
-                                        setContactNumberError={
-                                          setContactNumberError
-                                        }
-                                        setSAddressError={setSAddressError}
-                                        setSPostcodeError={setSPostcodeError}
-                                        bAddress={bAddress}
-                                        sAddress={sAddress}
-                                        bPostcode={bPostcode}
-                                        sPostcode={sPostcode}
-                                        contactNumber={contactNumber}
-                                        businessName={businessName}
-                                        scrollToTop={scrollToTop}
-                                        processingOrder={processingOrder}
-                                      />
-                                    </Elements>
+                                    <CheckoutForm
+                                      basket={oneOffBasket}
+                                      employerUser={customerId}
+                                      billing={{
+                                        address1: bAddress,
+                                        company: businessName,
+                                        postcode: bPostcode,
+                                        phone: contactNumber,
+                                      }}
+                                      shipping={{
+                                        address1: sAddress,
+                                        company: businessName,
+                                        postcode: sPostcode,
+                                        phone: contactNumber,
+                                      }}
+                                      shippingLines={[
+                                        {
+                                          methodId:
+                                            purchaseType == 0
+                                              ? parseFloat(
+                                                  getOneOffSubtotal().toFixed(2)
+                                                ) < 80.0
+                                                ? "flat_rate"
+                                                : "free_shipping"
+                                              : managingSubscription
+                                              ? parseFloat(
+                                                  getCurSubSubTotal().toFixed(2)
+                                                ) +
+                                                  parseFloat(
+                                                    getSubSubtotal().toFixed(2)
+                                                  ) <
+                                                80.0
+                                                ? "flat_rate"
+                                                : "free_shipping"
+                                              : parseFloat(
+                                                  parseFloat(
+                                                    getSubSubtotal().toFixed(2)
+                                                  ) < 80.0
+                                                    ? "flat_rate"
+                                                    : "free_shipping"
+                                                ),
+                                          methodTitle:
+                                            purchaseType == 0
+                                              ? parseFloat(
+                                                  getOneOffSubtotal().toFixed(2)
+                                                ) < 80.0
+                                                ? "Flat Rate"
+                                                : "Free Shipping"
+                                              : managingSubscription
+                                              ? parseFloat(
+                                                  getCurSubSubTotal().toFixed(2)
+                                                ) +
+                                                  parseFloat(
+                                                    getSubSubtotal().toFixed(2)
+                                                  ) <
+                                                80.0
+                                                ? "Flat Rate"
+                                                : "Free Shipping"
+                                              : parseFloat(
+                                                  parseFloat(
+                                                    getSubSubtotal().toFixed(2)
+                                                  ) < 80.0
+                                                    ? "Flat Rate"
+                                                    : "Free Shipping"
+                                                ),
+                                          total:
+                                            purchaseType == 0
+                                              ? parseFloat(
+                                                  getOneOffSubtotal().toFixed(2)
+                                                ) < 80.0
+                                                ? "8.95"
+                                                : "0.0"
+                                              : managingSubscription
+                                              ? parseFloat(
+                                                  getCurSubSubTotal().toFixed(2)
+                                                ) +
+                                                  parseFloat(
+                                                    getSubSubtotal().toFixed(2)
+                                                  ) <
+                                                80.0
+                                                ? "8.95"
+                                                : "0.0"
+                                              : parseFloat(
+                                                  parseFloat(
+                                                    getSubSubtotal().toFixed(2)
+                                                  ) < 80.0
+                                                    ? "8.95"
+                                                    : "0.0"
+                                                ),
+                                        },
+                                      ]}
+                                      shippingTotal={
+                                        purchaseType == 0
+                                          ? parseFloat(
+                                              getOneOffSubtotal().toFixed(2)
+                                            ) < 80.0
+                                            ? "8.95"
+                                            : "0.0"
+                                          : managingSubscription
+                                          ? parseFloat(
+                                              getCurSubSubTotal().toFixed(2)
+                                            ) +
+                                              parseFloat(
+                                                getSubSubtotal().toFixed(2)
+                                              ) <
+                                            80.0
+                                            ? "8.95"
+                                            : "0.0"
+                                          : parseFloat(
+                                              parseFloat(
+                                                getSubSubtotal().toFixed(2)
+                                              ) < 80.0
+                                                ? "8.95"
+                                                : "0.0"
+                                            )
+                                      }
+                                      setOrderComplete={
+                                        setOrderCompleteFromBasket
+                                      }
+                                      setOrderDetails={setOrderDetails}
+                                      purchaseType={purchaseType}
+                                      billingInterval={interval}
+                                      billingPeriod={period}
+                                      setProcessingOrder={setProcessingOrder}
+                                      setBAddressError={setBAddressError}
+                                      setBPostcodeError={setBPostcodeError}
+                                      setBusinessNameError={
+                                        setBusinessNameError
+                                      }
+                                      setContactNumberError={
+                                        setContactNumberError
+                                      }
+                                      setSAddressError={setSAddressError}
+                                      setSPostcodeError={setSPostcodeError}
+                                      bAddress={bAddress}
+                                      sAddress={sAddress}
+                                      bPostcode={bPostcode}
+                                      sPostcode={sPostcode}
+                                      contactNumber={contactNumber}
+                                      businessName={businessName}
+                                      scrollToTop={scrollToTop}
+                                      processingOrder={processingOrder}
+                                      setUrl={setUrl}
+                                      currentUrl={router.asPath}
+                                      managingSubscription={
+                                        managingSubscription
+                                      }
+                                      orderDetails={orderDetails}
+                                    />
                                   </div>
                                 )}
                               </>
@@ -923,7 +1103,7 @@ export const Basket = ({
                         // });
                         setProcessingOrder(true);
                       } else {
-                        handleSubmit(e);
+                        handleSubmit();
                       }
                     }}
                   >
@@ -1253,9 +1433,13 @@ export const Basket = ({
                     Delivery Fee
                   </p>
                   <p className="font-circular text-erniegreen text-sm">
-                    {parseFloat(getCurSubSubTotal().toFixed(2)) +
-                      parseFloat(getSubSubtotal().toFixed(2)) <
-                    80.0
+                    {purchaseType != 0
+                      ? parseFloat(getCurSubSubTotal().toFixed(2)) +
+                          parseFloat(getSubSubtotal().toFixed(2)) <
+                        80.0
+                        ? "£8.95"
+                        : "FREE"
+                      : parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
                       ? "£8.95"
                       : "FREE"}
                   </p>
@@ -1277,8 +1461,16 @@ export const Basket = ({
                             : 0.0)
                         ).toFixed(2)
                       : purchaseType == 0
-                      ? getOneOffSubtotal().toFixed(2)
-                      : getSubSubtotal().toFixed(2)}
+                      ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
+                        ? (
+                            parseFloat(getOneOffSubtotal().toFixed(2)) + 8.95
+                          ).toFixed(2)
+                        : parseFloat(getOneOffSubtotal().toFixed(2)).toFixed(2)
+                      : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+                      ? (
+                          parseFloat(getSubSubtotal().toFixed(2)) + 8.95
+                        ).toFixed(2)
+                      : parseFloat(getSubSubtotal().toFixed(2)).toFixed(2)}
                   </p>
                 </div>
                 <p className="font-circular tedt-erniegreen italic text-sm text-right">

@@ -1,19 +1,29 @@
 import {
   CardElement,
-  useStripe,
   useElements,
   CardNumberElement,
   CardExpiryElement,
   CardCvcElement,
+  EmbeddedCheckout,
+  EmbeddedCheckoutProvider,
+  Elements,
 } from "@stripe/react-stripe-js";
 import { gql, useMutation } from "@apollo/client";
 import { Source } from "@stripe/stripe-js";
 import graphqlClient from "@/apollo-client";
 import { useState } from "react";
+import { useStripe } from "@stripe/react-stripe-js";
+import Stripe from "stripe";
+import { loadStripe } from "@stripe/stripe-js";
+import { useEffect } from "react";
+import Router from "next/router";
+import { useRouter } from "next/router";
 
 export default function CheckoutForm({
   billing,
   shipping,
+  shippingLines,
+  shippingTotal,
   basket,
   customer,
   orderComplete,
@@ -38,8 +48,26 @@ export default function CheckoutForm({
   businessName,
   scrollToTop,
   processingOrder,
+  setUrl,
+  currentUrl,
+  managingSubscription,
+  orderDetails,
 }) {
-  const stripe = useStripe();
+  const stripePromise = loadStripe(
+    "pk_live_51Pglrw2Kqe9gzhhxqUyBOvx7Zfyn7z51eC6170fBY07jjDRD6wro4hyDYtvjfQyOwhxAxsGLFV6X0N8UMqo40n4d00LXY8HJl4"
+  );
+
+  const stripe = require("stripe")(
+    `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`
+  );
+
+  // const stripePromise = loadStripe(
+  //   "pk_test_51Pglrw2Kqe9gzhhx7iPQXlb8vzPFQI7i5AjONLFaBjZGXQJqjhBpAmgePzf6CURrjzdlaZTPKcDermVaae66Ra2100XdUiv2Fr"
+  // );
+
+  // const stripe = require("stripe")(
+  //   `sk_test_51Pglrw2Kqe9gzhhxrcTXW6sXhWZySsBFcEDBt9TTwusDws3kx64xyNUYfeNYfdvJpxglnGJ6acv0iJO2VTb8vTTt00eqkPVS4o`
+  // );
 
   const appearance = {
     theme: "flat",
@@ -47,7 +75,10 @@ export default function CheckoutForm({
       colorBackground: "#0570de",
     },
   };
-  const elements = useElements({ appearance });
+
+  const setUrlFromForm = (val) => {
+    setUrl(val);
+  };
 
   const CHECKOUT = gql`
     mutation newOrder($input: CreateOrderInput!) {
@@ -102,6 +133,12 @@ export default function CheckoutForm({
   const [addSubscription] = useMutation(ADDSUBSCRIPTION, {
     client: graphqlClient,
   });
+
+  const [session, setSession] = useState(null);
+
+  const [showForm, setShowForm] = useState(false);
+
+  let router = useRouter();
 
   async function handleSubmit(event) {
     setProcessingOrder(true);
@@ -182,19 +219,38 @@ export default function CheckoutForm({
 
     console.log(basket);
 
+    let total = 0.0;
+
     for (let i = 0; i < basket.length; i++) {
       lineItems.push({
         name: basket[i].product.name,
         productId: basket[i].product.databaseId,
         quantity: basket[i].quantity,
       });
+
+      total +=
+        basket[i].quantity *
+        parseFloat(basket[i].product.price.replace("£", ""));
     }
 
+    console.log(total);
+
     console.log(lineItems);
+
+    const stripe = new Stripe(
+      "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"
+    );
+
+    // const paymentIntent = stripe.paymentIntents.create({
+    //   amount: total * 100,
+    //   currency: "GBP",
+    // });
 
     if (purchaseType == 0) {
       try {
         const source = await handleStripe();
+
+        console.log(basket);
 
         await checkout({
           variables: {
@@ -205,6 +261,7 @@ export default function CheckoutForm({
               customerNote: "Ernie App Order",
               billing: billing,
               shipping: shipping,
+              shippingLines: shippingLines,
               metaData: [
                 {
                   key: `_stripe_source_id`,
@@ -246,6 +303,7 @@ export default function CheckoutForm({
               customerNote: "Ernie App Order",
               billing: billing,
               shipping: shipping,
+              shippingLines: shippingLines,
               metaData: [
                 {
                   key: `_stripe_source_id`,
@@ -269,6 +327,56 @@ export default function CheckoutForm({
       } catch (error) {}
     }
   }
+
+  useEffect(() => {
+    let line_items = [];
+
+    for (let i = 0; i < basket.length; i++) {
+      line_items.push({
+        price_data: {
+          currency: "gbp",
+          product_data: {
+            name: basket[i].product.name,
+          },
+          unit_amount: parseInt(
+            parseFloat(basket[i].product.price.replace("£", "")) * 100
+          ),
+        },
+        quantity: basket[i].quantity,
+      });
+    }
+
+    const fetchData = async () => {
+      const session = await stripe.checkout.sessions.create({
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              type: "fixed_amount",
+              fixed_amount: {
+                amount: shippingTotal == "8.95" ? 895 : 0,
+                currency: "gbp",
+              },
+              display_name: "Shipping",
+            },
+          },
+        ],
+        line_items: line_items,
+        mode: "payment",
+        success_url: `${
+          window.location.origin
+        }/dashboard/order?msub=${managingSubscription}&ptype=${purchaseType}&odetails=${JSON.stringify(
+          orderDetails
+        )}`,
+      });
+
+      setSession(session.url);
+      setUrlFromForm(session.url);
+
+      console.log(session);
+    };
+
+    fetchData();
+  }, [basket]);
 
   async function handleStripe() {
     if (!stripe || !elements) {
@@ -300,23 +408,14 @@ export default function CheckoutForm({
 
   return (
     <form className="h-full flex flex-col gap-4 justify-between">
-      <div className="relative flex flex-col gap-4 bg-erniecream p-2 rounded-lg">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontFamily: "var(--font-circularstd)",
-                fontSize: "16px",
-                backgroundColor: "#FFFFEC",
-              },
-            },
-            hidePostalCode: true,
-          }}
-        />
-      </div>
+      <div className="relative flex flex-col gap-4 bg-erniecream p-2 rounded-lg"></div>
       <div
         className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-lg rounded-xl absolute bottom-6 left-0 mx-6"
         onClick={(e) => {
+          let path = router.asPath;
+
+          router.push(session);
+
           handleSubmit(e);
         }}
       >
