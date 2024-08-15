@@ -61,14 +61,6 @@ export default function CheckoutForm({
     `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`
   );
 
-  // const stripePromise = loadStripe(
-  //   "pk_test_51Pglrw2Kqe9gzhhx7iPQXlb8vzPFQI7i5AjONLFaBjZGXQJqjhBpAmgePzf6CURrjzdlaZTPKcDermVaae66Ra2100XdUiv2Fr"
-  // );
-
-  // const stripe = require("stripe")(
-  //   `sk_test_51Pglrw2Kqe9gzhhxrcTXW6sXhWZySsBFcEDBt9TTwusDws3kx64xyNUYfeNYfdvJpxglnGJ6acv0iJO2VTb8vTTt00eqkPVS4o`
-  // );
-
   const appearance = {
     theme: "flat",
     variables: {

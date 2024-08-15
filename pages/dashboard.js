@@ -1381,10 +1381,10 @@ export default function Dashboard({ data, categories, products, orders }) {
           } font-sans ${circerounded.variable} font-sans`}
         >
           {/* {firstTimeUser && <Tutorial completeTutorial={completeTutorial} />} */}
-          <div className="lg:flex hidden text-erniegreen px-4">
+          <div className="xl:flex hidden text-erniegreen px-4">
             <p>Please use a mobile phone to view this page</p>
           </div>
-          <div className="lg:hidden flex flex-col text-erniegreen relative w-full flex-grow">
+          <div className="xl:hidden flex flex-col text-erniegreen relative w-full flex-grow">
             <StaticTopBar
               addToSubBasket={addToSubBasket}
               addToOneOffBasket={addToOneOffBasket}
