@@ -13,9 +13,6 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  env: {
-    STRIPE_SECRET: process.env.NEXT_PUBLIC_STRIPE_SECRET,
-  },
   output: "export",
 };
 

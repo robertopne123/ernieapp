@@ -57,9 +57,11 @@ export default function CheckoutForm({
     "pk_live_51Pglrw2Kqe9gzhhxqUyBOvx7Zfyn7z51eC6170fBY07jjDRD6wro4hyDYtvjfQyOwhxAxsGLFV6X0N8UMqo40n4d00LXY8HJl4"
   );
 
-  const stripe = require("stripe")(
-    `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`
-  );
+  let secret = process.env.NEXT_PUBLIC_STRIPE_SECRET;
+
+  const stripe = require("stripe")(`${secret}`);
+
+  console.log(secret);
 
   const appearance = {
     theme: "flat",
@@ -229,9 +231,7 @@ export default function CheckoutForm({
 
     console.log(lineItems);
 
-    const stripe = new Stripe(
-      "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"
-    );
+    const stripe = new Stripe(`${secret}`);
 
     // const paymentIntent = stripe.paymentIntents.create({
     //   amount: total * 100,
