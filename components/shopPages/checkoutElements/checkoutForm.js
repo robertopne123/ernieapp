@@ -400,7 +400,7 @@ export default function CheckoutForm({
 
   return (
     <form className="h-full flex flex-col gap-4 justify-between">
-      <div className="relative flex flex-col gap-4 bg-erniecream p-2 rounded-lg"></div>
+      <div className="relative flex flex-col gap-4 bg-erniecream rounded-lg"></div>
       <div
         className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-lg rounded-xl absolute bottom-6 left-0 mx-6"
         onClick={(e) => {
