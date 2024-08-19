@@ -313,11 +313,9 @@ export const Basket = ({
           80.0
           ? "flat_rate"
           : "free_shipping"
-        : parseFloat(
-            parseFloat(getSubSubtotal().toFixed(2)) < 80.0
-              ? "flat_rate"
-              : "free_shipping"
-          );
+        : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+        ? "flat_rate"
+        : "free_shipping";
 
     let mTitle =
       purchaseType == 0
@@ -330,11 +328,9 @@ export const Basket = ({
           80.0
           ? "Flat Rate"
           : "Free Shipping"
-        : parseFloat(
-            parseFloat(getSubSubtotal().toFixed(2)) < 80.0
-              ? "Flat Rate"
-              : "Free Shipping"
-          );
+        : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+        ? "Flat Rate"
+        : "Free Shipping";
 
     let total =
       purchaseType == 0
@@ -347,9 +343,9 @@ export const Basket = ({
           80.0
           ? "8.95"
           : "0.0"
-        : parseFloat(
-            parseFloat(getSubSubtotal().toFixed(2)) < 80.0 ? "8.95" : "0.0"
-          );
+        : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+        ? "8.95"
+        : "0.0";
 
     if (purchaseType == 0) {
       try {
@@ -396,9 +392,9 @@ export const Basket = ({
       }
     } else {
       try {
-        console.log(interval);
-        console.log(period);
-        console.log(customerId);
+        console.log(mId);
+        console.log(mTitle);
+        console.log(total);
         console.log(lineItems);
 
         addSubscription({
@@ -548,7 +544,13 @@ export const Basket = ({
                     <div className="mt-2 flex flex-col">
                       <p className="font-circular font-[500] text-erniegreen">
                         {managingSubscription ? "Subscription " : "Order "}{" "}
-                        Number: {console.log(orderDetails)}
+                        Number:{" "}
+                        {purchaseType == 1
+                          ? managingSubscription
+                            ? 0
+                            : orderDetails.data.createSubscription.subscription
+                                .databaseId
+                          : 0}
                         {/*                         
                         {purchaseType == 0
                           ? orderDetails.data.createOrder.order.databaseId
@@ -727,7 +729,7 @@ export const Basket = ({
                           htmlFor="isAddressSame"
                           className="font-circular font-[500] text-erniegreen text-sm"
                         >
-                          Is this the same as the shipping address?
+                          Is this the same as the billing address?
                         </label>
                         <input
                           type="checkbox"
