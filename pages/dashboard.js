@@ -799,6 +799,8 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     console.log(originalSubscriptions);
 
+    console.log(planDetails);
+
     let newChanges = [];
 
     let planDetailsTemp = [...planDetails];
@@ -887,19 +889,16 @@ export default function Dashboard({ data, categories, products, orders }) {
               console.log("qty");
               changes.push({
                 action: "qty",
-                difference:
-                  newChanges[i].quantity -
-                  existingSubscriptionProducts[j].quantity,
+                difference: newChanges[i].quantity,
                 product: newChanges[i],
               });
+              console.log(changes[i]);
             } else if (
               newChanges[i].quantity < existingSubscriptionProducts[j].quantity
             ) {
               changes.push({
                 action: "qty",
-                difference:
-                  existingSubscriptionProducts[j].quantity -
-                  newChanges[i].quantity,
+                difference: newChanges[i].quantity,
                 product: newChanges[i],
               });
             }
@@ -1093,11 +1092,15 @@ export default function Dashboard({ data, categories, products, orders }) {
             `,
             variables: {
               id: subscriptions.data.subscription.subscription.databaseId,
-              productId: changes[i].product.product.node.databaseId + "",
+              productId: changes[i].product.databaseId,
             },
           })
           .then((data) => {
             console.log("Old QTY Removed");
+
+            console.log(data);
+
+            console.log(changes[i]);
 
             client
               .mutate({
@@ -1470,11 +1473,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                   oneOffBasket={oneOffBasket}
                   purchaseType={purchaseType}
                   purchasing={purchasing}
+                  managingSubscription={managingSubscription}
                   newPurchase={newPurchase}
                   setPurchaseType={setPurchaseType}
                   setPurchasing={setPurchasing}
                   setNewPurchase={setNewPurchase}
                   subscriptions={subscriptions}
+                  setTab={setTab}
                 />
               )}
               {activeTab == 2 && (

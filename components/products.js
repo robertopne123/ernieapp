@@ -29,11 +29,15 @@ export default function Products({
   oneOffBasket,
   purchaseType,
   purchasing,
+  managingSubscription,
   setPurchaseType,
   setPurchasing,
   newPurchase,
   setNewPurchase,
   subscriptions,
+  setTab,
+  productsContext,
+  setProductsContext,
 }) {
   function filteredCategories() {
     let filtered = [];
@@ -67,6 +71,10 @@ export default function Products({
   const back = () => setPreviewing(false);
 
   const checkoutBack = () => setShowingCheckout(false);
+
+  const setProductsContextFromProducts = (products) => {
+    setProductsContext(products);
+  };
 
   const showAlertFromProductPage = (message, type) => {
     showAlert(message, type);
@@ -452,6 +460,10 @@ export default function Products({
 
   const [showingInfo, setShowingInfo] = useState(false);
 
+  const setTabFromProducts = (tab) => {
+    setTab(tab);
+  };
+
   const [infoName, setInfoName] = useState("");
   const [infoDesc, setInfoDesc] = useState("");
   const [infoImage, setInfoImage] = useState("");
@@ -523,6 +535,10 @@ export default function Products({
             oneOffBasket={oneOffBasket}
             pType={purchaseType}
             subscriptions={subscriptions}
+            managingSubscription={managingSubscription}
+            setTab={setTabFromProducts}
+            productsContext={productsContext}
+            setProductsContext={setProductsContextFromProducts}
           />
         ) : (
           <div className="flex flex-col gap-0 h-auto pb-16">
@@ -540,19 +556,33 @@ export default function Products({
               </div>
             )}
 
-            {purchaseType == 1 && (
-              <div className="flex flex-col gap-0 mx-6 mb-4">
-                <div className="flex flex-row justify-between">
-                  <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
-                    Managing Subscription
-                  </p>
+            {console.log(managingSubscription)}
+            {purchaseType == 1 &&
+              (managingSubscription ? (
+                <div className="flex flex-col gap-0 mx-6 mb-4">
+                  <div className="flex flex-row justify-between">
+                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                      Managing Subscription
+                    </p>
+                  </div>
+                  <img
+                    src="/divider.png"
+                    className="h-1.5 w-full mt-2 mb-2"
+                  ></img>
                 </div>
-                <img
-                  src="/divider.png"
-                  className="h-1.5 w-full mt-2 mb-2"
-                ></img>
-              </div>
-            )}
+              ) : (
+                <div className="flex flex-col gap-0 mx-6 mb-4">
+                  <div className="flex flex-row justify-between">
+                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                      Add To Subscription
+                    </p>
+                  </div>
+                  <img
+                    src="/divider.png"
+                    className="h-1.5 w-full mt-2 mb-2"
+                  ></img>
+                </div>
+              ))}
 
             <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2">
               {getGroupedProducts().map((group, index) => (

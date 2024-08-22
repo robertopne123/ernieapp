@@ -24,7 +24,7 @@ export const ManagePlan = ({
     subscriptions.data?.subscription?.subscription
   );
 
-  console.log(subscriptions.data?.subscription?.subscription);
+  console.log(subscriptions);
 
   const [subscriptionChanges, setSubscriptionChanges] = useState([]);
 
@@ -186,12 +186,16 @@ export const ManagePlan = ({
     );
 
     for (let i = 0; i < currentSubscriptionCopy.lineItems.nodes.length; i++) {
-      if (
-        currentSubscriptionCopy.lineItems.nodes[i].product.node.name ==
-        contextCopy[group].products[item].product.name
-      ) {
-        currentSubscriptionCopy.lineItems.nodes[i].quantity++;
-        foundProduct = true;
+      if (!foundProduct) {
+        if (
+          currentSubscriptionCopy.lineItems.nodes[i].product.node.name ==
+          contextCopy[group].products[item].product.name
+        ) {
+          console.log("Found product");
+
+          currentSubscriptionCopy.lineItems.nodes[i].quantity++;
+          foundProduct = true;
+        }
       }
     }
 
@@ -251,6 +255,8 @@ export const ManagePlan = ({
                 differenceCopy[l].product.node.name ==
                 currentSubscriptionCopy.lineItems.nodes[i].product.node.name
               ) {
+                console.log(differenceCopy[l]);
+
                 differenceCopy[l].quantity++;
                 itemFound = true;
                 continue;
@@ -259,6 +265,8 @@ export const ManagePlan = ({
 
             if (!itemFound) {
               differenceCopy.push(currentSubscriptionCopy.lineItems.nodes[i]);
+
+              console.log(differenceCopy[0]);
             }
             continue;
           }
@@ -375,7 +383,10 @@ export const ManagePlan = ({
   };
 
   const runOrderUpdate = () => {
+    console.log(currentSubscription);
+
     updatePlan(currentSubscription.lineItems.nodes);
+    setProcessingOrder(false);
   };
 
   const updateFrequencyPlan = () => {
@@ -473,7 +484,7 @@ export const ManagePlan = ({
 
   return (
     <>
-      {console.log(updateSubError)}
+      {console.log(currentSubscription)}
       {showSubConfirmation && (
         <ConfirmSubscription
           close={close}

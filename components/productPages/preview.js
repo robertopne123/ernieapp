@@ -15,6 +15,10 @@ export default function Preview({
   oneOffBasket,
   pType,
   subscriptions,
+  managingSubscription,
+  setTab,
+  productsContext,
+  setProductsContext,
 }) {
   const addToBasketFromPreviewPage = (item, category) => {
     addToBasket(item, category);
@@ -75,6 +79,12 @@ export default function Preview({
 
     return false;
   };
+
+  const setTabFromPreview = (tab) => {
+    setTab(tab);
+  };
+
+  console.log(category);
 
   return (
     <div
@@ -248,60 +258,65 @@ export default function Preview({
         </div>
       )}
       {pType == 1 && (
-        <div className="bg-erniecream rounded-xl p-6 mb-10">
-          <div className="flex flex-col gap-4 py-4">
-            <div className="w-full flex flex-row gap-6">
-              <div
-                className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                onClick={() => {
-                  if (subQuantity > 1) {
-                    setSubQuantity(subQuantity - 1);
+        <>
+          <div className="bg-erniecream rounded-xl p-6 mb-10">
+            <div className="flex flex-col gap-4 py-4">
+              <div className="w-full flex flex-row gap-6">
+                <div
+                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
+                  onClick={() => {
+                    if (subQuantity > 1) {
+                      setSubQuantity(subQuantity - 1);
+                    }
+                  }}
+                >
+                  <p className="font-circular text-center text-erniegreen text-xl">
+                    -
+                  </p>
+                </div>
+                <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
+                  {subQuantity + "kg"}
+                </p>
+                <div
+                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
+                  onClick={() => {
+                    setSubQuantity(subQuantity + 1);
+                  }}
+                >
+                  <p className="font-circular text-center text-erniegreen text-xl">
+                    +
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-row justify-between gap-8">
+                <p className="font-circe font-[900] text-erniegreen text-2xl">
+                  {product.price == null ? "£0.00" : product.price}
+                </p>
+                <div
+                  className="bg-erniegold rounded-xl py-1 px-3 flex-grow"
+                  onClick={() =>
+                    addToSubBasket({
+                      product: product,
+                      quantity: subQuantity,
+                    })
                   }
-                }}
-              >
-                <p className="font-circular text-center text-erniegreen text-xl">
-                  -
-                </p>
+                >
+                  <p className="font-circe font-[900] text-erniegreen text-center">
+                    Add to basket
+                  </p>
+                </div>
               </div>
-              <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
-                {subQuantity + "kg"}
+              <p className="font-circular text-erniegreen italic text-xs">
+                You save 50p per kg when you subscribe!
               </p>
-              <div
-                className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                onClick={() => {
-                  setSubQuantity(subQuantity + 1);
-                }}
-              >
-                <p className="font-circular text-center text-erniegreen text-xl">
-                  +
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-row justify-between gap-8">
-              <p className="font-circe font-[900] text-erniegreen text-2xl">
-                {product.price == null ? "£0.00" : product.price}
+              <p className="font-circular text-erniegreen italic text-xs font-[500]">
+                You will be able to choose your subscription frequency at
+                checkout. If you already have a subscription with us, this will
+                automatically be added onto your next order.
               </p>
-              <div
-                className="bg-erniegold rounded-xl py-1 px-3 flex-grow"
-                onClick={() =>
-                  addToSubBasket({ product: product, quantity: subQuantity })
-                }
-              >
-                <p className="font-circe font-[900] text-erniegreen text-center">
-                  Add to basket
-                </p>
-              </div>
             </div>
-            <p className="font-circular text-erniegreen italic text-xs">
-              You save 50p per kg when you subscribe!
-            </p>
-            <p className="font-circular text-erniegreen italic text-xs font-[500]">
-              You will be able to choose your subscription frequency at
-              checkout. If you already have a subscription with us, this will
-              automatically be added onto your next order.
-            </p>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
