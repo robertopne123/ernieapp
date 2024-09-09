@@ -18,7 +18,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useEffect } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
-import { Browser } from "@capacitor/browser";
 
 export default function CheckoutForm({
   billing,
