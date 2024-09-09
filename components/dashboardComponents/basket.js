@@ -1091,7 +1091,9 @@ export const Basket = ({
                     </div>
                   </div>
                   <div
-                    className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center"
+                    className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center ${
+                      selectedPayment == 0 && "invisible"
+                    }`}
                     onClick={(e) => {
                       if (managingSubscription) {
                         console.log(subAdjBasket);
@@ -1109,9 +1111,10 @@ export const Basket = ({
                       }
                     }}
                   >
+                    {console.log(selectedPayment)}
                     {processingOrder && (
                       <svg
-                        className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen`}
+                        className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

@@ -18,6 +18,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useEffect } from "react";
 import Router from "next/router";
 import { useRouter } from "next/router";
+import { Browser } from "@capacitor/browser";
 
 export default function CheckoutForm({
   billing,
@@ -339,7 +340,33 @@ export default function CheckoutForm({
     }
 
     const fetchData = async () => {
+      console.log("fetching");
+      console.log(window.location.origin);
+
       const session = await stripe.checkout.sessions.create({
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              type: "fixed_amount",
+              fixed_amount: {
+                amount: shippingTotal == "8.95" ? 895 : 0,
+                currency: "gbp",
+              },
+              display_name: "Shipping",
+            },
+          },
+        ],
+        line_items: line_items,
+        mode: "payment",
+        ui_mode: "embedded",
+        return_url: `${
+          window.location.origin
+        }/dashboard/order?msub=${managingSubscription}&ptype=${purchaseType}&odetails=${JSON.stringify(
+          orderDetails
+        )}`,
+      });
+
+      console.log({
         shipping_options: [
           {
             shipping_rate_data: {
@@ -363,11 +390,12 @@ export default function CheckoutForm({
 
       setSession(session.url);
       setUrlFromForm(session.url);
-
-      console.log(session);
     };
 
     fetchData();
+
+    console.log("new session");
+    console.log(session);
   }, [basket]);
 
   async function handleStripe() {
@@ -402,13 +430,22 @@ export default function CheckoutForm({
     <form className="h-full flex flex-col gap-4 justify-between">
       <div className="relative flex flex-col gap-4 bg-erniecream rounded-lg"></div>
       <div
-        className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-lg rounded-xl absolute bottom-6 left-0 mx-6"
+        className="bg-erniegold w-[calc(100%-48px)] py-2 text-erniegreen font-circe font-[900] text-lg rounded-xl absolute bottom-6 left-0 mx-6 z-10"
         onClick={(e) => {
-          let path = router.asPath;
+          try {
+            let path = router.asPath;
 
-          router.push(session);
+            // router.push(session);
 
-          handleSubmit(e);
+            console.log("session");
+            console.log(session);
+
+            Browser.open({ url: session });
+
+            handleSubmit(e);
+          } catch (error) {
+            console.log(error);
+          }
         }}
       >
         {processingOrder && (

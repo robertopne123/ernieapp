@@ -700,7 +700,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Account", index: 4, icon: "/circle-user.svg" },
   ];
 
-  const [testPlatform, setTestPlatform] = useState("");
+  const [testPlatform, setTestPlatform] = useState("ios");
 
   const goToTab = (tabID) => setTab(tabID);
 
