@@ -6,7 +6,7 @@ export default function Alert({ message, type, close, action, designStyle }) {
   return (
     <>
       <div
-        className={`w-full h-full absolute left-0 top-0 flex flex-col items-center py-16 alert ${
+        className={`w-full h-full absolute left-0 top-0 flex flex-col items-center py-16 alert pointer-events-none ${
           type == "Confirm" && "backdrop-blur justify-center"
         } z-[999]`}
       >

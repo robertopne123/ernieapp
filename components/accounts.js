@@ -31,7 +31,7 @@ export default function Accounts({
     <div className={`w-full h-full bg-erniemint pb-[80px]`}>
       {selectedPage == -1 && (
         <div
-          className={`grid grid-rows-4 gap-4 px-6 pt-6 bg-erniemint overflow-auto pb-6 ${
+          className={`grid grid-rows-4 gap-4 px-6 pt-6 bg-erniemint overflow-auto pb-6 cursor-pointer ${
             role == 0 ? "h-full" : "h-1/2"
           } w-full`}
         >
@@ -48,7 +48,7 @@ export default function Accounts({
               className="w-24 h-24 object-contain"
               priority
             ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
               Account
               <br className="xlmb:hidden" /> Details
             </p>
@@ -66,7 +66,7 @@ export default function Accounts({
               className="w-24 h-24 object-contain"
               priority
             ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
               Order
               <br className="xlmb:hidden" /> Summary
             </p>
@@ -84,9 +84,10 @@ export default function Accounts({
               className="w-24 h-24 object-contain -translate-y-[10px]"
               priority
             ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
-              Delivery
-              <br className="xlmb:hidden" /> & Returns
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
+              Delivery, Data
+              <br className="xlmb:hidden" />
+              Returns &
               <br />
               Policy
             </p>
@@ -104,7 +105,7 @@ export default function Accounts({
               className="w-24 h-24 object-contain"
               priority
             ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-3xl text-2xl">
+            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
               About
               <br className="xlmb:hidden" /> The App
             </p>

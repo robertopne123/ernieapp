@@ -155,50 +155,55 @@ export default function Preview({
               {product.description}
             </p>
           )}
-          <div className="flex flex-col">
-            <p className="font-circular text-sm text-erniegreen">
-              <span className="font-[900]">Taste notes: </span>
-              {product.productTags.nodes[0].name == "coffee" &&
-                product.coffeeExtraInfo.flavours}{" "}
-              {product.productTags.nodes[0].name == "hot chocolate" &&
-                product.hotChocolateExtraInfo.ingredients}{" "}
-              {product.productTags.nodes[0].name == "squirrel sisters" &&
-                product.chocolateBarsExtraInfo.ingredients}
-            </p>
-            <p className="font-circular text-sm text-erniegreen">
-              <span className="font-[900]">Origin: </span>
-              {product.productTags.nodes[0].name == "coffee" &&
-                product.coffeeExtraInfo.origin}{" "}
-              {product.productTags.nodes[0].name == "hot chocolate" &&
-                product.hotChocolateExtraInfo.origin}{" "}
-              {product.productTags.nodes[0].name == "squirrel sisters" &&
-                product.chocolateBarsExtraInfo.origin}
-            </p>
-            <p className="font-circular text-sm text-erniegreen">
-              <span className="font-[900]">
-                {product.productTags.nodes[0].name == "coffee"
-                  ? "Roast: "
-                  : "Diet Type: "}
-              </span>
-              {product.productTags.nodes[0].name == "coffee" &&
-                product.coffeeExtraInfo.roast}{" "}
-              {product.productTags.nodes[0].name == "hot chocolate" &&
-                product.hotChocolateExtraInfo.dietType}{" "}
-              {product.productTags.nodes[0].name == "squirrel sisters" &&
-                product.chocolateBarsExtraInfo.dietType}
-            </p>
-            <p
-              className={`font-circular text-sm text-erniegreen ${
-                product.coffeeExtraInfo.varietal != "-" &&
-                product.coffeeExtraInfo.varietal != null
-                  ? "flex"
-                  : "hidden"
-              }`}
-            >
-              <span className="font-[900]">Varietal: </span>
-              {product.coffeeExtraInfo.varietal}
-            </p>
-          </div>
+          {product.productTags.nodes[0].name == "containers" ||
+          product.productTags.nodes[0].name == "machines" ? (
+            <div></div>
+          ) : (
+            <div className="flex flex-col">
+              <p className={`font-circular text-sm text-erniegreen`}>
+                <span className="font-[900]">Taste notes: </span>
+                {product.productTags.nodes[0].name == "coffee" &&
+                  product.coffeeExtraInfo.flavours}{" "}
+                {product.productTags.nodes[0].name == "hot chocolate" &&
+                  product.hotChocolateExtraInfo.ingredients}{" "}
+                {product.productTags.nodes[0].name == "squirrel sisters" &&
+                  product.chocolateBarsExtraInfo.ingredients}
+              </p>
+              <p className="font-circular text-sm text-erniegreen">
+                <span className="font-[900]">Origin: </span>
+                {product.productTags.nodes[0].name == "coffee" &&
+                  product.coffeeExtraInfo.origin}{" "}
+                {product.productTags.nodes[0].name == "hot chocolate" &&
+                  product.hotChocolateExtraInfo.origin}{" "}
+                {product.productTags.nodes[0].name == "squirrel sisters" &&
+                  product.chocolateBarsExtraInfo.origin}
+              </p>
+              <p className="font-circular text-sm text-erniegreen">
+                <span className="font-[900]">
+                  {product.productTags.nodes[0].name == "coffee"
+                    ? "Roast: "
+                    : "Diet Type: "}
+                </span>
+                {product.productTags.nodes[0].name == "coffee" &&
+                  product.coffeeExtraInfo.roast}{" "}
+                {product.productTags.nodes[0].name == "hot chocolate" &&
+                  product.hotChocolateExtraInfo.dietType}{" "}
+                {product.productTags.nodes[0].name == "squirrel sisters" &&
+                  product.chocolateBarsExtraInfo.dietType}
+              </p>
+              <p
+                className={`font-circular text-sm text-erniegreen ${
+                  product.coffeeExtraInfo.varietal != "-" &&
+                  product.coffeeExtraInfo.varietal != null
+                    ? "flex"
+                    : "hidden"
+                }`}
+              >
+                <span className="font-[900]">Varietal: </span>
+                {product.coffeeExtraInfo.varietal}
+              </p>
+            </div>
+          )}
         </div>
       </div>
       {pType == 0 && (
@@ -237,7 +242,7 @@ export default function Preview({
                   {product.price == null ? "£0.00" : product.price}
                 </p>
                 <div
-                  className="bg-erniegold rounded-xl py-1 px-3 flex-grow"
+                  className="bg-erniegold rounded-xl py-1 px-3 flex-grow cursor-pointer"
                   onClick={() =>
                     addToOneOffBasket({
                       product: product,
@@ -293,7 +298,7 @@ export default function Preview({
                   {product.price == null ? "£0.00" : product.price}
                 </p>
                 <div
-                  className="bg-erniegold rounded-xl py-1 px-3 flex-grow"
+                  className="bg-erniegold rounded-xl py-1 px-3 flex-grow cursor-pointer"
                   onClick={() =>
                     addToSubBasket({
                       product: product,

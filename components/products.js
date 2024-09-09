@@ -333,7 +333,8 @@ export default function Products({
 
         if (
           productsCopy[i].productTags?.nodes[0].name != "coffee machine" &&
-          productsCopy[i].productTags?.nodes[0].name != "old-products"
+          productsCopy[i].productTags?.nodes[0].name != "old-products" &&
+          productsCopy[i].productTags?.nodes[0].name != "Donation"
         ) {
           if (groups.length != 0) {
             for (let j = 0; j < groups.length; j++) {
@@ -584,7 +585,7 @@ export default function Products({
                 </div>
               ))}
 
-            <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2">
+            <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2 cursor-pointer">
               {getGroupedProducts().map((group, index) => (
                 <div
                   className={`py-2 px-3 rounded-lg text-nowrap w-full ${
@@ -596,7 +597,7 @@ export default function Products({
                   }}
                 >
                   <p
-                    className={`font-circular font-[500] text-sm capitalize tab ${
+                    className={`font-circular font-[500] text-sm capitalize tab text-nowrap ${
                       selectedTab == index
                         ? "text-erniecream"
                         : "text-erniegreen"
@@ -701,7 +702,7 @@ export default function Products({
                         </div> */}
                           </div>
                           <div
-                            className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2"
+                            className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer"
                             onClick={() => {
                               setSelectedBrands(index);
                               setSelectedProduct(productIndex);

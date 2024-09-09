@@ -27,6 +27,7 @@ module.exports = {
         ernielightgold: "#f8c069",
         erniedarkcream: "#e7e8c7",
         erniecreamshadow: "#929277",
+        groundswell: "#F9B744",
       },
       fontFamily: {
         circular: ["var(--font-circularstd)"],

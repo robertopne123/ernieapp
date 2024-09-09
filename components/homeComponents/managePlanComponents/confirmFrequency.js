@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export const ConfirmFrequency = ({
   close,
+  onComplete,
   difference,
   update,
   updateSubError,
@@ -61,6 +62,7 @@ export const ConfirmFrequency = ({
             className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
             onClick={() => {
               update();
+              onComplete();
             }}
           >
             <p className="font-circe text-erniegreen font-[900] text-xl text-center">

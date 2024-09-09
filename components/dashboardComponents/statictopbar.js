@@ -26,6 +26,8 @@ export const StaticTopBar = ({
   setOrderDetails,
   showingBasket,
   setShowingBasket,
+  coupons,
+  products,
 }) => {
   const addToSubBasketFromBar = (item) => {
     addToSubBasket(item);
@@ -84,7 +86,7 @@ export const StaticTopBar = ({
   };
 
   return (
-    <div className="h-20 w-full bg-ernieteal py-4 px-6 flex flex-row justify-between z-[999]">
+    <div className="h-20 w-full bg-ernieteal py-4 px-6 flex flex-row justify-between z-[20]">
       <img src="/Asset-1@2x2.png" className="w-32 my-auto"></img>
       <Basket
         addToSubBasket={addToSubBasketFromBar}
@@ -112,6 +114,8 @@ export const StaticTopBar = ({
         setOrderDetails={setOrderDetailsFromBar}
         showingBasket={showingBasket}
         setShowingBasket={setShowingBasketFromBar}
+        coupons={coupons}
+        products={products}
       />
     </div>
   );

@@ -59,11 +59,16 @@ export default function Dashboard({ data, categories, products, orders }) {
   const fn = searchParams.get("fn");
   const customerId = searchParams.get("cid");
   const email = searchParams.get("email");
+  const newUser = searchParams.get("new");
+
+  console.log(newUser);
 
   const [activeTab, setTab] = useState(0);
 
   const [dataObject, setData] = useState(null);
   const [cartObject, setCart] = useState(null);
+
+  const [justRegistered, setJustRegistered] = useState(newUser === "true");
 
   const [employees, setEmployees] = useState(null);
 
@@ -90,6 +95,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [firstTimeUser, setFirstTimeUser] = useState(false);
 
   const [orderData, setOrders] = useState([]);
+  const [couponData, setCoupons] = useState([]);
 
   const [hasSubscription, setHasSubscription] = useState(false);
   const [subscriptionAttempt, setSubAttempt] = useState(false);
@@ -99,6 +105,8 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [purchasing, setPurchasing] = useState(false);
 
   const [newPurchase, setNewPurchase] = useState(false);
+
+  const [updatedPlan, setUpdatedPlan] = useState(false);
 
   useEffect(() => {
     console.log(subscriptions);
@@ -320,14 +328,17 @@ export default function Dashboard({ data, categories, products, orders }) {
                 status
               }
             }
-            coupons(where: { code: $email }) {
+            coupons {
               nodes {
                 code
-                amount
+                limitUsageToXItems
+                products {
+                  nodes {
+                    databaseId
+                  }
+                }
                 discountType
-                usageLimitPerUser
-                usageCount
-                id
+                freeShipping
               }
             }
             employeeLists(where: { name: $email }) {
@@ -359,6 +370,8 @@ export default function Dashboard({ data, categories, products, orders }) {
         console.log(data.data.clients.nodes[0].databaseId);
 
         setOrders(data.data.orders.nodes);
+
+        setCoupons(data.data.coupons.nodes);
 
         // for (let i = 0; i < data.data.orders.nodes.length; i++) {
         //   // console.log(data.data.orders.nodes[i]);
@@ -726,6 +739,8 @@ export default function Dashboard({ data, categories, products, orders }) {
   const updatePlanFrequency = (planDetails) => {
     const client = graphqlClient;
 
+    console.log(planDetails);
+
     client
       .mutate({
         mutation: gql`
@@ -786,9 +801,13 @@ export default function Dashboard({ data, categories, products, orders }) {
 
         setSubscriptions(dataNew);
         console.log(dataNew);
+
+        setUpdatedPlan(true);
       })
       .catch((error) => {
         setUpdateSubError(error);
+
+        console.log("error");
       });
   };
 
@@ -815,13 +834,13 @@ export default function Dashboard({ data, categories, products, orders }) {
           console.log(j);
 
           console.log(
-            planDetailsTemp[i].product.node.name +
+            planDetailsTemp[i].product.node?.name +
               " - " +
-              newChanges[j].product.node.name
+              newChanges[j].product.node?.name
           );
 
           if (
-            planDetailsTemp[i].product.node.name ==
+            planDetailsTemp[i].product.node?.name ==
             newChanges[j].product.node.name
           ) {
             console.log("product already exists");
@@ -835,7 +854,7 @@ export default function Dashboard({ data, categories, products, orders }) {
           } else {
             newChanges.push(planDetailsTemp[i]);
 
-            console.log("new - " + planDetailsTemp[i].product.node.name);
+            console.log("new - " + planDetailsTemp[i].product.node?.name);
 
             break;
           }
@@ -863,12 +882,12 @@ export default function Dashboard({ data, categories, products, orders }) {
       foundProduct = false;
       for (let j = 0; j < existingSubscriptionProducts.length; j++) {
         if (
-          newChanges[i].product.node.name ==
+          newChanges[i].product.node?.name ==
           existingSubscriptionProducts[j].product.node.name
         ) {
           console.log(
             "Comparing ",
-            newChanges[i].product.node.name,
+            newChanges[i].product.node?.name,
             " - ",
             existingSubscriptionProducts[j].product.node.name
           );
@@ -924,13 +943,13 @@ export default function Dashboard({ data, categories, products, orders }) {
       for (let j = 0; j < newChanges.length; j++) {
         if (
           existingSubscriptionProducts[i].product.node.name ==
-          newChanges[j].product.node.name
+          newChanges[j].product.node?.name
         ) {
           console.log(
             "Comparing ",
             existingSubscriptionProducts[i].product.node.name,
             " - ",
-            newChanges[j].product.node.name
+            newChanges[j].product.node?.name
           );
           foundProduct = true;
         }
@@ -973,12 +992,18 @@ export default function Dashboard({ data, categories, products, orders }) {
                     databaseId
                     lineItems {
                       nodes {
+                        databaseId
                         quantity
                         product {
                           node {
                             name
-                            description
+                            description(format: RAW)
                             databaseId
+                            featuredImage {
+                              node {
+                                sourceUrl
+                              }
+                            }
                             ... on SimpleProduct {
                               id
                               name
@@ -986,27 +1011,39 @@ export default function Dashboard({ data, categories, products, orders }) {
                             }
                           }
                         }
-                        databaseId
                       }
                     }
+                    billingPeriod
+                    billingInterval
+                    nextPaymentDate
                   }
                 }
               }
             `,
             variables: {
               id: subscriptions.data.subscription.subscription.databaseId,
-              productId: changes[i].product.product.node.databaseId + "",
+              productId: changes[i].product.product.node?.databaseId + "",
               productQuantity: changes[i].difference,
             },
           })
           .then((data) => {
-            setSubscriptions(data);
+            console.log(data);
+
+            let updateSubscriptions = {
+              subscriptions: {
+                data: {
+                  subscription: data.data.addProductToSubscription,
+                },
+              },
+            };
+
+            setSubscriptions(updateSubscriptions);
 
             setOrderComplete(true);
 
-            setOrderDetails(data);
+            setOrderDetails(updateSubscriptions);
 
-            console.log(data);
+            console.log(updateSubscriptions);
           })
           .catch((error) => {
             setUpdateSubError(error);
@@ -1023,12 +1060,18 @@ export default function Dashboard({ data, categories, products, orders }) {
                     databaseId
                     lineItems {
                       nodes {
+                        databaseId
                         quantity
                         product {
                           node {
                             name
-                            description
+                            description(format: RAW)
                             databaseId
+                            featuredImage {
+                              node {
+                                sourceUrl
+                              }
+                            }
                             ... on SimpleProduct {
                               id
                               name
@@ -1036,9 +1079,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                             }
                           }
                         }
-                        databaseId
                       }
                     }
+                    billingPeriod
+                    billingInterval
+                    nextPaymentDate
                   }
                 }
               }
@@ -1049,7 +1094,17 @@ export default function Dashboard({ data, categories, products, orders }) {
             },
           })
           .then((data) => {
-            setSubscriptions(data);
+            console.log(data);
+
+            let updateSubscriptions = {
+              subscriptions: {
+                data: {
+                  subscription: data.data.removeProductFromSubscription,
+                },
+              },
+            };
+
+            setSubscriptions(updateSubscriptions);
 
             setOrderComplete(true);
           })
@@ -1070,12 +1125,18 @@ export default function Dashboard({ data, categories, products, orders }) {
                     databaseId
                     lineItems {
                       nodes {
+                        databaseId
                         quantity
                         product {
                           node {
                             name
-                            description
+                            description(format: RAW)
                             databaseId
+                            featuredImage {
+                              node {
+                                sourceUrl
+                              }
+                            }
                             ... on SimpleProduct {
                               id
                               name
@@ -1083,9 +1144,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                             }
                           }
                         }
-                        databaseId
                       }
                     }
+                    billingPeriod
+                    billingInterval
+                    nextPaymentDate
                   }
                 }
               }
@@ -1121,12 +1184,18 @@ export default function Dashboard({ data, categories, products, orders }) {
                         databaseId
                         lineItems {
                           nodes {
+                            databaseId
                             quantity
                             product {
                               node {
                                 name
+                                description(format: RAW)
                                 databaseId
-                                description
+                                featuredImage {
+                                  node {
+                                    sourceUrl
+                                  }
+                                }
                                 ... on SimpleProduct {
                                   id
                                   name
@@ -1134,9 +1203,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 }
                               }
                             }
-                            databaseId
                           }
                         }
+                        billingPeriod
+                        billingInterval
+                        nextPaymentDate
                       }
                     }
                   }
@@ -1150,7 +1221,17 @@ export default function Dashboard({ data, categories, products, orders }) {
               .then((data) => {
                 console.log("New QTY Added");
 
-                setSubscriptions(data);
+                console.log(data);
+
+                let updateSubscriptions = {
+                  subscriptions: {
+                    data: {
+                      subscription: data.data.addProductToSubscription,
+                    },
+                  },
+                };
+
+                setSubscriptions(updateSubscriptions);
 
                 setOrderComplete(true);
               })
@@ -1315,7 +1396,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   console.log(employerUserID);
 
   const completeTutorial = () => {
-    setFirstTimeUser(false);
+    setJustRegistered(false);
   };
 
   //Basket Functions
@@ -1375,6 +1456,8 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   return (
     <div>
+      {console.log(managingSubscription)}
+      {updatedPlan && <Alert message={"Updated frequency"} />}
       {dataObject != null && (
         <main
           className={`flex max-h-screen h-screen ${
@@ -1383,7 +1466,7 @@ export default function Dashboard({ data, categories, products, orders }) {
             circularstd.variable
           } font-sans ${circerounded.variable} font-sans`}
         >
-          {/* {firstTimeUser && <Tutorial completeTutorial={completeTutorial} />} */}
+          {justRegistered && <Tutorial completeTutorial={completeTutorial} />}
           <div className="xl:flex hidden text-erniegreen px-4">
             <p>Please use a mobile phone to view this page</p>
           </div>
@@ -1414,6 +1497,8 @@ export default function Dashboard({ data, categories, products, orders }) {
               setOrderDetails={setOrderDetails}
               showingBasket={showingBasket}
               setShowingBasket={setShowingBasket}
+              coupons={couponData}
+              products={dataObject.data.products.nodes}
             />
             <div
               className={`${
@@ -1518,7 +1603,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                 tabs.map((tab, index) => (
                   <div
                     key={index}
-                    className={`flex-grow h-full flex flex-col gap-2 justify-center ${
+                    className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint ${
                       tab.index == activeTab ? "bg-erniemint" : ""
                     } `}
                     onClick={(e) => {
@@ -1526,6 +1611,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                       setNewPurchase(false);
                       console.log(tab.index, activeTab);
                       setShowingBasket(false);
+                      setManagingSubscription(false);
                     }}
                   >
                     <div className="w-8 h-8 mx-auto relative">

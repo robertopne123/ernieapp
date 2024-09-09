@@ -35,6 +35,8 @@ export const Basket = ({
   setOrderDetails,
   showingBasket,
   setShowingBasket,
+  coupons,
+  products,
 }) => {
   const stripePromise = loadStripe(
     "pk_live_51Pglrw2Kqe9gzhhxqUyBOvx7Zfyn7z51eC6170fBY07jjDRD6wro4hyDYtvjfQyOwhxAxsGLFV6X0N8UMqo40n4d00LXY8HJl4"
@@ -59,6 +61,19 @@ export const Basket = ({
   const [sPostcodeError, setSPostcodeError] = useState(false);
   const [bPostcodeError, setBPostcodeError] = useState(false);
   const [contactNumberError, setContactNumberError] = useState(false);
+
+  const [donationAmount, setDonationAmount] = useState(0.0);
+  const [voucherAmount, setVoucherAmount] = useState(0.0);
+  const [deliveryAmount, setDeliveryAmount] = useState(0.0);
+
+  const [voucher, setVoucher] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState("");
+  const [voucherApplied, setVoucherApplied] = useState(false);
+  const [voucherFound, setVoucherFound] = useState(false);
+  const [voucherInvalid, setVoucherInvalid] = useState(false);
+  const [voucherInvalidMsg, setVoucherInvalidMsg] = useState("");
+  const [matchedProduct, setMatchedProduct] = useState(-1);
+  const [mProducts, setMProducts] = useState([]);
 
   const router = useRouter();
 
@@ -291,10 +306,37 @@ export const Basket = ({
     }
 
     for (let i = 0; i < basket.length; i++) {
+      console.log(basket[i]);
+
+      if (mProducts.length > 0) {
+        if (
+          basket[i].product.databaseId ==
+          mProducts[mProducts.length - 1]?.databaseId
+        ) {
+          if (basket[i].quantity > 1) {
+            for (let j = 0; j < basket[i].quantity; j++) {
+              lineItems.push({
+                name: basket[i].product.name,
+                productId: basket[i].product.databaseId,
+                quantity: basket[i].quantity,
+              });
+            }
+          }
+        }
+      }
+
       lineItems.push({
         name: basket[i].product.name,
         productId: basket[i].product.databaseId,
         quantity: basket[i].quantity,
+      });
+    }
+
+    if (addDonation) {
+      lineItems.push({
+        name: "Groundswell Donation",
+        productId: 3723,
+        quantity: parseInt(donationAmount),
       });
     }
 
@@ -356,6 +398,7 @@ export const Basket = ({
               lineItems: lineItems,
               customerId: parseInt(customerId),
               customerNote: "Ernie App Order",
+              coupons: appliedVoucher,
               billing: {
                 address1: bAddress,
                 company: businessName,
@@ -372,7 +415,7 @@ export const Basket = ({
                 {
                   methodId: mId,
                   methodTitle: mTitle,
-                  total: total,
+                  total: appliedVoucher == "FREECOFFEE" ? "0.0" : total,
                 },
               ],
             },
@@ -424,7 +467,7 @@ export const Basket = ({
                 },
               ],
               billingInterval: interval + "",
-              billingPeriod: "month",
+              billingPeriod: period,
             },
           },
         })
@@ -445,12 +488,13 @@ export const Basket = ({
 
   const backAction = () => {
     setShowingCheckout(false);
+    setVoucherApplied(false);
   };
 
   const pathname = usePathname();
 
   const paymentOptions = [
-    { image: "/Visa_Inc._logo.svg", name: "stripe" },
+    // { image: "/Visa_Inc._logo.svg", name: "stripe" },
     // { image: "/Paypal.svg" },
     // { image: "/Apple_Pay_logo.svg" },
     // { image: "/Google_Pay_Logo.svg" },
@@ -462,6 +506,8 @@ export const Basket = ({
   const [ping, setPing] = useState(false);
 
   const [showBillingAddress, setShowBillingAddress] = useState(true);
+
+  const [addDonation, setDonation] = useState(false);
 
   useEffect(() => {
     let basketIndicator = document.getElementById("indicator");
@@ -482,9 +528,17 @@ export const Basket = ({
 
   useEffect(() => {
     setInterval(
-      parseInt(subscriptions.data?.subscription?.subscription?.billingInterval)
+      parseInt(
+        subscriptions.data?.subscription?.subscription?.billingInterval
+          ? subscriptions.data?.subscription?.subscription?.billingInterval
+          : 1
+      )
     );
-    setPeriod(subscriptions.data?.subscription?.subscription?.billingPeriod);
+    setPeriod(
+      subscriptions.data?.subscription?.subscription?.billingPeriod
+        ? subscriptions.data?.subscription?.subscription?.billingPeriod
+        : "week"
+    );
   }, [subscriptions]);
 
   const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
@@ -502,9 +556,154 @@ export const Basket = ({
     setProcessingOrder(false);
   }, [orderComplete]);
 
+  useEffect(() => {
+    if (managingSubscription) {
+      if (voucherApplied && appliedVoucher == "FREECOFFEE") {
+        setDeliveryAmount(0.0);
+
+        for (let i = 0; i < subAdjBasket.length; i++) {
+          console.log(subAdjBasket[i]);
+        }
+
+        setVoucherAmount(
+          parseFloat(
+            subAdjBasket[subAdjBasket.length - 1]?.product.price.replace(
+              "£",
+              ""
+            )
+          ) * -1
+        );
+      } else {
+        if (
+          parseFloat(getCurSubSubTotal().toFixed(2)) +
+            parseFloat(getSubSubtotal().toFixed(2)) <
+          80.0
+        ) {
+          setDeliveryAmount(8.95);
+          setVoucherAmount(0.0);
+        } else {
+          setDeliveryAmount(0.0);
+          setVoucherAmount(0.0);
+        }
+      }
+    } else {
+      if (purchaseType == 0) {
+        if (voucherApplied) {
+          let currentVoucher = {};
+
+          for (let i = 0; i < coupons.length; i++) {
+            if (coupons[i].code == appliedVoucher.toLowerCase()) {
+              currentVoucher = coupons[i];
+            }
+          }
+
+          console.log(currentVoucher);
+
+          if (currentVoucher.freeShipping) {
+            setDeliveryAmount(0.0);
+          } else {
+            setDeliveryAmount(8.95);
+          }
+
+          for (let i = 0; i < oneOffBasket.length; i++) {
+            console.log(oneOffBasket[i]);
+          }
+
+          setVoucherAmount(
+            parseFloat(
+              oneOffBasket[oneOffBasket.length - 1]?.product.price.replace(
+                "£",
+                ""
+              )
+            ) * -1
+          );
+        } else {
+          if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
+            setDeliveryAmount(8.95);
+            setVoucherAmount(0.0);
+          } else {
+            setDeliveryAmount(0.0);
+            setVoucherAmount(0.0);
+          }
+        }
+      } else {
+        if (voucherApplied && appliedVoucher == "FREECOFFEE") {
+          setDeliveryAmount(0.0);
+
+          for (let i = 0; i < subAdjBasket.length; i++) {
+            console.log(subAdjBasket[i]);
+          }
+
+          setVoucherAmount(
+            parseFloat(
+              subAdjBasket[subAdjBasket.length - 1]?.product.price.replace(
+                "£",
+                ""
+              )
+            ) * -1
+          );
+        } else {
+          if (parseFloat(getSubSubtotal().toFixed(2)) < 80.0) {
+            setDeliveryAmount(8.95);
+            setVoucherAmount(0.0);
+          } else {
+            setDeliveryAmount(0.0);
+            setVoucherAmount(0.0);
+          }
+        }
+      }
+    }
+  }, [
+    subAdjBasket,
+    getCurSubSubTotal,
+    getSubSubtotal,
+    voucher,
+    voucherApplied,
+    managingSubscription,
+    oneOffBasket,
+    getOneOffSubtotal,
+    purchaseType,
+    coupons,
+    appliedVoucher,
+  ]);
+
+  useEffect(() => {
+    if (addDonation) {
+    } else {
+      setDonationAmount(0.0);
+    }
+  }, [addDonation]);
+
+  useEffect(() => {
+    console.log(mProducts);
+
+    let higher = 0.0;
+    let location = 0;
+
+    for (let i = 0; i < mProducts.length; i++) {
+      if (
+        (
+          parseFloat(mProducts[i].product.price.replace("£", "")) *
+          mProducts[i].quantity
+        ).toFixed(2) > higher
+      ) {
+        higher = (
+          parseFloat(mProducts[i].product.price.replace("£", "")) *
+          mProducts[i].quantity
+        ).toFixed(2);
+        location = i;
+      }
+    }
+
+    console.log(higher);
+
+    setMatchedProduct(location);
+  }, [mProducts]);
+
   return (
     <div className="flex flex-col justify-center z-[999]">
-      <div className="relative">
+      <div className="relative cursor-pointer hover:bg-erniemint p-2 mr-[-8px]">
+        {console.log(oneOffBasket)}
         <img
           id="indicator"
           src="/ERNIE_APP_ICON_CART_V1.png"
@@ -544,10 +743,12 @@ export const Basket = ({
                     <div className="mt-2 flex flex-col">
                       <p className="font-circular font-[500] text-erniegreen">
                         {managingSubscription ? "Subscription " : "Order "}{" "}
+                        {console.log(orderDetails)}
                         Number:{" "}
                         {purchaseType == 1
                           ? managingSubscription
-                            ? 0
+                            ? orderDetails.subscriptions.data.subscription
+                                .subscription.databaseId
                             : orderDetails.data.createSubscription.subscription
                                 .databaseId
                           : 0}
@@ -597,20 +798,7 @@ export const Basket = ({
                       } else {
                         clearSubBasket();
 
-                        let data = {
-                          data: {
-                            subscription: {
-                              subscription: orderDetails.data
-                                .addProductToSubscription
-                                ? orderDetails.data.addProductToSubscription
-                                    ?.subscription
-                                : orderDetails.data
-                                    .removeProductFromSubscription
-                                    ?.subscription,
-                            },
-                          },
-                        };
-
+                        let data = orderDetails;
                         console.log(data);
 
                         setSubscriptions(data);
@@ -821,7 +1009,7 @@ export const Basket = ({
                   </div>
                   <div className="bg-erniecream rounded-xl p-6 flex flex-col">
                     <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
-                      Vouchers & Discounts
+                      Coupons & Discounts
                     </p>
                     <img src="/divider.png" className=" w-full mt-2"></img>
                     <div className="flex flex-col gap-4 mt-4">
@@ -831,10 +1019,201 @@ export const Basket = ({
                           name="voucher"
                           placeholder="Enter code here"
                           onChange={(e) => {
-                            // setRBusinessName(e.currentTarget.value);
+                            setVoucher(e.currentTarget.value);
                           }}
-                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                          onPaste={(e) => {
+                            setVoucher(e.currentTarget.value);
+                          }}
+                          className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] rounded-lg outline-erniegold outline-[1px] ${
+                            voucherInvalid
+                              ? "border-red-500"
+                              : voucherApplied
+                              ? "border-ernieteal"
+                              : "border-erniegreen"
+                          }`}
                         ></input>
+                      </div>
+                      {voucherApplied && (
+                        <div className="flex flex-row">
+                          <div
+                            className="p-2 bg-erniedarkcream flex flex-row gap-2 rounded-lg cursor-pointer"
+                            onClick={(e) => {
+                              setVoucherApplied(false);
+                            }}
+                          >
+                            <p className="font-circular text-erniegreen text-xs font-[500]">
+                              {appliedVoucher}
+                            </p>
+                            <img src="/cross.svg" className="w-3"></img>
+                          </div>
+                        </div>
+                      )}
+                      {voucherInvalid && (
+                        <div className="flex flex-row">
+                          <p className="font-circular text-red-500 text-xs font-[500]">
+                            {voucherInvalidMsg}
+                          </p>
+                        </div>
+                      )}
+                      <div
+                        className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer`}
+                        onClick={(e) => {
+                          console.log(voucher);
+
+                          console.log(coupons);
+
+                          console.log(oneOffBasket);
+
+                          let vFound = false;
+
+                          let productsForCode = [];
+
+                          for (let i = 0; i < coupons.length; i++) {
+                            if (coupons[i].code == voucher.toLowerCase()) {
+                              console.log(
+                                coupons[i].code,
+                                voucher.toLowerCase()
+                              );
+                              if (coupons[i].limitUsageToXItems == 1) {
+                                if (purchaseType == 0) {
+                                  productsForCode = coupons[i].products.nodes;
+
+                                  let matchingProducts = [];
+
+                                  for (
+                                    let a = 0;
+                                    a < productsForCode.length;
+                                    a++
+                                  ) {
+                                    for (
+                                      let b = 0;
+                                      b < oneOffBasket.length;
+                                      b++
+                                    ) {
+                                      console.log(
+                                        productsForCode[a].databaseId,
+                                        oneOffBasket[b].product.databaseId
+                                      );
+                                      if (
+                                        productsForCode[a].databaseId ==
+                                        oneOffBasket[b].product.databaseId
+                                      ) {
+                                        matchingProducts.push(oneOffBasket[b]);
+                                        break;
+                                      } else {
+                                      }
+                                    }
+                                  }
+
+                                  console.log(matchingProducts);
+
+                                  if (matchingProducts.length > 0) {
+                                    console.log(purchaseType);
+                                    setVoucherApplied(true);
+                                    setVoucherFound(true);
+                                    vFound = true;
+                                    setVoucherInvalid(false);
+                                    setAppliedVoucher(voucher);
+                                    console.log(matchingProducts);
+                                    setMProducts(matchingProducts);
+                                  } else {
+                                    console.log("sub");
+                                    console.log(purchaseType);
+                                    setVoucherApplied(false);
+                                    setVoucherFound(true);
+                                    vFound = true;
+                                    setVoucherInvalid(true);
+                                    setVoucherInvalidMsg(
+                                      "You have no valid items in your basket"
+                                    );
+                                  }
+                                } else {
+                                  console.log("sub");
+                                  console.log(purchaseType);
+                                  setVoucherApplied(false);
+                                  setVoucherFound(true);
+                                  vFound = true;
+                                  setVoucherInvalid(true);
+                                  setVoucherInvalidMsg(
+                                    "This coupon can only be applied to one-off orders"
+                                  );
+                                }
+                              } else {
+                                console.log(coupons[i].limitUsageToXItems);
+                                setVoucherApplied(true);
+                                setVoucherFound(true);
+                                vFound = true;
+                                setVoucherInvalid(false);
+                                setAppliedVoucher(voucher);
+
+                                productsForCode = coupons[i].products.nodes;
+
+                                let matchingProducts = [];
+
+                                for (
+                                  let a = 0;
+                                  a < productsForCode.length;
+                                  a++
+                                ) {
+                                  for (
+                                    let b = 0;
+                                    b < oneOffBasket.length;
+                                    b++
+                                  ) {
+                                    console.log(
+                                      productsForCode[a].databaseId,
+                                      oneOffBasket[b].product.databaseId
+                                    );
+                                    if (
+                                      productsForCode[a].databaseId ==
+                                      oneOffBasket[b].product.databaseId
+                                    ) {
+                                      matchingProducts.push(oneOffBasket[b]);
+                                    }
+                                  }
+                                }
+
+                                console.log(matchingProducts);
+
+                                if (matchingProducts.length > 0) {
+                                  console.log(purchaseType);
+                                  setVoucherApplied(true);
+                                  setVoucherFound(true);
+                                  vFound = true;
+                                  setVoucherInvalid(false);
+                                  setAppliedVoucher(voucher);
+                                } else {
+                                  console.log("sub");
+                                  console.log(purchaseType);
+                                  setVoucherApplied(false);
+                                  setVoucherFound(true);
+                                  vFound = true;
+                                  setVoucherInvalid(true);
+                                  setVoucherInvalidMsg(
+                                    "You have no valid items in your basket"
+                                  );
+                                }
+                              }
+
+                              break;
+                            } else {
+                              continue;
+                            }
+                          }
+
+                          if (!vFound) {
+                            console.log(voucher);
+                            setVoucherInvalid(true);
+                            setVoucherInvalidMsg("Invalid coupon");
+                            setVoucherApplied(false);
+                          }
+                        }}
+                      >
+                        <p
+                          className={`font-circe font-[900] text-erniegreen text-center text-lg`}
+                        >
+                          Apply Voucher
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -864,7 +1243,7 @@ export const Basket = ({
                             </div>
                             {selectedPayment == index && (
                               <>
-                                {index == 0 && (
+                                {/* {index == 0 && (
                                   <div className="bg-erniedarkcream">
                                     {console.log(period)}
                                     <CheckoutForm
@@ -1017,7 +1396,7 @@ export const Basket = ({
                                       orderDetails={orderDetails}
                                     />
                                   </div>
-                                )}
+                                )} */}
                               </>
                             )}
                           </div>
@@ -1075,6 +1454,67 @@ export const Basket = ({
                           </div>
                         </div>
                       ))}
+                      <div className="w-full h-[1px] bg-erniegreen mt-4"></div>
+                      <div className="flex flex-row justify-between mt-4">
+                        <p className="font-circular text-erniegreen text-sm">
+                          Delivery Fee
+                        </p>
+                        <p className="font-circular text-erniegreen text-sm">
+                          £{deliveryAmount.toFixed(2)}
+                        </p>
+                      </div>
+                      {addDonation && (
+                        <div className="flex flex-row justify-between mt-2">
+                          <p className="font-circular text-erniegreen text-sm">
+                            Donation
+                          </p>
+                          <p className="font-circular text-erniegreen text-sm">
+                            £{donationAmount.toFixed(2)}
+                          </p>
+                        </div>
+                      )}
+                      {voucherApplied && (
+                        <div className="flex flex-row justify-between mt-2">
+                          <p className="font-circular text-erniegreen text-sm font-[500]">
+                            DISCOUNT: {appliedVoucher}
+                          </p>
+                          <p className="font-circular text-erniegreen text-sm">
+                            -
+                            {purchaseType == 0 &&
+                              mProducts[matchedProduct]?.product.price}
+                          </p>
+                          {console.log(matchedProduct)}
+                        </div>
+                      )}
+                      <div className="flex flex-row justify-between mt-2">
+                        <p className="font-circular font-[900] text-erniegreen">
+                          Total
+                        </p>
+                        <p className="font-circular font-[900] text-erniegreen text-sm">
+                          £
+                          {managingSubscription
+                            ? (
+                                parseFloat(getCurSubSubTotal().toFixed(2)) +
+                                parseFloat(getSubSubtotal().toFixed(2)) +
+                                parseFloat(deliveryAmount.toFixed(2)) +
+                                parseFloat(donationAmount.toFixed(2)) +
+                                parseFloat(voucherAmount.toFixed(2))
+                              ).toFixed(2)
+                            : purchaseType == 0
+                            ? (
+                                parseFloat(getOneOffSubtotal().toFixed(2)) +
+                                parseFloat(deliveryAmount.toFixed(2)) +
+                                parseFloat(donationAmount.toFixed(2)) +
+                                parseFloat(voucherAmount.toFixed(2))
+                              ).toFixed(2)
+                            : (
+                                parseFloat(getSubSubtotal().toFixed(2)) +
+                                parseFloat(deliveryAmount.toFixed(2)) +
+                                parseFloat(donationAmount.toFixed(2)) +
+                                parseFloat(voucherAmount.toFixed(2))
+                              ).toFixed(2)}
+                        </p>
+                      </div>
                       {purchaseType == 1 && (
                         <p className="font-circular font-[500] text-erniegreen text-right">
                           {period == "week" && interval == 1
@@ -1090,12 +1530,31 @@ export const Basket = ({
                       )}
                     </div>
                   </div>
+                  {console.log(subAdjBasket)}
                   <div
-                    className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center ${
-                      selectedPayment == 0 && "invisible"
-                    }`}
+                    className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer`}
                     onClick={(e) => {
                       if (managingSubscription) {
+                        console.log(donationAmount);
+                        console.log(addDonation);
+
+                        console.log(products);
+
+                        let donationProduct = {};
+
+                        for (let i = 0; i < products.length; i++) {
+                          if (products[i].databaseId == 3723) {
+                            donationProduct = products[i];
+                          }
+                        }
+
+                        if (addDonation) {
+                          subAdjBasket.push({
+                            product: { node: donationProduct },
+                            quantity: donationAmount,
+                          });
+                        }
+
                         console.log(subAdjBasket);
 
                         updatePlan(subAdjBasket);
@@ -1248,6 +1707,7 @@ export const Basket = ({
                             ))}
                           </div>
                         </div>
+
                         <div className="bg-erniecream rounded-xl p-6 flex flex-col">
                           <p className="font-circe text-xl text-erniegreen font-[900] uppercase">
                             Subscription Frequency
@@ -1256,7 +1716,7 @@ export const Basket = ({
                             src="/divider.png"
                             className=" w-full mt-2"
                           ></img>
-                          {managingSubscription && (
+                          {purchaseType == 1 && (
                             <p className="font-circular text-erniegreen font-[500] text-sm mt-2">
                               Note: This is change your entire subscriptions
                               frequency.
@@ -1264,6 +1724,7 @@ export const Basket = ({
                           )}
                           <select
                             name="frequency"
+                            disabled={managingSubscription}
                             onChange={(e) => {
                               setNewSubFrequency(e.target.value.toUpperCase());
 
@@ -1336,6 +1797,12 @@ export const Basket = ({
                               {"Bi-monthly (once every two months)"}
                             </option>
                           </select>
+                          {managingSubscription && (
+                            <p className="font-circular text-red-500 font-[500] text-xs mt-2">
+                              The subscription can only be adjusted by visiting
+                              Manage Plan
+                            </p>
+                          )}
                         </div>
                       </>
                     )}
@@ -1392,6 +1859,95 @@ export const Basket = ({
                   )}
                 </>
               )}
+              <div className="bg-ernieteal rounded-xl p-6 flex flex-col">
+                <img
+                  src="/groundswellimg.jpg"
+                  className="bg-groundswell w-36 p-2 object-cover rounded-lg"
+                ></img>
+                <p className="font-circe font-[900] uppercase text-erniecream text-xl mt-4">
+                  Donate to Groundswell
+                </p>
+
+                <p className="font-circular font-[500] text-erniecream">
+                  Add a £1 donation to Groundswell to your order
+                </p>
+                <div className="flex flex-row mt-2 items-center gap-2">
+                  <div className="grid grid-cols-4 gap-2 w-full">
+                    <div className="flex flex-row gap-2 relative">
+                      <label
+                        htmlFor="donation"
+                        className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                      >
+                        £0.00
+                      </label>
+                      <input
+                        type="radio"
+                        name="donation"
+                        className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10 cursor-pointer"
+                        value={"0.0"}
+                        onChange={(e) => {
+                          setDonation(false);
+                          setDonationAmount(0.0);
+                        }}
+                      ></input>
+                    </div>
+                    <div className="flex flex-row gap-2 relative">
+                      <label
+                        htmlFor="donation"
+                        className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                      >
+                        £1.00
+                      </label>
+                      <input
+                        type="radio"
+                        name="donation"
+                        className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10 cursor-pointer"
+                        value={"1.0"}
+                        onChange={(e) => {
+                          setDonation(true);
+                          setDonationAmount(1.0);
+                        }}
+                      ></input>
+                    </div>
+                    <div className="flex flex-row gap-2 relative">
+                      <label
+                        htmlFor="donation"
+                        className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                      >
+                        £2.00
+                      </label>
+                      <input
+                        type="radio"
+                        name="donation"
+                        className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10 cursor-pointer"
+                        value={"2.0"}
+                        onChange={(e) => {
+                          setDonation(true);
+                          setDonationAmount(2.0);
+                        }}
+                      ></input>
+                    </div>
+                    <div className="flex flex-row gap-2 relative">
+                      <label
+                        htmlFor="donation"
+                        className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                      >
+                        £5.00
+                      </label>
+                      <input
+                        type="radio"
+                        name="donation"
+                        className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10 cursor-pointer"
+                        value={"5.0"}
+                        onChange={(e) => {
+                          setDonation(true);
+                          setDonationAmount(5.0);
+                        }}
+                      ></input>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div className="bg-erniecream rounded-xl p-6 flex flex-col">
                 <p className="font-circular font-[900] text-erniegreen">
                   Subtotal
@@ -1438,17 +1994,32 @@ export const Basket = ({
                     Delivery Fee
                   </p>
                   <p className="font-circular text-erniegreen text-sm">
-                    {purchaseType != 0
-                      ? parseFloat(getCurSubSubTotal().toFixed(2)) +
-                          parseFloat(getSubSubtotal().toFixed(2)) <
-                        80.0
-                        ? "£8.95"
-                        : "FREE"
-                      : parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
-                      ? "£8.95"
-                      : "FREE"}
+                    £{deliveryAmount.toFixed(2)}
                   </p>
                 </div>
+                {addDonation && (
+                  <div className="flex flex-row justify-between mt-2">
+                    <p className="font-circular text-erniegreen text-sm">
+                      Donation
+                    </p>
+                    <p className="font-circular text-erniegreen text-sm">
+                      £{donationAmount.toFixed(2)}
+                    </p>
+                  </div>
+                )}
+                {voucherApplied && (
+                  <div className="flex flex-row justify-between mt-2">
+                    <p className="font-circular text-erniegreen text-sm font-[500]">
+                      DISCOUNT: {appliedVoucher}
+                    </p>
+                    <p className="font-circular text-erniegreen text-sm">
+                      -
+                      {purchaseType == 0 &&
+                        oneOffBasket[oneOffBasket.length - 1]?.product?.price}
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex flex-row justify-between mt-2">
                   <p className="font-circular font-[900] text-erniegreen">
                     Total
@@ -1459,28 +2030,30 @@ export const Basket = ({
                       ? (
                           parseFloat(getCurSubSubTotal().toFixed(2)) +
                           parseFloat(getSubSubtotal().toFixed(2)) +
-                          (parseFloat(getCurSubSubTotal().toFixed(2)) +
-                            parseFloat(getSubSubtotal().toFixed(2)) <
-                          80.0
-                            ? 8.95
-                            : 0.0)
+                          parseFloat(deliveryAmount.toFixed(2)) +
+                          parseFloat(donationAmount.toFixed(2)) +
+                          parseFloat(voucherAmount.toFixed(2))
                         ).toFixed(2)
                       : purchaseType == 0
-                      ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
-                        ? (
-                            parseFloat(getOneOffSubtotal().toFixed(2)) + 8.95
-                          ).toFixed(2)
-                        : parseFloat(getOneOffSubtotal().toFixed(2)).toFixed(2)
-                      : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
                       ? (
-                          parseFloat(getSubSubtotal().toFixed(2)) + 8.95
+                          parseFloat(getOneOffSubtotal().toFixed(2)) +
+                          parseFloat(deliveryAmount.toFixed(2)) +
+                          parseFloat(donationAmount.toFixed(2)) +
+                          parseFloat(voucherAmount.toFixed(2))
                         ).toFixed(2)
-                      : parseFloat(getSubSubtotal().toFixed(2)).toFixed(2)}
+                      : (
+                          parseFloat(getSubSubtotal().toFixed(2)) +
+                          parseFloat(deliveryAmount.toFixed(2)) +
+                          parseFloat(donationAmount.toFixed(2)) +
+                          parseFloat(voucherAmount.toFixed(2))
+                        ).toFixed(2)}
                   </p>
                 </div>
-                <p className="font-circular tedt-erniegreen italic text-sm text-right">
-                  Every {interval == 2 && "other"} {period}
-                </p>
+                {purchaseType == 1 && (
+                  <p className="font-circular tedt-erniegreen italic text-sm text-right">
+                    Every {interval == 2 && "other"} {period}
+                  </p>
+                )}
               </div>
               {subBasket.length == 0 && oneOffBasket.length == 0 ? (
                 <></>

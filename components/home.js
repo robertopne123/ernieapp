@@ -10,6 +10,7 @@ import { QuickOrder } from "./homeComponents/quickOrder";
 import { About } from "./homeComponents/about";
 import { HowItWorks } from "./homeComponents/howItWorks";
 import { QuickOrderView } from "./homeComponents/quickOrderView";
+import Alert from "./alert";
 
 export default function Home({
   quantity,
@@ -48,6 +49,7 @@ export default function Home({
   };
 
   const updatePlanFreqFromSummary = (planDetails) => {
+    console.log(planDetails);
     updatePlanFrequency(planDetails);
   };
 
@@ -142,7 +144,7 @@ export default function Home({
   };
 
   return (
-    <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh)] ">
+    <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh-96px)] ">
       {homeTab == -1 && (
         <div className="flex flex-col">
           <WelcomeMsg name={firstName} />
@@ -169,7 +171,7 @@ export default function Home({
                     You currently don&apos;t have an active subscription
                   </p>
                   <div
-                    className="bg-ernielightgold rounded-xl p-2 mt-4"
+                    className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
                     onClick={() => {
                       setPurchaseType(1);
                       setPurchasing(true);
@@ -181,9 +183,10 @@ export default function Home({
                     </p>
                   </div>
                   <div
-                    className="bg-ernielightgold rounded-xl p-2 mt-4"
+                    className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
                     onClick={() => {
                       setPurchaseType(0);
+
                       setPurchasing(true);
                       setNewPurchase(true);
                     }}

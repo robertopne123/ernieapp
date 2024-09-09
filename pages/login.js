@@ -77,6 +77,10 @@ export default function Login() {
 
   const [forgotPasswordDone, setForgotPasswordDone] = useState(false);
 
+  const [testPlatform, setTestPlatform] = useState("ios");
+
+  const [justRegistered, setJustRegistered] = useState(false);
+
   // safePush is used to avoid route pushing errors when users click multiple times or when the network is slow:  "Error: Abort fetching component for route"
   const safePush = (path) => {
     if (onChanging) {
@@ -115,7 +119,6 @@ export default function Login() {
         customer {
           sessionToken
           databaseId
-
           billing {
             address1
             address2
@@ -289,6 +292,17 @@ export default function Login() {
     }
   );
 
+  const [prevUser, setPrevUser] = useState(null);
+
+  useEffect(() => {
+    let prevU = localStorage.getItem("prevUser");
+    let prevP = localStorage.getItem("prevPass");
+
+    if (prevU != null && prevP != null) {
+      setPrevUser({ u: prevU, p: prevP });
+    }
+  }, []);
+
   useEffect(() => {
     console.log(loginLoading);
   }, [loginLoading]);
@@ -351,6 +365,8 @@ export default function Login() {
         .then((data) => {
           console.log(data);
 
+          setJustRegistered(true);
+
           createClient({
             variables: {
               address: rPAddress,
@@ -377,6 +393,8 @@ export default function Login() {
 
             setRegisterComplete(true);
 
+            loginUser(email, password, true);
+
             if (!loginLoading) {
               setLoginLoading(false);
               setLoginType(2);
@@ -386,6 +404,7 @@ export default function Login() {
         .catch((error) => {
           if (error.message == "Sorry, that username already exists!") {
             setRegisterError("Sorry, that email already exists");
+            setLoginLoading(false);
           } else if (
             error.message == "Cannot create a user with an empty login name."
           ) {
@@ -425,7 +444,9 @@ export default function Login() {
     // });
   };
 
-  const loginUser = (un, pw) => {
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
+
+  const loginUser = (un, pw, jr) => {
     if (localStorage.getItem("authtoken") != null) {
       localStorage.removeItem("authtoken");
     }
@@ -434,68 +455,89 @@ export default function Login() {
         password: pw,
         username: un,
       },
-    }).then((data) => {
-      if (!loginLoading) {
+    })
+      .then((data) => {
+        if (!loginLoading) {
+          setLoginLoading(false);
+        }
+
+        console.log("Login");
+        console.log(data);
+
+        localStorage.setItem("authtoken", data?.data?.login?.authToken);
+        localStorage.setItem("refreshtoken", data?.data?.login?.refreshToken);
+        localStorage.setItem(
+          "role",
+          data?.data?.login?.user.roles.nodes[0].name
+        );
+        console.log(data?.data?.login?.user.roles.nodes[0].name);
+
+        localStorage.setItem(
+          "customer",
+          JSON.stringify(data?.data?.login?.customer)
+        );
+        localStorage.setItem(
+          "woo-session",
+          data?.data?.login?.customer?.sessionToken
+        );
+        localStorage.setItem(
+          "employeruser",
+          data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
+        );
+        localStorage.setItem(
+          "first-time-user",
+          data?.data?.login?.user.userCompanyField.usedApp == null
+            ? true
+            : false
+        );
+        localStorage.setItem("employeremail", data?.data?.login?.user?.email);
+
+        localStorage.setItem(
+          "companyname",
+          data?.data?.login?.user.userCompanyField.company
+        );
+
+        localStorage.setItem("firstName", data?.data?.login?.user?.firstName);
+
+        console.log(data);
+
+        setIncorrectPassword(false);
+
+        // safePush(
+        //   "/dashboard" +
+        //     "?" +
+        //     createQueryString("id", data?.login.user?.id) +
+        //     "&" +
+        //     createQueryString("cid", data?.login?.customer?.databaseId) +
+        //     "&" +
+        //     createQueryString("fn", data?.login?.user?.firstName) +
+        //     "&" +
+        //     createQueryString("email", data?.login?.user?.email)
+        // );
+
+        localStorage.setItem("prevUser", username);
+        localStorage.setItem("prevPass", password);
+
+        safePush(
+          "/dashboard" +
+            "?" +
+            createQueryString("id", data?.data?.login.user?.id) +
+            "&" +
+            createQueryString("cid", data?.data?.login?.customer?.databaseId) +
+            "&" +
+            createQueryString("fn", data?.data?.login?.user?.firstName) +
+            "&" +
+            createQueryString("email", data?.data?.login?.user?.email) +
+            "&" +
+            createQueryString("new", jr)
+        );
+      })
+      .catch((error) => {
+        console.log(error.message);
+
+        setIncorrectPassword(true);
         setLoginLoading(false);
-      }
-
-      console.log("Login");
-      console.log(data);
-
-      localStorage.setItem("authtoken", data?.data?.login?.authToken);
-      localStorage.setItem("refreshtoken", data?.data?.login?.refreshToken);
-      localStorage.setItem("role", data?.data?.login?.user.roles.nodes[0].name);
-      console.log(data?.data?.login?.user.roles.nodes[0].name);
-
-      localStorage.setItem(
-        "customer",
-        JSON.stringify(data?.data?.login?.customer)
-      );
-      localStorage.setItem(
-        "woo-session",
-        data?.data?.login?.customer?.sessionToken
-      );
-      localStorage.setItem(
-        "employeruser",
-        data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
-      );
-      localStorage.setItem(
-        "first-time-user",
-        data?.data?.login?.user.userCompanyField.usedApp == null ? true : false
-      );
-      localStorage.setItem("employeremail", data?.data?.login?.user?.email);
-
-      localStorage.setItem(
-        "companyname",
-        data?.data?.login?.user.userCompanyField.company
-      );
-
-      console.log(data);
-
-      // safePush(
-      //   "/dashboard" +
-      //     "?" +
-      //     createQueryString("id", data?.login.user?.id) +
-      //     "&" +
-      //     createQueryString("cid", data?.login?.customer?.databaseId) +
-      //     "&" +
-      //     createQueryString("fn", data?.login?.user?.firstName) +
-      //     "&" +
-      //     createQueryString("email", data?.login?.user?.email)
-      // );
-
-      safePush(
-        "/dashboard" +
-          "?" +
-          createQueryString("id", data?.data?.login.user?.id) +
-          "&" +
-          createQueryString("cid", data?.data?.login?.customer?.databaseId) +
-          "&" +
-          createQueryString("fn", data?.data?.login?.user?.firstName) +
-          "&" +
-          createQueryString("email", data?.data?.login?.user?.email)
-      );
-    });
+      });
   };
 
   if (data) {
@@ -512,9 +554,6 @@ export default function Login() {
         <div className="liquidernie w-24 h-24 mx-auto my-auto relative flex flex-row"></div>
       </div>
     );
-  }
-  if (error) {
-    return `Submission error! ${error.message}`;
   }
 
   const backAction = () => {
@@ -609,16 +648,25 @@ export default function Login() {
   };
 
   return (
-    <div>
+    <div
+      className={`${
+        testPlatform == "ios" ? "pt-[59px] pb-[34px]" : ""
+      } h-screen bg-ernieteal`}
+    >
       {registerComplete && <Alert message={"Register Complete"}></Alert>}
       {registerError != "" && <Alert message={registerError}></Alert>}
+      {incorrectPassword && <Alert message={"Incorrect Password"}></Alert>}
       {loginLoading && (
         <div className="flex min-h-screen bg-ernieteal relative">
           <div className="liquidernie w-24 h-24 mx-auto my-auto relative flex flex-row"></div>
         </div>
       )}
       {forgotPassword && !forgotPasswordDone && (
-        <div className="flex min-h-screen flex-col bg-erniecream">
+        <div
+          className={`flex flex-col bg-erniecream ${
+            testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
+          }`}
+        >
           <div className="w-screen h-screen flex flex-col bg-erniedarkcream">
             <div className="flex flex-col bg-ernieteal w-full p-4">
               <img src="/Asset-1@2x2.png" className="h-20 object-contain"></img>
@@ -690,7 +738,11 @@ export default function Login() {
         </div>
       )}
       {forgotPasswordDone && (
-        <div className="flex min-h-screen flex-col bg-erniecream">
+        <div
+          className={`flex ${
+            testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
+          } flex-col bg-erniecream`}
+        >
           <div className="w-screen h-screen flex flex-col bg-erniedarkcream">
             <div className="flex flex-col bg-ernieteal w-full p-4">
               <img src="/Asset-1@2x2.png" className="h-16 object-contain"></img>
@@ -717,7 +769,13 @@ export default function Login() {
       )}
       {!loginLoading && !forgotPassword && (
         <div
-          className={`flex min-h-screen flex-col items-center justify-between bg-erniecream ${circularstd.variable} font-sans ${circerounded.variable} font-sans`}
+          className={`flex ${
+            testPlatform == "ios"
+              ? "max-h-[calc(100vh - 34px - 59px)]"
+              : "max-h-[88vh]"
+          } flex-col h-full items-center justify-between bg-erniecream ${
+            circularstd.variable
+          } font-sans ${circerounded.variable} font-sans`}
         >
           <div className="lg:flex hidden text-erniegreen px-4">
             <p>Please use a mobile phone to view this page</p>
@@ -1129,50 +1187,91 @@ export default function Login() {
                     Login
                   </p>
                   <img src="/divider.png" className="w-full"></img>
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label
-                        htmlFor="emailaddress"
-                        className="font-circular text-erniegreen text-sm font-[500]"
-                      >
-                        Email Address
-                      </label>
-                      <input
-                        type="text"
-                        name="emailaddress"
-                        onChange={(e) => {
-                          setUsername(e.currentTarget.value);
-                        }}
-                        className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
-                      ></input>
+                  {console.log(prevUser)}
+                  {prevUser == null ? (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="emailaddress"
+                          className="font-circular text-erniegreen text-sm font-[500]"
+                        >
+                          Email Address
+                        </label>
+                        <input
+                          type="text"
+                          name="emailaddress"
+                          onChange={(e) => {
+                            setUsername(e.currentTarget.value);
+                          }}
+                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                        ></input>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label
+                          htmlFor="password"
+                          className="font-circular text-erniegreen text-sm font-[500]"
+                        >
+                          Password
+                        </label>
+                        <input
+                          type="password"
+                          name="password"
+                          onChange={(e) => {
+                            setPassword(e.currentTarget.value);
+                          }}
+                          className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                        ></input>
+                      </div>
                     </div>
-                    <div className="flex flex-col gap-2">
-                      <label
-                        htmlFor="password"
-                        className="font-circular text-erniegreen text-sm font-[500]"
-                      >
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        onChange={(e) => {
-                          setPassword(e.currentTarget.value);
-                        }}
-                        className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
-                      ></input>
+                  ) : (
+                    <div className="flex flex-col pt-4">
+                      <div className="flex border-[1px] border-erniegreen p-4 rounded-xl flex-row justify-between items-center">
+                        <div className="flex flex-col">
+                          <p className="font-circular text-erniegreen font-[500] mb-2">
+                            Previously logged in as...
+                          </p>
+                          <p className="font-circe text-erniegreen font-[900] uppercase text-2xl">
+                            {localStorage.getItem("firstName")}
+                          </p>
+                          <p className="font-circular text-erniegreen font-[500] opacity-50">
+                            {prevUser.u}
+                          </p>
+                        </div>
+                        <p className="font-circe text-erniegreen font-[900] uppercase text-4xl">
+                          {">"}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 <button
                   className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
                   onClick={(e) => {
                     e.preventDefault();
-                    loginUser(username, password);
+
+                    if (prevUser == null) {
+                      loginUser(username, password, false);
+                    } else {
+                      loginUser(prevUser.u, prevUser.p, false);
+                    }
                   }}
                 >
-                  Login
+                  {prevUser == null
+                    ? "Login"
+                    : `Login as ${localStorage.getItem("firstName")}`}
                 </button>
+                {prevUser != null && (
+                  <button
+                    className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
+                    onClick={(e) => {
+                      localStorage.removeItem("prevUser");
+                      localStorage.removeItem("prevPass");
+                      setPrevUser(null);
+                    }}
+                  >
+                    Login with a different user
+                  </button>
+                )}
                 {/* <button
                   type="button"
                   className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"

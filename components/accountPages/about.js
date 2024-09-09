@@ -52,7 +52,7 @@ export default function About({ backAction }) {
   }, []);
 
   return (
-    <div className="flex flex-col flex-grow gap-6 h-full bg-erniedarkcream px-6">
+    <div className="flex flex-col flex-grow gap-6 h-full bg-erniedarkcream px-6 ">
       {deletionComplete && (
         <div className="flex min-h-screen flex-col bg-erniecream">
           <div className="w-full h-screen flex flex-col bg-erniedarkcream">
@@ -88,7 +88,7 @@ export default function About({ backAction }) {
               Back
             </p>
           </div>
-          <div className="flex flex-col gap-6 flex-grow">
+          <div className="flex flex-col gap-6 flex-grow mt-4">
             <div className="rounded-xl bg-erniecream p-6">
               <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
                 About
@@ -144,7 +144,7 @@ export default function About({ backAction }) {
               <img src="/dolcearch.svg" className="w-8"></img>
               <p className="font-circular text-erniegreen font-[500] text-sm">
                 The Ernie App was designed, developed and is maintained by Dolce
-                Studios.
+                Studio.
               </p>
             </div>
           </div>

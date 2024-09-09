@@ -496,13 +496,17 @@ export const ManagePlan = ({
       {showFreqConfirmation && (
         <ConfirmFrequency
           close={close}
+          onComplete={() => {
+            close();
+            backAction();
+          }}
           difference={currentSubscription}
           update={updateFrequencyPlan}
           updateSubError={updateSubError}
         />
       )}
 
-      <div className="bg-erniedarkcream h-full flex flex-col gap-6 pb-8 px-6">
+      <div className="bg-erniedarkcream h-full flex flex-col gap-6 pb-8 px-6 overflow-y-scroll">
         <div
           className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
           onClick={backAction}
