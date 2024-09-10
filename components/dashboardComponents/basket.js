@@ -956,7 +956,6 @@ export const Basket = ({
                               onChange={(e) => {
                                 setBAddress(e.currentTarget.value);
                               }}
-                              defaultValue={!showBillingAddress && sAddress}
                               className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
                                 bAddressError
                                   ? "border-red-400"
@@ -980,7 +979,6 @@ export const Basket = ({
                               onChange={(e) => {
                                 setBPostcode(e.currentTarget.value);
                               }}
-                              defaultValue={!showBillingAddress && sPostcode}
                               className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] ${
                                 bPostcodeError
                                   ? "border-red-400"
