@@ -48,12 +48,16 @@ export const Basket = ({
     console.log("complete");
   }, [orderComplete]);
 
-  const [businessName, setBusinessName] = useState("");
-  const [sAddress, setSAddress] = useState("");
-  const [bAddress, setBAddress] = useState("");
-  const [sPostcode, setSPostcode] = useState("");
-  const [bPostcode, setBPostcode] = useState("");
-  const [contactNumber, setContactNumber] = useState("");
+  const [businessName, setBusinessName] = useState(
+    localStorage.getItem("companyname")
+  );
+  const [sAddress, setSAddress] = useState(localStorage.getItem("address"));
+  const [bAddress, setBAddress] = useState(localStorage.getItem("address"));
+  const [sPostcode, setSPostcode] = useState(localStorage.getItem("postcode"));
+  const [bPostcode, setBPostcode] = useState(localStorage.getItem("postcode"));
+  const [contactNumber, setContactNumber] = useState(
+    localStorage.getItem("number")
+  );
 
   const [businessNameError, setBusinessNameError] = useState(false);
   const [sAddressError, setSAddressError] = useState(false);
@@ -501,7 +505,7 @@ export const Basket = ({
     { image: "/erniesmall.svg", name: "bacs" },
   ];
 
-  const [selectedPayment, setSelectedPayment] = useState(-1);
+  const [selectedPayment, setSelectedPayment] = useState(0);
 
   const [ping, setPing] = useState(false);
 
@@ -851,6 +855,7 @@ export const Basket = ({
                         <input
                           type="text"
                           name="businessname"
+                          defaultValue={businessName}
                           onChange={(e) => {
                             setBusinessName(e.currentTarget.value);
                           }}
@@ -874,6 +879,7 @@ export const Basket = ({
                         <input
                           type="text"
                           name="sAddress"
+                          defaultValue={sAddress}
                           onChange={(e) => {
                             setSAddress(e.currentTarget.value);
                             if (showBillingAddress) {
@@ -899,6 +905,7 @@ export const Basket = ({
                         <input
                           type="text"
                           name="sPostcode"
+                          defaultValue={sPostcode}
                           onChange={(e) => {
                             setSPostcode(e.currentTarget.value);
                             if (showBillingAddress) {
@@ -945,6 +952,7 @@ export const Basket = ({
                             <input
                               type="text"
                               name="bAddress"
+                              defaultValue={bAddress}
                               onChange={(e) => {
                                 setBAddress(e.currentTarget.value);
                               }}
@@ -968,6 +976,7 @@ export const Basket = ({
                             <input
                               type="text"
                               name="bPostcode"
+                              defaultValue={bPostcode}
                               onChange={(e) => {
                                 setBPostcode(e.currentTarget.value);
                               }}
@@ -995,6 +1004,7 @@ export const Basket = ({
                         <input
                           type="text"
                           name="contactnumber"
+                          defaultValue={contactNumber}
                           onChange={(e) => {
                             setContactNumber(e.currentTarget.value);
                           }}
@@ -1237,9 +1247,6 @@ export const Basket = ({
                               }}
                             >
                               <img className="h-6" src={option.image} />
-                              <p className="font-circular text-erniegreen">
-                                {">"}
-                              </p>
                             </div>
                             {selectedPayment == index && (
                               <>
@@ -1883,6 +1890,7 @@ export const Basket = ({
                       <input
                         type="radio"
                         name="donation"
+                        defaultChecked={true}
                         className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10 cursor-pointer"
                         value={"0.0"}
                         onChange={(e) => {

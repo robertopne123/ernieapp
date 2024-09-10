@@ -249,7 +249,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                 }
               }
             }
-            clients(where: { title: $company }) {
+            clients(where: { title: $company }, first: 100) {
               nodes {
                 databaseId
                 title
@@ -372,6 +372,35 @@ export default function Dashboard({ data, categories, products, orders }) {
         setOrders(data.data.orders.nodes);
 
         setCoupons(data.data.coupons.nodes);
+
+        let clients = data.data.clients.nodes;
+
+        let currentUser = localStorage.getItem("prevUser");
+
+        let clientAcc = {};
+
+        for (let i = 0; i < clients.length; i++) {
+          console.log(clients[i].clientInformation.pointOfContactEmail);
+          console.log(currentUser);
+
+          if (clients[i].clientInformation.pointOfContactEmail == currentUser) {
+            clientAcc = clients[i];
+            break;
+          }
+        }
+
+        localStorage.setItem(
+          "address",
+          clientAcc.clientInformation?.deliveryCompanyAddress
+        );
+        localStorage.setItem(
+          "postcode",
+          clientAcc.clientInformation?.deliveryCompanyPostcode
+        );
+        localStorage.setItem(
+          "number",
+          clientAcc.clientInformation?.pointOfContactNumber
+        );
 
         // for (let i = 0; i < data.data.orders.nodes.length; i++) {
         //   // console.log(data.data.orders.nodes[i]);
@@ -1407,12 +1436,19 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderDetails, setOrderDetails] = useState({});
 
+  const [addingToSBasket, setAddingToSBasket] = useState(false);
+  const [addingToOBasket, setAddingToOBasket] = useState(false);
+
   const addToSubBasket = (item) => {
     let subBasketCopy = [...subBasket];
 
     subBasketCopy.push(item);
 
     setSubBasket(subBasketCopy);
+
+    setTimeout(function () {
+      setAddingToSBasket(false);
+    }, 1000);
   };
 
   const addToOneOffBasket = (item) => {
@@ -1421,6 +1457,10 @@ export default function Dashboard({ data, categories, products, orders }) {
     oneOffBasketCopy.push(item);
 
     setOneOffBasket(oneOffBasketCopy);
+
+    setTimeout(function () {
+      setAddingToOBasket(false);
+    }, 1000);
   };
 
   const clearOneOffBasket = () => {
@@ -1565,6 +1605,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setNewPurchase={setNewPurchase}
                   subscriptions={subscriptions}
                   setTab={setTab}
+                  addingToSBasket={addingToSBasket}
+                  addingToOBasket={addingToOBasket}
+                  setAddingToSBasket={setAddingToSBasket}
+                  setAddingToOBasket={setAddingToOBasket}
                 />
               )}
               {activeTab == 2 && (

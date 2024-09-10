@@ -38,6 +38,10 @@ export default function Products({
   setTab,
   productsContext,
   setProductsContext,
+  addingToSBasket,
+  addingToOBasket,
+  setAddingToSBasket,
+  setAddingToOBasket,
 }) {
   function filteredCategories() {
     let filtered = [];
@@ -86,6 +90,14 @@ export default function Products({
 
   const setBasketFromProductPage = (item) => {
     setBasket(item);
+  };
+
+  const setAddingToSBasketFromProductPage = (val) => {
+    setAddingToSBasket(val);
+  };
+
+  const setAddingToOBasketFromProductPage = (val) => {
+    setAddingToOBasket(val);
   };
 
   // console.log(subsidy);
@@ -540,6 +552,10 @@ export default function Products({
             setTab={setTabFromProducts}
             productsContext={productsContext}
             setProductsContext={setProductsContextFromProducts}
+            addingToSBasket={addingToSBasket}
+            addingToOBasket={addingToOBasket}
+            setAddingToSBasket={setAddingToSBasketFromProductPage}
+            setAddingToOBasket={setAddingToOBasketFromProductPage}
           />
         ) : (
           <div className="flex flex-col gap-0 h-auto pb-16">
