@@ -749,7 +749,7 @@ export default function Login() {
             </div>
             <div className="p-6">
               <p className="font-circular text-erniegreen text-center">
-                We&apos;ve sent you password reset email.
+                We&apos;ve sent you a password reset email.
               </p>
             </div>
             <div className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer mx-6">
