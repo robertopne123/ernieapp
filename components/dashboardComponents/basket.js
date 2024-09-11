@@ -8,6 +8,7 @@ import { useMutation } from "@apollo/client";
 import graphqlClient from "@/apollo-client";
 import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
+import { Info } from "./info";
 
 export const Basket = ({
   addToSubBasket,
@@ -547,6 +548,12 @@ export const Basket = ({
 
   const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
 
+  const [showingInfo, setShowingInfo] = useState(false);
+
+  const close = () => {
+    setShowingInfo(false);
+  };
+
   function scrollToTop() {
     if (!isBrowser()) return;
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -705,7 +712,16 @@ export const Basket = ({
   }, [mProducts]);
 
   return (
-    <div className="flex flex-col justify-center z-[999]">
+    <div className="flex flex-col justify-center z-[990]">
+      {showingInfo && (
+        <Info
+          name={"Coffee That Connects: Bridging Communities with Groundswell "}
+          description={
+            "Ernie London is proud to partner with Groundswell, a charity creating healthier lives, stronger voices and better futures for anyone with experience of homelessness. We share the belief that everyone deserves to be seen, heard and supported. Our contribution will fuel Groundswell’s person-centered and participatory approach to tackling homelessness, where often the most powerful first step is connecting over a cup of coffee. Together, we’re turning every sip into a step towards solving homelessness, recognising that change often begins with a simple, human gesture. "
+          }
+          close={close}
+        />
+      )}
       <div className="relative cursor-pointer hover:bg-erniemint p-2 mr-[-8px]">
         {console.log(oneOffBasket)}
         <img
@@ -728,7 +744,7 @@ export const Basket = ({
           {showingCheckout ? (
             <div>
               {orderComplete ? (
-                <div className="absolute right-0 top-20 h-full w-full bg-erniedarkcream px-6 z-[999] pb-6 flex flex-col gap-4 pt-6">
+                <div className="absolute right-0 top-20 h-full w-full bg-erniedarkcream px-6 z-[990] pb-6 flex flex-col gap-4 pt-6">
                   <p className="font-circe font-[900] text-center text-3xl  text-erniegreen">
                     Thank you
                   </p>
@@ -817,7 +833,7 @@ export const Basket = ({
                   </div>
                 </div>
               ) : (
-                <div className="absolute right-0 top-20 h-auto w-full bg-erniedarkcream px-6 z-[999] pb-6 flex flex-col gap-4">
+                <div className="absolute right-0 top-20 h-auto w-full bg-erniedarkcream px-6 z-[990] pb-6 flex flex-col gap-4">
                   <div
                     className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
                     onClick={() => {
@@ -1609,7 +1625,7 @@ export const Basket = ({
               )}
             </div>
           ) : (
-            <div className="absolute right-0 top-20 h-[calc(88vh-80px)] w-full bg-erniedarkcream px-6 z-[999] py-6 flex flex-col gap-4 overflow-auto">
+            <div className="absolute right-0 top-20 h-[calc(88vh-80px)] w-full bg-erniedarkcream px-6 z-[990] py-6 flex flex-col gap-4 overflow-auto">
               {subBasket.length == 0 && oneOffBasket.length == 0 ? (
                 <p className="font-circular text-erniegreen text-center">
                   Your basket is currently empty
@@ -1865,10 +1881,19 @@ export const Basket = ({
                 </>
               )}
               <div className="bg-ernieteal rounded-xl p-6 flex flex-col">
-                <img
-                  src="/groundswellimg.jpg"
-                  className="bg-groundswell w-36 p-2 object-cover rounded-lg"
-                ></img>
+                <div className="flex flex-row justify-between">
+                  <img
+                    src="/groundswellimg.jpg"
+                    className="bg-groundswell w-36 p-2 object-cover rounded-lg"
+                  ></img>
+                  <img
+                    src="/info.svg"
+                    className="w-10"
+                    onClick={(e) => {
+                      setShowingInfo(true);
+                    }}
+                  ></img>
+                </div>
                 <p className="font-circe font-[900] uppercase text-erniecream text-xl mt-4">
                   Donate to Groundswell
                 </p>
