@@ -228,7 +228,11 @@ export default function Preview({
                   </p>
                 </div>
                 <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
-                  {oneOffQuantity + "kg"}
+                  {oneOffQuantity +
+                    " " +
+                    (product.productDisplayStyle.priceSuffix
+                      ? product.productDisplayStyle.priceSuffix
+                      : "")}
                 </p>
                 <div
                   className="bg-erniedarkcream p-1 rounded-lg flex-grow"
@@ -310,7 +314,11 @@ export default function Preview({
                   </p>
                 </div>
                 <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
-                  {subQuantity + "kg"}
+                  {subQuantity +
+                    " " +
+                    (product.productDisplayStyle.priceSuffix
+                      ? product.productDisplayStyle.priceSuffix
+                      : "")}
                 </p>
                 <div
                   className="bg-erniedarkcream p-1 rounded-lg flex-grow"

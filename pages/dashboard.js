@@ -223,6 +223,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                       sourceUrl
                     }
                     titleStyle
+                    priceSuffix
                   }
                   productTags {
                     nodes {

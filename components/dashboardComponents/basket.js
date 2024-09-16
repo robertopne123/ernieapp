@@ -1618,7 +1618,9 @@ export const Basket = ({
                     <p
                       className={`font-circe font-[900] text-erniegreen text-center text-lg`}
                     >
-                      {managingSubscription ? "Update Subscription" : "Pay Now"}
+                      {managingSubscription
+                        ? "Update Subscription"
+                        : "Pay By Invoice"}
                     </p>
                   </div>
                 </div>
