@@ -403,6 +403,19 @@ export default function Dashboard({ data, categories, products, orders }) {
           clientAcc.clientInformation?.pointOfContactNumber
         );
 
+        localStorage.setItem("clientID", clientAcc.databaseId);
+        localStorage.setItem("bags", clientAcc.impactFigures?.bags);
+        localStorage.setItem("carbon", clientAcc.impactFigures?.carbon);
+        localStorage.setItem("trees", clientAcc.impactFigures?.trees);
+        localStorage.setItem("coffee", clientAcc.impactFigures?.coffee);
+        localStorage.setItem("phones", clientAcc.impactFigures?.phones);
+        localStorage.setItem("m25", clientAcc.impactFigures?.m25);
+
+        localStorage.setItem(
+          "clientInformation",
+          JSON.stringify(clientAcc.clientInformation)
+        );
+
         // for (let i = 0; i < data.data.orders.nodes.length; i++) {
         //   // console.log(data.data.orders.nodes[i]);
         //   for (

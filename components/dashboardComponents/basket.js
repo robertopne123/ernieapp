@@ -177,6 +177,13 @@ export const Basket = ({
           databaseId
           id
           total
+          lineItems {
+            nodes {
+              databaseId
+              quantity
+              productId
+            }
+          }
         }
       }
     }
@@ -213,11 +220,102 @@ export const Basket = ({
     }
   `;
 
+  const UPDATECLIENT = gql`
+    mutation UpdateClient(
+      $id: ID!
+      $m25: Float!
+      $phones: Int!
+      $trees: Int!
+      $coffee: Int!
+      $bags: Int!
+      $carbon: Float!
+      $address: String!
+      $coffeeMachine: Boolean!
+      $contactNumber: String!
+      $email: String!
+      $noOfStaff: String!
+      $poiEmail: String!
+      $poiFirstname: String!
+      $postcode: String!
+      $wfh: Boolean!
+    ) {
+      updateClient(
+        input: {
+          id: $id
+          m25: $m25
+          phones: $phones
+          trees: $trees
+          coffee: $coffee
+          bags: $bags
+          carbon: $carbon
+          address: $address
+          coffeeMachine: $coffeeMachine
+          email: $email
+          noOfStaff: $noOfStaff
+          poiEmail: $poiEmail
+          poiFirstName: $poiFirstName
+          postcode: $postcode
+          wfh: $wfh
+        }
+      ) {
+        client {
+          databaseId
+          title
+          clientInformation {
+            activeState
+            coffeeMachineOnSite
+            coffeePoints
+            companyRegistrationNumber
+            deliveryCompanyAddress
+            deliveryCompanyPostcode
+            deliveryFrequency
+            fieldGroupName
+            howDidYouHearAboutUs
+            impactCertificate {
+              sourceUrl
+            }
+            invoicingContactEmail
+            invoicingContactFirstName
+            invoicingContactLastName
+            invoicingContactNumber
+            invoicingContactRole
+            numberOfStaff
+            otherComments
+            pointOfContactEmail
+            pointOfContactFirstName
+            pointOfContactLastName
+            pointOfContactNumber
+            pointOfContactRole
+            regCompanyAddress
+            registeredCompanyPostcode
+            show
+            startDate
+            subscriptionId
+            subsidy
+            workFromHomeDays
+          }
+          impactFigures {
+            bags
+            carbon
+            coffee
+            m25
+            phones
+            trees
+          }
+        }
+      }
+    }
+  `;
+
   const [checkout] = useMutation(NEWORDER, {
     client: graphqlClient,
   });
 
   const [addSubscription] = useMutation(ADDSUBSCRIPTION, {
+    client: graphqlClient,
+  });
+
+  const [updateClient] = useMutation(UPDATECLIENT, {
     client: graphqlClient,
   });
 
@@ -428,6 +526,44 @@ export const Basket = ({
         })
           .then((data) => {
             console.log("Order Received (", data, ")");
+
+            let totalQty = 0;
+
+            for (
+              let i = 0;
+              i < data.data.createOrder.order.lineItems.nodes.length;
+              i++
+            ) {
+              totalQty +=
+                data.data.createOrder.order.lineItems.nodes[i].quantity;
+            }
+
+            console.log(totalQty);
+
+            // updateClient({
+            //   variables: {
+            //     id: localStorage.getItem("clientID"),
+            //     bags: parseInt(localStorage.getItem("bags")) + totalQty,
+            //     carbon:
+            //       parseFloat(localStorage.getItem("carbon")) +
+            //       (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
+            //     trees:
+            //       parseInt(localStorage.getItem("trees")) +
+            //       Math.floor(totalQty / 6),
+            //     coffee:
+            //       parseInt(localStorage.getItem("coffee")) + totalQty * 100,
+            //     phones:
+            //       parseInt(localStorage.getItem("phones")) +
+            //       Math.round(totalQty * 0.44 * 120),
+            //     m25: +(Math.round((totalQty * 0.44) / 32.148) +
+            //       parseFloat(localStorage.getItem("m25")) <
+            //     1
+            //       ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
+            //         parseFloat(localStorage.getItem("m25"))
+            //       : Math.round((total * 0.44) / 32.148) +
+            //         parseFloat(localStorage.getItem("m25"))),
+            //   },
+            // });
 
             setOrderComplete(true);
             setOrderDetails(data);
@@ -771,17 +907,12 @@ export const Basket = ({
                                 .subscription.databaseId
                             : orderDetails.data.createSubscription.subscription
                                 .databaseId
-                          : 0}
-                        {/*                         
-                        {purchaseType == 0
-                          ? orderDetails.data.createOrder.order.databaseId
-                          : orderDetails.data.createSubscription.subscription
-                              .orderNumber} */}
+                          : orderDetails.data.createOrder.order.databaseId}
                       </p>
                       {purchaseType == 0 && (
                         <p className="font-circular font-[400] text-erniegreen">
-                          Order Total:{" "}
-                          {/* {orderDetails.data.createOrder.order.total} */}
+                          Order Total: {console.log(orderDetails)}
+                          {orderDetails.data.createOrder.order.total}
                         </p>
                       )}
                     </div>
