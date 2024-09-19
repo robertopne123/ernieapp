@@ -515,8 +515,8 @@ export default function Login() {
         //     createQueryString("email", data?.login?.user?.email)
         // );
 
-        localStorage.setItem("prevUser", username);
-        localStorage.setItem("prevPass", password);
+        localStorage.setItem("prevUser", un);
+        localStorage.setItem("prevPass", pw);
 
         safePush(
           "/dashboard" +
@@ -1252,7 +1252,13 @@ export default function Login() {
                     if (prevUser == null) {
                       loginUser(username, password, false);
                     } else {
-                      loginUser(prevUser.u, prevUser.p, false);
+                      let pUser = prevUser.u;
+                      let pPass = prevUser.p;
+
+                      loginUser(pUser, pPass, false);
+
+                      localStorage.setItem("prevUser", pUser);
+                      localStorage.setItem("prevPass", pPass);
                     }
                   }}
                 >
