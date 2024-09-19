@@ -232,10 +232,9 @@ export const Basket = ({
       $address: String!
       $coffeeMachine: Boolean!
       $contactNumber: String!
-      $email: String!
       $noOfStaff: String!
       $poiEmail: String!
-      $poiFirstname: String!
+      $poiFirstName: String!
       $postcode: String!
       $wfh: Boolean!
     ) {
@@ -250,7 +249,7 @@ export const Basket = ({
           carbon: $carbon
           address: $address
           coffeeMachine: $coffeeMachine
-          email: $email
+          contactNumber: $contactNumber
           noOfStaff: $noOfStaff
           poiEmail: $poiEmail
           poiFirstName: $poiFirstName
@@ -540,30 +539,59 @@ export const Basket = ({
 
             console.log(totalQty);
 
-            // updateClient({
-            //   variables: {
-            //     id: localStorage.getItem("clientID"),
-            //     bags: parseInt(localStorage.getItem("bags")) + totalQty,
-            //     carbon:
-            //       parseFloat(localStorage.getItem("carbon")) +
-            //       (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
-            //     trees:
-            //       parseInt(localStorage.getItem("trees")) +
-            //       Math.floor(totalQty / 6),
-            //     coffee:
-            //       parseInt(localStorage.getItem("coffee")) + totalQty * 100,
-            //     phones:
-            //       parseInt(localStorage.getItem("phones")) +
-            //       Math.round(totalQty * 0.44 * 120),
-            //     m25: +(Math.round((totalQty * 0.44) / 32.148) +
-            //       parseFloat(localStorage.getItem("m25")) <
-            //     1
-            //       ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
-            //         parseFloat(localStorage.getItem("m25"))
-            //       : Math.round((total * 0.44) / 32.148) +
-            //         parseFloat(localStorage.getItem("m25"))),
-            //   },
-            // });
+            let cInfo = JSON.parse(localStorage.getItem("clientInformation"));
+
+            console.log(cInfo);
+
+            let address = cInfo.deliveryCompanyAddress;
+            let coffeeMachine = cInfo.coffeeMachineOnSite;
+            let contactNumber = cInfo.pointOfContactNumber;
+            let noOfStaff = cInfo.numberOfStaff;
+            let poiEmail = cInfo.pointOfContactEmail;
+            let poiFirstName = cInfo.pointOfContactFirstName;
+            let postcode = cInfo.deliveryCompanyPostcode;
+            let wfh = cInfo.workFromHomeDays;
+
+            updateClient({
+              variables: {
+                id: localStorage.getItem("clientID"),
+                bags: parseInt(localStorage.getItem("bags")) + totalQty,
+                carbon:
+                  parseFloat(localStorage.getItem("carbon")) +
+                  (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
+                trees:
+                  parseInt(localStorage.getItem("trees")) +
+                  Math.floor(totalQty / 6),
+                coffee:
+                  parseInt(localStorage.getItem("coffee")) + totalQty * 100,
+                phones:
+                  parseInt(localStorage.getItem("phones")) +
+                  Math.round(totalQty * 0.44 * 120),
+                m25:
+                  Math.round((totalQty * 0.44) / 32.148) +
+                    parseFloat(localStorage.getItem("m25")) <
+                  1
+                    ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
+                      parseFloat(localStorage.getItem("m25"))
+                    : Math.round((total * 0.44) / 32.148) +
+                      parseFloat(localStorage.getItem("m25")),
+                address: address,
+                coffeeMachine: coffeeMachine,
+                contactNumber: contactNumber,
+                noOfStaff: noOfStaff,
+                poiEmail: poiEmail,
+                poiFirstName: poiFirstName,
+                postcode: postcode,
+                wfh: wfh,
+              },
+            }).then((data) => {
+              console.log(data);
+
+              localStorage.setItem(
+                "client",
+                JSON.stringify(data.data.updateClient.client)
+              );
+            });
 
             setOrderComplete(true);
             setOrderDetails(data);
@@ -613,7 +641,74 @@ export const Basket = ({
           },
         })
           .then((data) => {
-            console.log("New Subscription (", data, ")");
+            console.log("Order Received (", data, ")");
+
+            let totalQty = 0;
+
+            for (
+              let i = 0;
+              i < data.data.createOrder.order.lineItems.nodes.length;
+              i++
+            ) {
+              totalQty +=
+                data.data.createOrder.order.lineItems.nodes[i].quantity;
+            }
+
+            console.log(totalQty);
+
+            let cInfo = JSON.parse(localStorage.getItem("clientInformation"));
+
+            console.log(cInfo);
+
+            let address = cInfo.deliveryCompanyAddress;
+            let coffeeMachine = cInfo.coffeeMachineOnSite;
+            let contactNumber = cInfo.pointOfContactNumber;
+            let noOfStaff = cInfo.numberOfStaff;
+            let poiEmail = cInfo.pointOfContactEmail;
+            let poiFirstName = cInfo.pointOfContactFirstName;
+            let postcode = cInfo.deliveryCompanyPostcode;
+            let wfh = cInfo.workFromHomeDays;
+
+            updateClient({
+              variables: {
+                id: localStorage.getItem("clientID"),
+                bags: parseInt(localStorage.getItem("bags")) + totalQty,
+                carbon:
+                  parseFloat(localStorage.getItem("carbon")) +
+                  (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
+                trees:
+                  parseInt(localStorage.getItem("trees")) +
+                  Math.floor(totalQty / 6),
+                coffee:
+                  parseInt(localStorage.getItem("coffee")) + totalQty * 100,
+                phones:
+                  parseInt(localStorage.getItem("phones")) +
+                  Math.round(totalQty * 0.44 * 120),
+                m25:
+                  Math.round((totalQty * 0.44) / 32.148) +
+                    parseFloat(localStorage.getItem("m25")) <
+                  1
+                    ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
+                      parseFloat(localStorage.getItem("m25"))
+                    : Math.round((total * 0.44) / 32.148) +
+                      parseFloat(localStorage.getItem("m25")),
+                address: address,
+                coffeeMachine: coffeeMachine,
+                contactNumber: contactNumber,
+                noOfStaff: noOfStaff,
+                poiEmail: poiEmail,
+                poiFirstName: poiFirstName,
+                postcode: postcode,
+                wfh: wfh,
+              },
+            }).then((data) => {
+              console.log(data);
+
+              localStorage.setItem(
+                "client",
+                JSON.stringify(data.data.updateClient.client)
+              );
+            });
 
             setOrderComplete(true);
             setOrderDetails(data);

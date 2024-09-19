@@ -416,6 +416,8 @@ export default function Dashboard({ data, categories, products, orders }) {
           JSON.stringify(clientAcc.clientInformation)
         );
 
+        localStorage.setItem("client", JSON.stringify(clientAcc));
+
         // for (let i = 0; i < data.data.orders.nodes.length; i++) {
         //   // console.log(data.data.orders.nodes[i]);
         //   for (

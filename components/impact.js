@@ -42,6 +42,10 @@ export default function Impact({
 
   const [showingCert, setShowingCert] = useState(false);
 
+  const [client, setClient] = useState(
+    JSON.parse(localStorage.getItem("client"))
+  );
+
   const PdfViewer = ({ url }) => {
     const fullScreenPluginInstance = fullScreenPlugin();
     const scrollModePluginInstance = scrollModePlugin();
@@ -190,9 +194,10 @@ export default function Impact({
                     priority
                     className="w-28 h-28"
                   ></Image>
+                  {console.log(client)}
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {userTotalQuantity}
+                      {client.impactFigures.bags}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Bags directed from waste stream
@@ -209,8 +214,7 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {userTotalQuantity * 0.44 +
-                        Math.floor(userTotalQuantity / 2) * 25}
+                      {client.impactFigures.carbon}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Kgs of carbon removed from the atmosphere
@@ -227,7 +231,7 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {Math.floor(userTotalQuantity / 6)}
+                      {client.impactFigures.trees}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Trees planted
@@ -244,7 +248,7 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {userTotalQuantity * 100}
+                      {client.impactFigures.coffee}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Cups of coffee enjoyed by you
@@ -261,7 +265,7 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {Math.round(userTotalQuantity * 0.44 * 120)}
+                      {client.impactFigures.phones}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Phones charged from Tco2e saved
@@ -278,11 +282,7 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {Math.round((userTotalQuantity * 0.44) / 32.148) < 1
-                        ? Math.round(
-                            ((userTotalQuantity * 0.44) / 32.148) * 100
-                          ) / 100
-                        : Math.round((userTotalQuantity * 0.44) / 32.148)}
+                      {client.impactFigures.m25}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Loops of the M25 worth of carbon saved
