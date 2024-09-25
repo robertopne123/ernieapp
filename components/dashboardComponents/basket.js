@@ -306,6 +306,189 @@ export const Basket = ({
     }
   `;
 
+  const client = graphqlClient;
+  const LOGIN = gql`
+    mutation MyMutation($password: String!, $username: String!) {
+      login(
+        input: {
+          provider: PASSWORD
+          credentials: { password: $password, username: $username }
+        }
+      ) {
+        authToken
+        refreshToken
+        wooSessionToken
+        sessionToken
+        customer {
+          sessionToken
+          databaseId
+          billing {
+            address1
+            address2
+            city
+            company
+            country
+            email
+            firstName
+            lastName
+            phone
+            postcode
+            state
+          }
+          shipping {
+            address1
+            address2
+            city
+            company
+            country
+            email
+            firstName
+            lastName
+            phone
+            postcode
+            state
+          }
+        }
+        user {
+          email
+          id
+          firstName
+          auth {
+            authToken
+            wooSessionToken
+            refreshToken
+            userSecret
+          }
+          roles {
+            nodes {
+              name
+            }
+          }
+          userCompanyField {
+            parentUser
+            usedApp
+            company
+          }
+        }
+      }
+    }
+  `;
+
+  const REFRESH = gql`
+    mutation refresh($refreshToken: String!) {
+      refreshToken(input: { refreshToken: $refreshToken }) {
+        authToken
+        success
+      }
+    }
+  `;
+
+  const [login, { data, loading, error }] = useMutation(LOGIN, {
+    client: client,
+  });
+
+  const [refreshToken, { refreshData, refreshLoading, refreshError }] =
+    useMutation(REFRESH, {
+      client: client,
+    });
+
+  const loginUser = (un, pw, jr) => {
+    if (localStorage.getItem("authtoken") != null) {
+      localStorage.removeItem("authtoken");
+    }
+    login({
+      variables: {
+        password: pw,
+        username: un,
+      },
+    })
+      .then((data) => {
+        if (!loginLoading) {
+          setLoginLoading(false);
+        }
+
+        console.log("Login");
+        console.log(data);
+
+        localStorage.setItem("authtoken", data?.data?.login?.authToken);
+        localStorage.setItem("refreshtoken", data?.data?.login?.refreshToken);
+        localStorage.setItem(
+          "role",
+          data?.data?.login?.user.roles.nodes[0].name
+        );
+        console.log(data?.data?.login?.user.roles.nodes[0].name);
+
+        localStorage.setItem(
+          "customer",
+          JSON.stringify(data?.data?.login?.customer)
+        );
+        localStorage.setItem(
+          "woo-session",
+          data?.data?.login?.customer?.sessionToken
+        );
+        localStorage.setItem(
+          "employeruser",
+          data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
+        );
+        localStorage.setItem(
+          "first-time-user",
+          data?.data?.login?.user.userCompanyField.usedApp == null
+            ? true
+            : false
+        );
+        localStorage.setItem("employeremail", data?.data?.login?.user?.email);
+
+        localStorage.setItem(
+          "companyname",
+          data?.data?.login?.user.userCompanyField.company
+        );
+
+        localStorage.setItem("firstName", data?.data?.login?.user?.firstName);
+
+        console.log(data);
+
+        setIncorrectPassword(false);
+
+        // safePush(
+        //   "/dashboard" +
+        //     "?" +
+        //     createQueryString("id", data?.login.user?.id) +
+        //     "&" +
+        //     createQueryString("cid", data?.login?.customer?.databaseId) +
+        //     "&" +
+        //     createQueryString("fn", data?.login?.user?.firstName) +
+        //     "&" +
+        //     createQueryString("email", data?.login?.user?.email)
+        // );
+
+        localStorage.setItem("prevUser", un);
+        localStorage.setItem("prevPass", pw);
+
+        safePush(
+          "/dashboard" +
+            "?" +
+            createQueryString("id", data?.data?.login.user?.id) +
+            "&" +
+            createQueryString("cid", data?.data?.login?.customer?.databaseId) +
+            "&" +
+            createQueryString("fn", data?.data?.login?.user?.firstName) +
+            "&" +
+            createQueryString("email", data?.data?.login?.user?.email) +
+            "&" +
+            createQueryString("new", jr)
+        );
+      })
+      .catch((error) => {
+        console.log(error.message);
+
+        setIncorrectPassword(true);
+        setLoginLoading(false);
+      });
+  };
+
+  const [retryCount, setRetryCount] = useState(0);
+  const [maxRetry, setRetryMax] = useState(5);
+
   const [checkout] = useMutation(NEWORDER, {
     client: graphqlClient,
   });
@@ -598,6 +781,126 @@ export const Basket = ({
           })
           .catch((error) => {
             console.log(error);
+
+            localStorage.setItem("authtoken", "");
+
+            refreshToken({
+              variables: {
+                refreshToken: localStorage.getItem("refreshtoken"),
+              },
+            }).then((data) => {
+              console.log(data);
+
+              localStorage.setItem(
+                "authtoken",
+                data.data.refreshToken.authToken
+              );
+
+              checkout({
+                variables: {
+                  input: {
+                    paymentMethod: "bacs",
+                    lineItems: lineItems,
+                    customerId: parseInt(customerId),
+                    customerNote: "Ernie App Order",
+                    coupons: appliedVoucher,
+                    billing: {
+                      address1: bAddress,
+                      company: businessName,
+                      postcode: bPostcode,
+                      phone: contactNumber,
+                    },
+                    shipping: {
+                      address1: sAddress,
+                      company: businessName,
+                      postcode: sPostcode,
+                      phone: contactNumber,
+                    },
+                    shippingLines: [
+                      {
+                        methodId: mId,
+                        methodTitle: mTitle,
+                        total: appliedVoucher == "FREECOFFEE" ? "0.0" : total,
+                      },
+                    ],
+                  },
+                },
+              }).then((data) => {
+                console.log("Order Received (", data, ")");
+
+                let totalQty = 0;
+
+                for (
+                  let i = 0;
+                  i < data.data.createOrder.order.lineItems.nodes.length;
+                  i++
+                ) {
+                  totalQty +=
+                    data.data.createOrder.order.lineItems.nodes[i].quantity;
+                }
+
+                console.log(totalQty);
+
+                let cInfo = JSON.parse(
+                  localStorage.getItem("clientInformation")
+                );
+
+                console.log(cInfo);
+
+                let address = cInfo.deliveryCompanyAddress;
+                let coffeeMachine = cInfo.coffeeMachineOnSite;
+                let contactNumber = cInfo.pointOfContactNumber;
+                let noOfStaff = cInfo.numberOfStaff;
+                let poiEmail = cInfo.pointOfContactEmail;
+                let poiFirstName = cInfo.pointOfContactFirstName;
+                let postcode = cInfo.deliveryCompanyPostcode;
+                let wfh = cInfo.workFromHomeDays;
+
+                updateClient({
+                  variables: {
+                    id: localStorage.getItem("clientID"),
+                    bags: parseInt(localStorage.getItem("bags")) + totalQty,
+                    carbon:
+                      parseFloat(localStorage.getItem("carbon")) +
+                      (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
+                    trees:
+                      parseInt(localStorage.getItem("trees")) +
+                      Math.floor(totalQty / 6),
+                    coffee:
+                      parseInt(localStorage.getItem("coffee")) + totalQty * 100,
+                    phones:
+                      parseInt(localStorage.getItem("phones")) +
+                      Math.round(totalQty * 0.44 * 120),
+                    m25:
+                      Math.round((totalQty * 0.44) / 32.148) +
+                        parseFloat(localStorage.getItem("m25")) <
+                      1
+                        ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
+                          parseFloat(localStorage.getItem("m25"))
+                        : Math.round((total * 0.44) / 32.148) +
+                          parseFloat(localStorage.getItem("m25")),
+                    address: address,
+                    coffeeMachine: coffeeMachine,
+                    contactNumber: contactNumber,
+                    noOfStaff: noOfStaff,
+                    poiEmail: poiEmail,
+                    poiFirstName: poiFirstName,
+                    postcode: postcode,
+                    wfh: wfh,
+                  },
+                }).then((data) => {
+                  console.log(data);
+
+                  localStorage.setItem(
+                    "client",
+                    JSON.stringify(data.data.updateClient.client)
+                  );
+                });
+
+                setOrderComplete(true);
+                setOrderDetails(data);
+              });
+            });
           });
       } catch (error) {
         console.error("hi", error);
@@ -715,6 +1018,120 @@ export const Basket = ({
           })
           .catch((error) => {
             console.log(error);
+
+            localStorage.setItem("authtoken", "");
+
+            refreshToken({
+              variables: {
+                refreshToken: localStorage.getItem("refreshtoken"),
+              },
+            }).then((data) => {
+              addSubscription({
+                variables: {
+                  input: {
+                    paymentMethod: "bacs",
+                    lineItems: lineItems,
+                    customerId: parseInt(customerId),
+                    customerNote: "Ernie App Order",
+                    billing: {
+                      address1: bAddress,
+                      company: businessName,
+                      postcode: bPostcode,
+                      phone: contactNumber,
+                    },
+                    shipping: {
+                      address1: sAddress,
+                      company: businessName,
+                      postcode: sPostcode,
+                      phone: contactNumber,
+                    },
+                    shippingLines: [
+                      {
+                        methodId: mId,
+                        methodTitle: mTitle,
+                        total: total,
+                      },
+                    ],
+                    billingInterval: interval + "",
+                    billingPeriod: period,
+                  },
+                },
+              }).then((data) => {
+                console.log("Order Received (", data, ")");
+
+                let totalQty = 0;
+
+                for (
+                  let i = 0;
+                  i < data.data.createOrder.order.lineItems.nodes.length;
+                  i++
+                ) {
+                  totalQty +=
+                    data.data.createOrder.order.lineItems.nodes[i].quantity;
+                }
+
+                console.log(totalQty);
+
+                let cInfo = JSON.parse(
+                  localStorage.getItem("clientInformation")
+                );
+
+                console.log(cInfo);
+
+                let address = cInfo.deliveryCompanyAddress;
+                let coffeeMachine = cInfo.coffeeMachineOnSite;
+                let contactNumber = cInfo.pointOfContactNumber;
+                let noOfStaff = cInfo.numberOfStaff;
+                let poiEmail = cInfo.pointOfContactEmail;
+                let poiFirstName = cInfo.pointOfContactFirstName;
+                let postcode = cInfo.deliveryCompanyPostcode;
+                let wfh = cInfo.workFromHomeDays;
+
+                updateClient({
+                  variables: {
+                    id: localStorage.getItem("clientID"),
+                    bags: parseInt(localStorage.getItem("bags")) + totalQty,
+                    carbon:
+                      parseFloat(localStorage.getItem("carbon")) +
+                      (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
+                    trees:
+                      parseInt(localStorage.getItem("trees")) +
+                      Math.floor(totalQty / 6),
+                    coffee:
+                      parseInt(localStorage.getItem("coffee")) + totalQty * 100,
+                    phones:
+                      parseInt(localStorage.getItem("phones")) +
+                      Math.round(totalQty * 0.44 * 120),
+                    m25:
+                      Math.round((totalQty * 0.44) / 32.148) +
+                        parseFloat(localStorage.getItem("m25")) <
+                      1
+                        ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
+                          parseFloat(localStorage.getItem("m25"))
+                        : Math.round((total * 0.44) / 32.148) +
+                          parseFloat(localStorage.getItem("m25")),
+                    address: address,
+                    coffeeMachine: coffeeMachine,
+                    contactNumber: contactNumber,
+                    noOfStaff: noOfStaff,
+                    poiEmail: poiEmail,
+                    poiFirstName: poiFirstName,
+                    postcode: postcode,
+                    wfh: wfh,
+                  },
+                }).then((data) => {
+                  console.log(data);
+
+                  localStorage.setItem(
+                    "client",
+                    JSON.stringify(data.data.updateClient.client)
+                  );
+                });
+
+                setOrderComplete(true);
+                setOrderDetails(data);
+              });
+            });
           });
       } catch (error) {
         console.log(error);
@@ -1044,7 +1461,7 @@ export const Basket = ({
                       } else {
                         clearSubBasket();
 
-                        let data = orderDetails;
+                        let data = [...orderDetails];
                         console.log(data);
 
                         setSubscriptions(data);

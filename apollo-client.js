@@ -5,6 +5,20 @@ import {
   createHttpLink,
 } from "@apollo/client";
 
+import { RetryLink } from "@apollo/client/link/retry";
+
+const link = new RetryLink({
+  delay: {
+    initial: 300,
+    max: Infinity,
+    jitter: true,
+  },
+  attempts: {
+    max: 5,
+    retryIf: (error, _operation) => !!error,
+  },
+});
+
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 
@@ -58,7 +72,9 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
     );
-  if (networkError) console.log(`[Network error]: ${networkError}`);
+  if (networkError) {
+    console.log(`[Network error]: ${networkError.statusCode}`);
+  }
 });
 
 /**
@@ -100,12 +116,14 @@ export const afterware = new ApolloLink((operation, forward) => {
 // Apollo GraphQL client.
 const graphqlClient = new ApolloClient({
   link: authLink.concat(
-    errorLink.concat(
-      middleware.concat(
-        afterware.concat(
-          createHttpLink({
-            uri: "https://ernie.london/graphql",
-          })
+    link.concat(
+      errorLink.concat(
+        middleware.concat(
+          afterware.concat(
+            createHttpLink({
+              uri: "https://ernie.london/graphql",
+            })
+          )
         )
       )
     )

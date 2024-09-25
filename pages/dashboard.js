@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import Products from "@/components/products";
 
 import { gql } from "@apollo/client";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import createApolloClient from "@/apollo-client";
 import graphqlClient from "@/apollo-client";
 import Impact from "@/components/impact";
@@ -108,9 +108,25 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [updatedPlan, setUpdatedPlan] = useState(false);
 
+  const client = graphqlClient;
+
   useEffect(() => {
     console.log(subscriptions);
   }, [subscriptions?.data?.subscription?.subscription?.lineItems?.nodes]);
+
+  const REFRESH = gql`
+    mutation refresh($refreshToken: String!) {
+      refreshToken(input: { refreshToken: $refreshToken }) {
+        authToken
+        success
+      }
+    }
+  `;
+
+  const [refreshToken, { refreshData, refreshLoading, refreshError }] =
+    useMutation(REFRESH, {
+      client: client,
+    });
 
   const loadData = (cid, code, employer) => {
     const client = graphqlClient;
@@ -513,6 +529,379 @@ export default function Dashboard({ data, categories, products, orders }) {
 
             setImpactCertificateURL(data.data.getPDF.url);
           });
+      })
+      .catch((error) => {
+        console.log(error);
+
+        refreshToken({
+          variables: {
+            refreshToken: localStorage.getItem("refreshtoken"),
+          },
+        }).then((data) => {
+          client
+            .query({
+              query: gql`
+                query MyQuery2(
+                  $email: String
+                  $company: String
+                  $employerUser: Int
+                ) {
+                  productTags {
+                    nodes {
+                      name
+                      tagCategoryImages {
+                        displayOrder
+                        tagImage {
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
+                  customer(customerId: $employerUser) {
+                    subscriptions {
+                      nextPaymentDate
+                    }
+                  }
+                  products(first: 100) {
+                    nodes {
+                      id
+                      databaseId
+                      image {
+                        sourceUrl
+                      }
+                      description(format: RAW)
+                      name
+                      ... on SimpleProduct {
+                        id
+                        name
+                        price
+                        chocolateBarsExtraInfo {
+                          calories
+                          dietType
+                          ingredients
+                          type
+                        }
+                        coffeeExtraInfo {
+                          flavours
+                          origin
+                          roast
+                          type
+                          varietal
+                        }
+                        hotChocolateExtraInfo {
+                          dietType
+                          ingredients
+                          origin
+                          type
+                        }
+                        productDisplayStyle {
+                          badgeImage {
+                            sourceUrl
+                          }
+                          bgImage {
+                            sourceUrl
+                          }
+                          secondaryImage {
+                            sourceUrl
+                          }
+                          titleStyle
+                          priceSuffix
+                        }
+                        productTags {
+                          nodes {
+                            name
+                            tagCategoryImages {
+                              displayOrder
+                              tagImage {
+                                sourceUrl
+                              }
+                            }
+                          }
+                        }
+                        brands {
+                          nodes {
+                            name
+                            description
+                            brandingImage {
+                              image {
+                                sourceUrl
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  clients(where: { title: $company }, first: 100) {
+                    nodes {
+                      databaseId
+                      title
+                      clientInformation {
+                        activeState
+                        coffeeMachineOnSite
+                        coffeePoints
+                        companyRegistrationNumber
+                        deliveryCompanyAddress
+                        deliveryCompanyPostcode
+                        deliveryFrequency
+                        fieldGroupName
+                        howDidYouHearAboutUs
+                        impactCertificate {
+                          sourceUrl
+                        }
+                        invoicingContactEmail
+                        invoicingContactFirstName
+                        invoicingContactLastName
+                        invoicingContactNumber
+                        invoicingContactRole
+                        numberOfStaff
+                        otherComments
+                        pointOfContactEmail
+                        pointOfContactFirstName
+                        pointOfContactLastName
+                        pointOfContactNumber
+                        pointOfContactRole
+                        regCompanyAddress
+                        registeredCompanyPostcode
+                        show
+                        startDate
+                        subscriptionId
+                        subsidy
+                        workFromHomeDays
+                      }
+                      impactFigures {
+                        bags
+                        carbon
+                        coffee
+                        m25
+                        phones
+                        trees
+                      }
+                    }
+                  }
+                  orders(first: 10000, where: { customerId: $employerUser }) {
+                    nodes {
+                      id
+                      createdVia
+                      lineItems {
+                        nodes {
+                          quantity
+                          product {
+                            node {
+                              name
+                              databaseId
+                              terms {
+                                nodes {
+                                  ... on ProductTag {
+                                    id
+                                    name
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      customer {
+                        databaseId
+                        email
+                      }
+                      date
+                      orderNumber
+                      status
+                    }
+                  }
+                  coupons {
+                    nodes {
+                      code
+                      limitUsageToXItems
+                      products {
+                        nodes {
+                          databaseId
+                        }
+                      }
+                      discountType
+                      freeShipping
+                    }
+                  }
+                  employeeLists(where: { name: $email }) {
+                    nodes {
+                      employeeListFields {
+                        companyEmail
+                        employeeEmail
+                        employeeName
+                      }
+                    }
+                  }
+                }
+              `,
+              variables: {
+                email: code,
+                employerEmail: employer,
+                company: companyName,
+                employerEmailID: employer,
+                employerUser: parseInt(employerUser),
+              },
+            })
+            .then((data) => {
+              setData(data);
+              console.log(data);
+              tempDataObject = data;
+
+              setCompanyID(data.data.clients.nodes[0].databaseId);
+
+              console.log(data.data.clients.nodes[0].databaseId);
+
+              setOrders(data.data.orders.nodes);
+
+              setCoupons(data.data.coupons.nodes);
+
+              let clients = data.data.clients.nodes;
+
+              let currentUser = localStorage.getItem("prevUser");
+
+              let clientAcc = {};
+
+              for (let i = 0; i < clients.length; i++) {
+                console.log(clients[i].clientInformation.pointOfContactEmail);
+                console.log(currentUser);
+
+                if (
+                  clients[i].clientInformation.pointOfContactEmail ==
+                  currentUser
+                ) {
+                  clientAcc = clients[i];
+                  break;
+                }
+              }
+
+              localStorage.setItem(
+                "address",
+                clientAcc.clientInformation?.deliveryCompanyAddress
+              );
+              localStorage.setItem(
+                "postcode",
+                clientAcc.clientInformation?.deliveryCompanyPostcode
+              );
+              localStorage.setItem(
+                "number",
+                clientAcc.clientInformation?.pointOfContactNumber
+              );
+
+              localStorage.setItem("clientID", clientAcc.databaseId);
+              localStorage.setItem("bags", clientAcc.impactFigures?.bags);
+              localStorage.setItem("carbon", clientAcc.impactFigures?.carbon);
+              localStorage.setItem("trees", clientAcc.impactFigures?.trees);
+              localStorage.setItem("coffee", clientAcc.impactFigures?.coffee);
+              localStorage.setItem("phones", clientAcc.impactFigures?.phones);
+              localStorage.setItem("m25", clientAcc.impactFigures?.m25);
+
+              localStorage.setItem(
+                "clientInformation",
+                JSON.stringify(clientAcc.clientInformation)
+              );
+
+              localStorage.setItem("client", JSON.stringify(clientAcc));
+
+              // for (let i = 0; i < data.data.orders.nodes.length; i++) {
+              //   // console.log(data.data.orders.nodes[i]);
+              //   for (
+              //     let j = 0;
+              //     j < data.data.orders.nodes[i].subscriptions.length;
+              //     j++
+              //   ) {
+              //     console.log(
+              //       data.data.orders.nodes[i].subscription[j].nextPaymentDate
+              //     );
+              //   }
+              // }
+
+              console.log(employerUser);
+
+              client
+                .mutate({
+                  mutation: gql`
+                    mutation GetSubscription($employerUser: ID!) {
+                      subscription(input: { id: $employerUser }) {
+                        subscription {
+                          databaseId
+                          lineItems {
+                            nodes {
+                              databaseId
+                              quantity
+                              product {
+                                node {
+                                  name
+                                  description(format: RAW)
+                                  databaseId
+                                  featuredImage {
+                                    node {
+                                      sourceUrl
+                                    }
+                                  }
+                                  ... on SimpleProduct {
+                                    id
+                                    name
+                                    price
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          billingPeriod
+                          billingInterval
+                          nextPaymentDate
+                        }
+                      }
+                    }
+                  `,
+                  variables: {
+                    employerUser: employerUser,
+                  },
+                })
+                .then((data) => {
+                  setSubscriptions(data);
+                  setOriginalSubscriptions(data);
+
+                  console.log(data);
+
+                  if (data?.data?.subscription?.subscription != null) {
+                    setHasSubscription(true);
+                    setSubAttempt(true);
+                  } else {
+                    setSubAttempt(true);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+
+                  setHasSubscription(false);
+                  setSubAttempt(true);
+                });
+
+              client
+                .mutate({
+                  mutation: gql`
+                    mutation GetPDF($dataset: ID!, $templateId: ID!) {
+                      getPDF(
+                        input: { dataset: $dataset, templateId: $templateId }
+                      ) {
+                        url
+                      }
+                    }
+                  `,
+                  variables: {
+                    dataset: data.data.clients.nodes[0].databaseId,
+                    templateId: 2,
+                  },
+                })
+                .then((data) => {
+                  console.log(data);
+
+                  setImpactCertificateURL(data.data.getPDF.url);
+                });
+            });
+        });
       });
 
     client
@@ -853,6 +1242,78 @@ export default function Dashboard({ data, categories, products, orders }) {
         setUpdateSubError(error);
 
         console.log("error");
+
+        console.log(error);
+
+        refreshToken({
+          variables: {
+            refreshToken: localStorage.getItem("refreshtoken"),
+          },
+        }).then((data) => {
+          client
+            .mutate({
+              mutation: gql`
+                mutation MyMutation(
+                  $billingInterval: String!
+                  $billingPeriod: String!
+                  $id: ID!
+                ) {
+                  changeSubscriptionFrequency(
+                    input: {
+                      billingInterval: $billingInterval
+                      billingPeriod: $billingPeriod
+                      id: $id
+                    }
+                  ) {
+                    subscription {
+                      databaseId
+                      lineItems {
+                        nodes {
+                          databaseId
+                          quantity
+                          product {
+                            node {
+                              name
+                              description(format: RAW)
+                              databaseId
+                              featuredImage {
+                                node {
+                                  sourceUrl
+                                }
+                              }
+                              ... on SimpleProduct {
+                                id
+                                name
+                                price
+                              }
+                            }
+                          }
+                        }
+                      }
+                      billingPeriod
+                      billingInterval
+                      nextPaymentDate
+                    }
+                  }
+                }
+              `,
+              variables: {
+                billingInterval: planDetails.billingInterval,
+                billingPeriod: planDetails.billingPeriod,
+                id: planDetails.databaseId,
+              },
+            })
+            .then((data) => {
+              let dataCopy = data.data.changeSubscriptionFrequency;
+
+              let dataNew = { data: { subscription: dataCopy } };
+
+              setSubscriptions(dataNew);
+              console.log(dataNew);
+
+              setUpdatedPlan(true);
+            });
+        });
       });
   };
 
@@ -1092,6 +1553,91 @@ export default function Dashboard({ data, categories, products, orders }) {
           })
           .catch((error) => {
             setUpdateSubError(error);
+
+            console.log("error");
+
+            console.log(error);
+
+            localStorage.setItem("authtoken", "");
+
+            refreshToken({
+              variables: {
+                refreshToken: localStorage.getItem("refreshtoken"),
+              },
+            }).then((data) => {
+              client
+                .mutate({
+                  mutation: gql`
+                    mutation MyMutation2(
+                      $id: ID!
+                      $productId: ID!
+                      $productQuantity: Int!
+                    ) {
+                      addProductToSubscription(
+                        input: {
+                          id: $id
+                          productId: $productId
+                          productQuantity: $productQuantity
+                        }
+                      ) {
+                        subscription {
+                          databaseId
+                          lineItems {
+                            nodes {
+                              databaseId
+                              quantity
+                              product {
+                                node {
+                                  name
+                                  description(format: RAW)
+                                  databaseId
+                                  featuredImage {
+                                    node {
+                                      sourceUrl
+                                    }
+                                  }
+                                  ... on SimpleProduct {
+                                    id
+                                    name
+                                    price
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          billingPeriod
+                          billingInterval
+                          nextPaymentDate
+                        }
+                      }
+                    }
+                  `,
+                  variables: {
+                    id: subscriptions.data.subscription.subscription.databaseId,
+                    productId: changes[i].product.product.node?.databaseId + "",
+                    productQuantity: changes[i].difference,
+                  },
+                })
+                .then((data) => {
+                  console.log(data);
+
+                  let updateSubscriptions = {
+                    subscriptions: {
+                      data: {
+                        subscription: data.data.addProductToSubscription,
+                      },
+                    },
+                  };
+
+                  setSubscriptions(updateSubscriptions);
+
+                  setOrderComplete(true);
+
+                  setOrderDetails(updateSubscriptions);
+
+                  console.log(updateSubscriptions);
+                });
+            });
           });
       } else if (changes[i].action == "remove") {
         client
@@ -1157,6 +1703,74 @@ export default function Dashboard({ data, categories, products, orders }) {
             setUpdateSubError(error);
 
             console.log("remove product error");
+
+            localStorage.setItem("authtoken", "");
+
+            refreshToken({
+              variables: {
+                refreshToken: localStorage.getItem("refreshtoken"),
+              },
+            }).then((data) => {
+              client
+                .mutate({
+                  mutation: gql`
+                    mutation MyMutation2($id: ID!, $productId: ID!) {
+                      removeProductFromSubscription(
+                        input: { id: $id, productId: $productId }
+                      ) {
+                        subscription {
+                          databaseId
+                          lineItems {
+                            nodes {
+                              databaseId
+                              quantity
+                              product {
+                                node {
+                                  name
+                                  description(format: RAW)
+                                  databaseId
+                                  featuredImage {
+                                    node {
+                                      sourceUrl
+                                    }
+                                  }
+                                  ... on SimpleProduct {
+                                    id
+                                    name
+                                    price
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          billingPeriod
+                          billingInterval
+                          nextPaymentDate
+                        }
+                      }
+                    }
+                  `,
+                  variables: {
+                    id: subscriptions.data.subscription.subscription.databaseId,
+                    productId: changes[i].product.product.node.databaseId + "",
+                  },
+                })
+                .then((data) => {
+                  console.log(data);
+
+                  let updateSubscriptions = {
+                    subscriptions: {
+                      data: {
+                        subscription: data.data.removeProductFromSubscription,
+                      },
+                    },
+                  };
+
+                  setSubscriptions(updateSubscriptions);
+
+                  setOrderComplete(true);
+                });
+            });
           });
       } else if (changes[i].action == "qty") {
         client
@@ -1288,6 +1902,142 @@ export default function Dashboard({ data, categories, products, orders }) {
             setUpdateSubError(error.message + "");
 
             console.log("error");
+
+            localStorage.setItem("authtoken", "");
+
+            refreshToken({
+              variables: {
+                refreshToken: localStorage.getItem("refreshtoken"),
+              },
+            }).then((data) => {
+              client
+                .mutate({
+                  mutation: gql`
+                    mutation MyMutation2($id: ID!, $productId: ID!) {
+                      removeProductFromSubscription(
+                        input: { id: $id, productId: $productId }
+                      ) {
+                        subscription {
+                          databaseId
+                          lineItems {
+                            nodes {
+                              databaseId
+                              quantity
+                              product {
+                                node {
+                                  name
+                                  description(format: RAW)
+                                  databaseId
+                                  featuredImage {
+                                    node {
+                                      sourceUrl
+                                    }
+                                  }
+                                  ... on SimpleProduct {
+                                    id
+                                    name
+                                    price
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          billingPeriod
+                          billingInterval
+                          nextPaymentDate
+                        }
+                      }
+                    }
+                  `,
+                  variables: {
+                    id: subscriptions.data.subscription.subscription.databaseId,
+                    productId: changes[i].product.databaseId,
+                  },
+                })
+                .then((data) => {
+                  console.log("Old QTY Removed");
+
+                  console.log(data);
+
+                  console.log(changes[i]);
+
+                  client
+                    .mutate({
+                      mutation: gql`
+                        mutation MyMutation2(
+                          $id: ID!
+                          $productId: ID!
+                          $productQuantity: Int!
+                        ) {
+                          addProductToSubscription(
+                            input: {
+                              id: $id
+                              productId: $productId
+                              productQuantity: $productQuantity
+                            }
+                          ) {
+                            subscription {
+                              databaseId
+                              lineItems {
+                                nodes {
+                                  databaseId
+                                  quantity
+                                  product {
+                                    node {
+                                      name
+                                      description(format: RAW)
+                                      databaseId
+                                      featuredImage {
+                                        node {
+                                          sourceUrl
+                                        }
+                                      }
+                                      ... on SimpleProduct {
+                                        id
+                                        name
+                                        price
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                              billingPeriod
+                              billingInterval
+                              nextPaymentDate
+                            }
+                          }
+                        }
+                      `,
+                      variables: {
+                        id: subscriptions.data.subscription.subscription
+                          .databaseId,
+                        productId:
+                          changes[i].product.product.node.databaseId + "",
+                        productQuantity: changes[i].difference,
+                      },
+                    })
+                    .then((data) => {
+                      console.log("New QTY Added");
+
+                      console.log(data);
+
+                      let updateSubscriptions = {
+                        subscriptions: {
+                          data: {
+                            subscription: data.data.addProductToSubscription,
+                          },
+                        },
+                      };
+
+                      setSubscriptions(updateSubscriptions);
+
+                      setOrderComplete(true);
+                    })
+                    .catch((error) => {
+                      console.log("new Qty error");
+                    });
+                });
+            });
           });
       }
     }
@@ -1384,6 +2134,86 @@ export default function Dashboard({ data, categories, products, orders }) {
             }
 
             setOrders(ordersCopy);
+          })
+          .catch((error) => {
+            refreshToken({
+              variables: {
+                refreshToken: localStorage.getItem("refreshtoken"),
+              },
+            }).then((data) => {
+              client
+                .mutate({
+                  mutation: gql`
+                    mutation updateOrder(
+                      $orderId: Int!
+                      $productId: Int!
+                      $quantity: Int!
+                    ) {
+                      updateOrder(
+                        input: {
+                          orderId: $orderId
+                          lineItems: {
+                            quantity: $quantity
+                            productId: $productId
+                          }
+                        }
+                      ) {
+                        order {
+                          id
+                          lineItems {
+                            nodes {
+                              quantity
+                              product {
+                                node {
+                                  name
+                                  databaseId
+                                  terms {
+                                    nodes {
+                                      ... on ProductTag {
+                                        id
+                                        name
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                          customer {
+                            databaseId
+                            email
+                          }
+                          date
+                          orderNumber
+                          status
+                        }
+                      }
+                    }
+                  `,
+                  variables: {
+                    orderId: parseInt(orderDetails.orderNumber),
+                    productId:
+                      orderDetails.lineItems.nodes[i].product.node.databaseId,
+                    quantity: orderDetails.lineItems.nodes[i].quantity,
+                  },
+                })
+                .then((data) => {
+                  console.log(data);
+
+                  // setOrders(data);
+                  let ordersCopy = [...orderData];
+
+                  for (let i = 0; i < ordersCopy.length; i++) {
+                    if (ordersCopy[i].orderNumber == orderDetails.orderNumber) {
+                      console.log(ordersCopy[i]);
+                      console.log(orderDetails);
+                      ordersCopy[i] = orderDetails;
+                    }
+                  }
+
+                  setOrders(ordersCopy);
+                });
+            });
           });
       }
     }
@@ -1435,6 +2265,56 @@ export default function Dashboard({ data, categories, products, orders }) {
         setData(tempDataObject);
 
         setSubsidyChanging(false);
+      })
+      .catch((error) => {
+        refreshToken({
+          variables: {
+            refreshToken: localStorage.getItem("refreshtoken"),
+          },
+        }).then((data) => {
+          client
+            .mutate({
+              mutation: gql`
+                mutation changeSubsidy(
+                  $id: ID!
+                  $amount: Float
+                  $discountType: DiscountTypeEnum
+                ) {
+                  updateCoupon(
+                    input: {
+                      id: $id
+                      amount: $amount
+                      discountType: $discountType
+                    }
+                  ) {
+                    coupon {
+                      amount
+                      discountType
+                    }
+                  }
+                }
+              `,
+              variables: {
+                id: dataObject?.data.coupons.nodes[0].id,
+                amount: val,
+                discountType: type == "FIXED_CART" ? "FIXED_CART" : "PERCENT",
+              },
+            })
+            .then((data) => {
+              console.log(data.data.updateCoupon.coupon.amount);
+
+              let tempDataObject = cloneDeep(dataObject);
+
+              tempDataObject.data.coupons.nodes[0].amount =
+                data.data.updateCoupon.coupon.amount;
+              tempDataObject.data.coupons.nodes[0].discountType =
+                data.data.updateCoupon.coupon.discountType;
+
+              setData(tempDataObject);
+
+              setSubsidyChanging(false);
+            });
+        });
       });
   };
 

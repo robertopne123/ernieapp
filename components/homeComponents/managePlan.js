@@ -42,7 +42,7 @@ export const ManagePlan = ({
     console.log(currentSubscription);
 
     for (let i = 0; i < orderProducts.length; i++) {
-      for (let j = 0; j < currentSubscription.lineItems.nodes.length; j++) {
+      for (let j = 0; j < currentSubscription?.lineItems.nodes.length; j++) {
         if (
           orderProducts[i].name ==
           currentSubscription.lineItems.nodes[j].product.node.name
@@ -861,8 +861,8 @@ export const ManagePlan = ({
               <option
                 value="weekly"
                 selected={
-                  currentSubscription.billingPeriod == "week" &&
-                  currentSubscription.billingInterval == "1"
+                  currentSubscription?.billingPeriod == "week" &&
+                  currentSubscription?.billingInterval == "1"
                 }
               >
                 Weekly
@@ -870,8 +870,8 @@ export const ManagePlan = ({
               <option
                 value="bi-weekly"
                 selected={
-                  currentSubscription.billingPeriod == "week" &&
-                  currentSubscription.billingInterval == "2"
+                  currentSubscription?.billingPeriod == "week" &&
+                  currentSubscription?.billingInterval == "2"
                 }
               >
                 {"Bi-weekly (once every two weeks)"}
@@ -879,8 +879,8 @@ export const ManagePlan = ({
               <option
                 value="monthly"
                 selected={
-                  currentSubscription.billingPeriod == "month" &&
-                  currentSubscription.billingInterval == "1"
+                  currentSubscription?.billingPeriod == "month" &&
+                  currentSubscription?.billingInterval == "1"
                 }
               >
                 Monthly
@@ -888,8 +888,8 @@ export const ManagePlan = ({
               <option
                 value="bi-monthly"
                 selected={
-                  currentSubscription.billingPeriod == "month" &&
-                  currentSubscription.billingInterval == "2"
+                  currentSubscription?.billingPeriod == "month" &&
+                  currentSubscription?.billingInterval == "2"
                 }
               >
                 {"Bi-monthly (once every two months)"}
