@@ -112,7 +112,7 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   useEffect(() => {
     console.log(subscriptions);
-  }, [subscriptions?.data?.subscription?.subscription?.lineItems?.nodes]);
+  }, [subscriptions]);
 
   const REFRESH = gql`
     mutation refresh($refreshToken: String!) {
@@ -538,6 +538,8 @@ export default function Dashboard({ data, categories, products, orders }) {
             refreshToken: localStorage.getItem("refreshtoken"),
           },
         }).then((data) => {
+          localStorage.setItem("authtoken", data.data.refreshToken.authToken);
+
           client
             .query({
               query: gql`
@@ -1250,6 +1252,8 @@ export default function Dashboard({ data, categories, products, orders }) {
             refreshToken: localStorage.getItem("refreshtoken"),
           },
         }).then((data) => {
+          localStorage.setItem("authtoken", data.data.refreshToken.authToken);
+
           client
             .mutate({
               mutation: gql`
@@ -1324,215 +1328,925 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     console.log(originalSubscriptions);
 
-    console.log(planDetails);
+    console.log(subscriptions);
 
     let newChanges = [];
 
     let planDetailsTemp = [...planDetails];
 
-    for (let i = 0; i < planDetailsTemp.length; i++) {
-      console.log(i);
+    console.log(planDetailsTemp);
 
-      if (newChanges.length > 0) {
-        console.log("newChanges");
+    // for (let i = 0; i < planDetailsTemp.length; i++) {
+    //   console.log(i);
 
-        for (let j = 0; j < newChanges.length; j++) {
-          console.log(j);
+    //   if (newChanges.length > 0) {
+    //     console.log("newChanges");
 
-          console.log(
-            planDetailsTemp[i].product.node?.name +
-              " - " +
-              newChanges[j].product.node?.name
-          );
+    //     for (let j = 0; j < newChanges.length; j++) {
+    //       console.log(j);
 
-          if (
-            planDetailsTemp[i].product.node?.name ==
-            newChanges[j].product.node.name
-          ) {
-            console.log("product already exists");
+    //       console.log(
+    //         planDetailsTemp[i].product.node?.name +
+    //           " - " +
+    //           newChanges[j].product.node?.name
+    //       );
 
-            newChanges[j].quantity =
-              newChanges[j].quantity + planDetailsTemp[i].quantity;
+    //       if (
+    //         planDetailsTemp[i].product.node?.name ==
+    //         newChanges[j].product.node.name
+    //       ) {
+    //         console.log("product already exists");
 
-            planDetailsTemp.splice(i, 1);
+    //         console.log(newChanges[j].quantity, planDetailsTemp[i].quantity);
 
-            break;
-          } else {
-            newChanges.push(planDetailsTemp[i]);
+    //         newChanges[j].quantity =
+    //           newChanges[j].quantity + planDetailsTemp[i].quantity;
 
-            console.log("new - " + planDetailsTemp[i].product.node?.name);
+    //         planDetailsTemp.splice(i, 1);
 
-            break;
-          }
-        }
-      } else {
-        newChanges.push(planDetailsTemp[i]);
+    //         break;
+    //       } else {
+    //         newChanges.push(planDetailsTemp[i]);
 
-        console.log("new - " + planDetailsTemp[i].product.node.name);
-      }
-    }
+    //         console.log("new - " + planDetailsTemp[i].product.node?.name);
 
-    console.log(newChanges);
+    //         break;
+    //       }
+    //     }
+    //   } else {
+    //     newChanges.push(planDetailsTemp[i]);
 
-    console.log(planDetails);
-    console.log(existingSubscriptionProducts);
+    //     console.log("new - " + planDetailsTemp[i].product.node.name);
+    //   }
+    // }
 
-    let finalDetails = [...planDetails];
+    // console.log(newChanges);
 
-    //COMPARISON - FIRST SCAN
-    let changes = [];
+    // console.log(planDetails);
+    // console.log(existingSubscriptionProducts);
 
-    let foundProduct = false;
+    // let finalDetails = [...planDetails];
 
-    for (let i = 0; i < newChanges.length; i++) {
-      foundProduct = false;
-      for (let j = 0; j < existingSubscriptionProducts.length; j++) {
-        if (
-          newChanges[i].product.node?.name ==
-          existingSubscriptionProducts[j].product.node.name
-        ) {
-          console.log(
-            "Comparing ",
-            newChanges[i].product.node?.name,
-            " - ",
-            existingSubscriptionProducts[j].product.node.name
-          );
+    // //COMPARISON - FIRST SCAN
+    // let changes = [];
 
-          foundProduct = true;
-          console.log(
-            newChanges[i].quantity +
-              " - " +
-              existingSubscriptionProducts[j].quantity
-          );
+    // let foundProduct = false;
 
-          if (
-            newChanges[i].quantity != existingSubscriptionProducts[j].quantity
-          ) {
-            if (
-              newChanges[i].quantity > existingSubscriptionProducts[j].quantity
-            ) {
-              console.log("qty");
-              changes.push({
-                action: "qty",
-                difference: newChanges[i].quantity,
-                product: newChanges[i],
-              });
-              console.log(changes[i]);
-            } else if (
-              newChanges[i].quantity < existingSubscriptionProducts[j].quantity
-            ) {
-              changes.push({
-                action: "qty",
-                difference: newChanges[i].quantity,
-                product: newChanges[i],
-              });
-            }
-          } else {
-            console.log("qty same");
-          }
-        }
-      }
+    // for (let i = 0; i < newChanges.length; i++) {
+    //   foundProduct = false;
+    //   for (let j = 0; j < existingSubscriptionProducts.length; j++) {
+    //     if (
+    //       newChanges[i].product.node?.name ==
+    //       existingSubscriptionProducts[j].product.node.name
+    //     ) {
+    //       console.log(
+    //         "Comparing ",
+    //         newChanges[i].product.node?.name,
+    //         " - ",
+    //         existingSubscriptionProducts[j].product.node.name
+    //       );
 
-      if (!foundProduct) {
-        changes.push({
-          action: "add",
-          product: newChanges[i],
-          difference: newChanges[i].quantity,
-        });
-      }
-    }
+    //       foundProduct = true;
+    //       console.log(
+    //         newChanges[i].quantity +
+    //           " - " +
+    //           existingSubscriptionProducts[j].quantity
+    //       );
 
-    console.log(existingSubscriptionProducts);
+    //       if (
+    //         newChanges[i].quantity != existingSubscriptionProducts[j].quantity
+    //       ) {
+    //         if (
+    //           newChanges[i].quantity > existingSubscriptionProducts[j].quantity
+    //         ) {
+    //           console.log("qty");
+    //           changes.push({
+    //             action: "qty",
+    //             difference: newChanges[i].quantity,
+    //             product: newChanges[i],
+    //           });
+    //           console.log(changes[i]);
+    //         } else if (
+    //           newChanges[i].quantity < existingSubscriptionProducts[j].quantity
+    //         ) {
+    //           changes.push({
+    //             action: "qty",
+    //             difference: newChanges[i].quantity,
+    //             product: newChanges[i],
+    //           });
+    //         }
+    //       } else {
+    //         console.log("qty same");
+    //       }
+    //     }
+    //   }
 
-    for (let i = 0; i < existingSubscriptionProducts.length; i++) {
-      foundProduct = false;
-      for (let j = 0; j < newChanges.length; j++) {
-        if (
-          existingSubscriptionProducts[i].product.node.name ==
-          newChanges[j].product.node?.name
-        ) {
-          console.log(
-            "Comparing ",
-            existingSubscriptionProducts[i].product.node.name,
-            " - ",
-            newChanges[j].product.node?.name
-          );
-          foundProduct = true;
-        }
-      }
+    //   if (!foundProduct) {
+    //     changes.push({
+    //       action: "add",
+    //       product: newChanges[i],
+    //       difference: newChanges[i].quantity,
+    //     });
+    //   }
+    // }
 
-      if (!foundProduct) {
-        changes.push({
-          action: "remove",
-          product: existingSubscriptionProducts[i],
-        });
-      }
-    }
+    // console.log(existingSubscriptionProducts);
 
-    console.log(changes);
+    // for (let i = 0; i < existingSubscriptionProducts.length; i++) {
+    //   foundProduct = false;
+    //   for (let j = 0; j < newChanges.length; j++) {
+    //     if (
+    //       existingSubscriptionProducts[i].product.node.name ==
+    //       newChanges[j].product.node?.name
+    //     ) {
+    //       console.log(
+    //         "Comparing ",
+    //         existingSubscriptionProducts[i].product.node.name,
+    //         " - ",
+    //         newChanges[j].product.node?.name
+    //       );
+    //       foundProduct = true;
+    //     }
+    //   }
 
-    console.log(subscriptions);
+    //   if (!foundProduct) {
+    //     changes.push({
+    //       action: "remove",
+    //       product: existingSubscriptionProducts[i],
+    //     });
+    //   }
+    // }
+
+    // console.log(changes);
+
+    // console.log(subscriptions);
 
     const client = graphqlClient;
 
-    for (let i = 0; i < changes.length; i++) {
-      if (changes[i].action == "add") {
-        console.log("add");
+    // for (let i = 0; i < changes.length; i++) {
+    //   if (changes[i].action == "add") {
+    //     console.log("add");
 
-        client
-          .mutate({
-            mutation: gql`
-              mutation MyMutation2(
-                $id: ID!
-                $productId: ID!
-                $productQuantity: Int!
+    //     client
+    //       .mutate({
+    //         mutation: gql`
+    //           mutation MyMutation2(
+    //             $id: ID!
+    //             $productId: ID!
+    //             $productQuantity: Int!
+    //           ) {
+    //             addProductToSubscription(
+    //               input: {
+    //                 id: $id
+    //                 productId: $productId
+    //                 productQuantity: $productQuantity
+    //               }
+    //             ) {
+    //               subscription {
+    //                 databaseId
+    //                 lineItems {
+    //                   nodes {
+    //                     databaseId
+    //                     quantity
+    //                     product {
+    //                       node {
+    //                         name
+    //                         description(format: RAW)
+    //                         databaseId
+    //                         featuredImage {
+    //                           node {
+    //                             sourceUrl
+    //                           }
+    //                         }
+    //                         ... on SimpleProduct {
+    //                           id
+    //                           name
+    //                           price
+    //                         }
+    //                       }
+    //                     }
+    //                   }
+    //                 }
+    //                 billingPeriod
+    //                 billingInterval
+    //                 nextPaymentDate
+    //               }
+    //             }
+    //           }
+    //         `,
+    //         variables: {
+    //           id: subscriptions.data.subscription.subscription.databaseId,
+    //           productId: changes[i].product.product.node?.databaseId + "",
+    //           productQuantity: changes[i].difference,
+    //         },
+    //       })
+    //       .then((data) => {
+    //         console.log(data);
+
+    //         let updateSubscriptions = {
+    //           subscriptions: {
+    //             data: {
+    //               subscription: data.data.addProductToSubscription,
+    //             },
+    //           },
+    //         };
+
+    //         setSubscriptions(updateSubscriptions);
+
+    //         setOrderComplete(true);
+
+    //         setOrderDetails(updateSubscriptions);
+
+    //         console.log(updateSubscriptions);
+    //       })
+    //       .catch((error) => {
+    //         setUpdateSubError(error);
+
+    //         console.log("error");
+
+    //         console.log(error);
+
+    //         localStorage.setItem("authtoken", "");
+
+    //         refreshToken({
+    //           variables: {
+    //             refreshToken: localStorage.getItem("refreshtoken"),
+    //           },
+    //         }).then((data) => {
+    //           localStorage.setItem(
+    //             "authtoken",
+    //             data.data.refreshToken.authToken
+    //           );
+
+    //           client
+    //             .mutate({
+    //               mutation: gql`
+    //                 mutation MyMutation2(
+    //                   $id: ID!
+    //                   $productId: ID!
+    //                   $productQuantity: Int!
+    //                 ) {
+    //                   addProductToSubscription(
+    //                     input: {
+    //                       id: $id
+    //                       productId: $productId
+    //                       productQuantity: $productQuantity
+    //                     }
+    //                   ) {
+    //                     subscription {
+    //                       databaseId
+    //                       lineItems {
+    //                         nodes {
+    //                           databaseId
+    //                           quantity
+    //                           product {
+    //                             node {
+    //                               name
+    //                               description(format: RAW)
+    //                               databaseId
+    //                               featuredImage {
+    //                                 node {
+    //                                   sourceUrl
+    //                                 }
+    //                               }
+    //                               ... on SimpleProduct {
+    //                                 id
+    //                                 name
+    //                                 price
+    //                               }
+    //                             }
+    //                           }
+    //                         }
+    //                       }
+    //                       billingPeriod
+    //                       billingInterval
+    //                       nextPaymentDate
+    //                     }
+    //                   }
+    //                 }
+    //               `,
+    //               variables: {
+    //                 id: subscriptions.data.subscription.subscription.databaseId,
+    //                 productId: changes[i].product.product.node?.databaseId + "",
+    //                 productQuantity: changes[i].difference,
+    //               },
+    //             })
+    //             .then((data) => {
+    //               console.log(data);
+
+    //               let updateSubscriptions = {
+    //                 subscriptions: {
+    //                   data: {
+    //                     subscription: data.data.addProductToSubscription,
+    //                   },
+    //                 },
+    //               };
+
+    //               setSubscriptions(updateSubscriptions);
+
+    //               setOrderComplete(true);
+
+    //               setOrderDetails(updateSubscriptions);
+
+    //               console.log(updateSubscriptions);
+    //             });
+    //         });
+    //       });
+    //   } else if (changes[i].action == "remove") {
+    //     client
+    //       .mutate({
+    //         mutation: gql`
+    //           mutation MyMutation2($id: ID!, $productId: ID!) {
+    //             removeProductFromSubscription(
+    //               input: { id: $id, productId: $productId }
+    //             ) {
+    //               subscription {
+    //                 databaseId
+    //                 lineItems {
+    //                   nodes {
+    //                     databaseId
+    //                     quantity
+    //                     product {
+    //                       node {
+    //                         name
+    //                         description(format: RAW)
+    //                         databaseId
+    //                         featuredImage {
+    //                           node {
+    //                             sourceUrl
+    //                           }
+    //                         }
+    //                         ... on SimpleProduct {
+    //                           id
+    //                           name
+    //                           price
+    //                         }
+    //                       }
+    //                     }
+    //                   }
+    //                 }
+    //                 billingPeriod
+    //                 billingInterval
+    //                 nextPaymentDate
+    //               }
+    //             }
+    //           }
+    //         `,
+    //         variables: {
+    //           id: subscriptions.data.subscription.subscription.databaseId,
+    //           productId: changes[i].product.product.node.databaseId + "",
+    //         },
+    //       })
+    //       .then((data) => {
+    //         console.log(data);
+
+    //         let updateSubscriptions = {
+    //           subscriptions: {
+    //             data: {
+    //               subscription: data.data.removeProductFromSubscription,
+    //             },
+    //           },
+    //         };
+
+    //         setSubscriptions(updateSubscriptions);
+
+    //         setOrderComplete(true);
+    //       })
+    //       .catch((error) => {
+    //         setUpdateSubError(error);
+
+    //         console.log("remove product error");
+
+    //         localStorage.setItem("authtoken", "");
+
+    //         refreshToken({
+    //           variables: {
+    //             refreshToken: localStorage.getItem("refreshtoken"),
+    //           },
+    //         }).then((data) => {
+    //           localStorage.setItem(
+    //             "authtoken",
+    //             data.data.refreshToken.authToken
+    //           );
+
+    //           client
+    //             .mutate({
+    //               mutation: gql`
+    //                 mutation MyMutation2($id: ID!, $productId: ID!) {
+    //                   removeProductFromSubscription(
+    //                     input: { id: $id, productId: $productId }
+    //                   ) {
+    //                     subscription {
+    //                       databaseId
+    //                       lineItems {
+    //                         nodes {
+    //                           databaseId
+    //                           quantity
+    //                           product {
+    //                             node {
+    //                               name
+    //                               description(format: RAW)
+    //                               databaseId
+    //                               featuredImage {
+    //                                 node {
+    //                                   sourceUrl
+    //                                 }
+    //                               }
+    //                               ... on SimpleProduct {
+    //                                 id
+    //                                 name
+    //                                 price
+    //                               }
+    //                             }
+    //                           }
+    //                         }
+    //                       }
+    //                       billingPeriod
+    //                       billingInterval
+    //                       nextPaymentDate
+    //                     }
+    //                   }
+    //                 }
+    //               `,
+    //               variables: {
+    //                 id: subscriptions.data.subscription.subscription.databaseId,
+    //                 productId: changes[i].product.product.node.databaseId + "",
+    //               },
+    //             })
+    //             .then((data) => {
+    //               console.log(data);
+
+    //               let updateSubscriptions = {
+    //                 subscriptions: {
+    //                   data: {
+    //                     subscription: data.data.removeProductFromSubscription,
+    //                   },
+    //                 },
+    //               };
+
+    //               setSubscriptions(updateSubscriptions);
+
+    //               setOrderComplete(true);
+    //             });
+    //         });
+    //       });
+    //   } else if (changes[i].action == "qty") {
+    //     console.log(changes[i]);
+
+    //     client
+    //       .mutate({
+    //         mutation: gql`
+    //           mutation MyMutation2($id: ID!, $productId: ID!) {
+    //             removeProductFromSubscription(
+    //               input: { id: $id, productId: $productId }
+    //             ) {
+    //               subscription {
+    //                 databaseId
+    //                 lineItems {
+    //                   nodes {
+    //                     databaseId
+    //                     quantity
+    //                     product {
+    //                       node {
+    //                         name
+    //                         description(format: RAW)
+    //                         databaseId
+    //                         featuredImage {
+    //                           node {
+    //                             sourceUrl
+    //                           }
+    //                         }
+    //                         ... on SimpleProduct {
+    //                           id
+    //                           name
+    //                           price
+    //                         }
+    //                       }
+    //                     }
+    //                   }
+    //                 }
+    //                 billingPeriod
+    //                 billingInterval
+    //                 nextPaymentDate
+    //               }
+    //             }
+    //           }
+    //         `,
+    //         variables: {
+    //           id: subscriptions.data.subscription.subscription.databaseId,
+    //           productId: changes[i].product.databaseId,
+    //         },
+    //       })
+    //       .then((data) => {
+    //         console.log("Old QTY Removed");
+
+    //         console.log(data);
+
+    //         console.log(changes[i]);
+
+    //         client
+    //           .mutate({
+    //             mutation: gql`
+    //               mutation MyMutation2(
+    //                 $id: ID!
+    //                 $productId: ID!
+    //                 $productQuantity: Int!
+    //               ) {
+    //                 addProductToSubscription(
+    //                   input: {
+    //                     id: $id
+    //                     productId: $productId
+    //                     productQuantity: $productQuantity
+    //                   }
+    //                 ) {
+    //                   subscription {
+    //                     databaseId
+    //                     lineItems {
+    //                       nodes {
+    //                         databaseId
+    //                         quantity
+    //                         product {
+    //                           node {
+    //                             name
+    //                             description(format: RAW)
+    //                             databaseId
+    //                             featuredImage {
+    //                               node {
+    //                                 sourceUrl
+    //                               }
+    //                             }
+    //                             ... on SimpleProduct {
+    //                               id
+    //                               name
+    //                               price
+    //                             }
+    //                           }
+    //                         }
+    //                       }
+    //                     }
+    //                     billingPeriod
+    //                     billingInterval
+    //                     nextPaymentDate
+    //                   }
+    //                 }
+    //               }
+    //             `,
+    //             variables: {
+    //               id: subscriptions.data.subscription.subscription.databaseId,
+    //               productId: changes[i].product.product.node.databaseId + "",
+    //               productQuantity: changes[i].difference,
+    //             },
+    //           })
+    //           .then((data) => {
+    //             console.log("New QTY Added");
+
+    //             console.log(data);
+
+    //             let updateSubscriptions = {
+    //               subscriptions: {
+    //                 data: {
+    //                   subscription: data.data.addProductToSubscription,
+    //                 },
+    //               },
+    //             };
+
+    //             setSubscriptions(updateSubscriptions);
+
+    //             setOrderComplete(true);
+    //           })
+    //           .catch((error) => {
+    //             console.log("new Qty error");
+    //           });
+    //       })
+    //       .catch((error) => {
+    //         setUpdateSubError(error.message + "");
+
+    //         console.log("error");
+
+    //         localStorage.setItem("authtoken", "");
+
+    //         refreshToken({
+    //           variables: {
+    //             refreshToken: localStorage.getItem("refreshtoken"),
+    //           },
+    //         }).then((data) => {
+    //           localStorage.setItem(
+    //             "authtoken",
+    //             data.data.refreshToken.authToken
+    //           );
+    //           client
+    //             .mutate({
+    //               mutation: gql`
+    //                 mutation MyMutation2($id: ID!, $productId: ID!) {
+    //                   removeProductFromSubscription(
+    //                     input: { id: $id, productId: $productId }
+    //                   ) {
+    //                     subscription {
+    //                       databaseId
+    //                       lineItems {
+    //                         nodes {
+    //                           databaseId
+    //                           quantity
+    //                           product {
+    //                             node {
+    //                               name
+    //                               description(format: RAW)
+    //                               databaseId
+    //                               featuredImage {
+    //                                 node {
+    //                                   sourceUrl
+    //                                 }
+    //                               }
+    //                               ... on SimpleProduct {
+    //                                 id
+    //                                 name
+    //                                 price
+    //                               }
+    //                             }
+    //                           }
+    //                         }
+    //                       }
+    //                       billingPeriod
+    //                       billingInterval
+    //                       nextPaymentDate
+    //                     }
+    //                   }
+    //                 }
+    //               `,
+    //               variables: {
+    //                 id: subscriptions.data.subscription.subscription.databaseId,
+    //                 productId: changes[i].product.product.node.databaseId,
+    //               },
+    //             })
+    //             .then((data) => {
+    //               console.log("Old QTY Removed");
+
+    //               console.log(data);
+
+    //               console.log(changes[i]);
+
+    //               client
+    //                 .mutate({
+    //                   mutation: gql`
+    //                     mutation MyMutation2(
+    //                       $id: ID!
+    //                       $productId: ID!
+    //                       $productQuantity: Int!
+    //                     ) {
+    //                       addProductToSubscription(
+    //                         input: {
+    //                           id: $id
+    //                           productId: $productId
+    //                           productQuantity: $productQuantity
+    //                         }
+    //                       ) {
+    //                         subscription {
+    //                           databaseId
+    //                           lineItems {
+    //                             nodes {
+    //                               databaseId
+    //                               quantity
+    //                               product {
+    //                                 node {
+    //                                   name
+    //                                   description(format: RAW)
+    //                                   databaseId
+    //                                   featuredImage {
+    //                                     node {
+    //                                       sourceUrl
+    //                                     }
+    //                                   }
+    //                                   ... on SimpleProduct {
+    //                                     id
+    //                                     name
+    //                                     price
+    //                                   }
+    //                                 }
+    //                               }
+    //                             }
+    //                           }
+    //                           billingPeriod
+    //                           billingInterval
+    //                           nextPaymentDate
+    //                         }
+    //                       }
+    //                     }
+    //                   `,
+    //                   variables: {
+    //                     id: subscriptions.data.subscription.subscription
+    //                       .databaseId,
+    //                     productId:
+    //                       changes[i].product.product.node.databaseId + "",
+    //                     productQuantity: changes[i].difference,
+    //                   },
+    //                 })
+    //                 .then((data) => {
+    //                   console.log("New QTY Added");
+
+    //                   console.log(data);
+
+    //                   let updateSubscriptions = {
+    //                     subscriptions: {
+    //                       data: {
+    //                         subscription: data.data.addProductToSubscription,
+    //                       },
+    //                     },
+    //                   };
+
+    //                   console.log(updateSubscriptions);
+
+    //                   setSubscriptions(updateSubscriptions);
+
+    //                   setOrderComplete(true);
+    //                   setOrderDetails(updateSubscriptions);
+    //                 })
+    //                 .catch((error) => {
+    //                   console.log("new Qty error");
+    //                 });
+    //             });
+    //         });
+    //       });
+    //   }
+    // }
+
+    for (
+      let i = 0;
+      i <
+      originalSubscriptions.data.subscription.subscription.lineItems.nodes
+        .length;
+      i++
+    ) {
+      console.log(
+        originalSubscriptions.data.subscription.subscription.lineItems.nodes[i]
+          .product.node.databaseId
+      );
+
+      client
+        .mutate({
+          mutation: gql`
+            mutation MyMutation2($id: ID!, $productId: ID!) {
+              removeProductFromSubscription(
+                input: { id: $id, productId: $productId }
               ) {
-                addProductToSubscription(
-                  input: {
-                    id: $id
-                    productId: $productId
-                    productQuantity: $productQuantity
-                  }
-                ) {
-                  subscription {
-                    databaseId
-                    lineItems {
-                      nodes {
-                        databaseId
-                        quantity
-                        product {
-                          node {
+                subscription {
+                  databaseId
+                  lineItems {
+                    nodes {
+                      databaseId
+                      quantity
+                      product {
+                        node {
+                          name
+                          description(format: RAW)
+                          databaseId
+                          featuredImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          ... on SimpleProduct {
+                            id
                             name
-                            description(format: RAW)
-                            databaseId
-                            featuredImage {
-                              node {
-                                sourceUrl
-                              }
-                            }
-                            ... on SimpleProduct {
-                              id
-                              name
-                              price
-                            }
+                            price
                           }
                         }
                       }
                     }
-                    billingPeriod
-                    billingInterval
-                    nextPaymentDate
                   }
+                  billingPeriod
+                  billingInterval
+                  nextPaymentDate
                 }
               }
-            `,
+            }
+          `,
+          variables: {
+            id: subscriptions.data.subscription.subscription.databaseId,
+            productId:
+              originalSubscriptions.data.subscription.subscription.lineItems
+                .nodes[i].databaseId + "",
+          },
+        })
+        .catch((error) => {
+          localStorage.setItem("authtoken", "");
+
+          refreshToken({
             variables: {
-              id: subscriptions.data.subscription.subscription.databaseId,
-              productId: changes[i].product.product.node?.databaseId + "",
-              productQuantity: changes[i].difference,
+              refreshToken: localStorage.getItem("refreshtoken"),
             },
-          })
-          .then((data) => {
+          }).then((data) => {
+            console.log(data);
+
+            localStorage.setItem("authtoken", data.data.refreshToken.authToken);
+
+            client.mutate({
+              mutation: gql`
+                mutation MyMutation2($id: ID!, $productId: ID!) {
+                  removeProductFromSubscription(
+                    input: { id: $id, productId: $productId }
+                  ) {
+                    subscription {
+                      databaseId
+                      lineItems {
+                        nodes {
+                          databaseId
+                          quantity
+                          product {
+                            node {
+                              name
+                              description(format: RAW)
+                              databaseId
+                              featuredImage {
+                                node {
+                                  sourceUrl
+                                }
+                              }
+                              ... on SimpleProduct {
+                                id
+                                name
+                                price
+                              }
+                            }
+                          }
+                        }
+                      }
+                      billingPeriod
+                      billingInterval
+                      nextPaymentDate
+                    }
+                  }
+                }
+              `,
+              variables: {
+                id: subscriptions.data.subscription.subscription.databaseId,
+                productId:
+                  originalSubscriptions.data.subscription.subscription.lineItems
+                    .nodes[i].databaseId + "",
+              },
+            });
+          });
+        });
+    }
+
+    for (let i = 0; i < planDetailsTemp.length; i++) {
+      client
+        .mutate({
+          mutation: gql`
+            mutation MyMutation2(
+              $id: ID!
+              $productId: ID!
+              $productQuantity: Int!
+            ) {
+              addProductToSubscription(
+                input: {
+                  id: $id
+                  productId: $productId
+                  productQuantity: $productQuantity
+                }
+              ) {
+                subscription {
+                  databaseId
+                  lineItems {
+                    nodes {
+                      databaseId
+                      quantity
+                      product {
+                        node {
+                          name
+                          description(format: RAW)
+                          databaseId
+                          featuredImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          ... on SimpleProduct {
+                            id
+                            name
+                            price
+                          }
+                        }
+                      }
+                    }
+                  }
+                  billingPeriod
+                  billingInterval
+                  nextPaymentDate
+                }
+              }
+            }
+          `,
+          variables: {
+            id: subscriptions.data.subscription.subscription.databaseId,
+            productId: planDetailsTemp[i].product.node.databaseId + "",
+            productQuantity:
+              planDetailsTemp[i].quantity != null
+                ? planDetailsTemp[i].quantity
+                : 1,
+          },
+        })
+        .then((data) => {
+          if (i == planDetailsTemp.length - 1) {
             console.log(data);
 
             let updateSubscriptions = {
@@ -1543,286 +2257,25 @@ export default function Dashboard({ data, categories, products, orders }) {
               },
             };
 
-            setSubscriptions(updateSubscriptions);
+            console.log(updateSubscriptions);
 
-            setOrderComplete(true);
+            setSubscriptions(updateSubscriptions);
 
             setOrderDetails(updateSubscriptions);
-
-            console.log(updateSubscriptions);
-          })
-          .catch((error) => {
-            setUpdateSubError(error);
-
-            console.log("error");
-
-            console.log(error);
-
-            localStorage.setItem("authtoken", "");
-
-            refreshToken({
-              variables: {
-                refreshToken: localStorage.getItem("refreshtoken"),
-              },
-            }).then((data) => {
-              client
-                .mutate({
-                  mutation: gql`
-                    mutation MyMutation2(
-                      $id: ID!
-                      $productId: ID!
-                      $productQuantity: Int!
-                    ) {
-                      addProductToSubscription(
-                        input: {
-                          id: $id
-                          productId: $productId
-                          productQuantity: $productQuantity
-                        }
-                      ) {
-                        subscription {
-                          databaseId
-                          lineItems {
-                            nodes {
-                              databaseId
-                              quantity
-                              product {
-                                node {
-                                  name
-                                  description(format: RAW)
-                                  databaseId
-                                  featuredImage {
-                                    node {
-                                      sourceUrl
-                                    }
-                                  }
-                                  ... on SimpleProduct {
-                                    id
-                                    name
-                                    price
-                                  }
-                                }
-                              }
-                            }
-                          }
-                          billingPeriod
-                          billingInterval
-                          nextPaymentDate
-                        }
-                      }
-                    }
-                  `,
-                  variables: {
-                    id: subscriptions.data.subscription.subscription.databaseId,
-                    productId: changes[i].product.product.node?.databaseId + "",
-                    productQuantity: changes[i].difference,
-                  },
-                })
-                .then((data) => {
-                  console.log(data);
-
-                  let updateSubscriptions = {
-                    subscriptions: {
-                      data: {
-                        subscription: data.data.addProductToSubscription,
-                      },
-                    },
-                  };
-
-                  setSubscriptions(updateSubscriptions);
-
-                  setOrderComplete(true);
-
-                  setOrderDetails(updateSubscriptions);
-
-                  console.log(updateSubscriptions);
-                });
-            });
-          });
-      } else if (changes[i].action == "remove") {
-        client
-          .mutate({
-            mutation: gql`
-              mutation MyMutation2($id: ID!, $productId: ID!) {
-                removeProductFromSubscription(
-                  input: { id: $id, productId: $productId }
-                ) {
-                  subscription {
-                    databaseId
-                    lineItems {
-                      nodes {
-                        databaseId
-                        quantity
-                        product {
-                          node {
-                            name
-                            description(format: RAW)
-                            databaseId
-                            featuredImage {
-                              node {
-                                sourceUrl
-                              }
-                            }
-                            ... on SimpleProduct {
-                              id
-                              name
-                              price
-                            }
-                          }
-                        }
-                      }
-                    }
-                    billingPeriod
-                    billingInterval
-                    nextPaymentDate
-                  }
-                }
-              }
-            `,
-            variables: {
-              id: subscriptions.data.subscription.subscription.databaseId,
-              productId: changes[i].product.product.node.databaseId + "",
-            },
-          })
-          .then((data) => {
-            console.log(data);
-
-            let updateSubscriptions = {
-              subscriptions: {
-                data: {
-                  subscription: data.data.removeProductFromSubscription,
-                },
-              },
-            };
-
-            setSubscriptions(updateSubscriptions);
-
             setOrderComplete(true);
-          })
-          .catch((error) => {
-            setUpdateSubError(error);
+          }
+        })
+        .catch((error) => {
+          localStorage.setItem("authtoken", "");
 
-            console.log("remove product error");
-
-            localStorage.setItem("authtoken", "");
-
-            refreshToken({
-              variables: {
-                refreshToken: localStorage.getItem("refreshtoken"),
-              },
-            }).then((data) => {
-              client
-                .mutate({
-                  mutation: gql`
-                    mutation MyMutation2($id: ID!, $productId: ID!) {
-                      removeProductFromSubscription(
-                        input: { id: $id, productId: $productId }
-                      ) {
-                        subscription {
-                          databaseId
-                          lineItems {
-                            nodes {
-                              databaseId
-                              quantity
-                              product {
-                                node {
-                                  name
-                                  description(format: RAW)
-                                  databaseId
-                                  featuredImage {
-                                    node {
-                                      sourceUrl
-                                    }
-                                  }
-                                  ... on SimpleProduct {
-                                    id
-                                    name
-                                    price
-                                  }
-                                }
-                              }
-                            }
-                          }
-                          billingPeriod
-                          billingInterval
-                          nextPaymentDate
-                        }
-                      }
-                    }
-                  `,
-                  variables: {
-                    id: subscriptions.data.subscription.subscription.databaseId,
-                    productId: changes[i].product.product.node.databaseId + "",
-                  },
-                })
-                .then((data) => {
-                  console.log(data);
-
-                  let updateSubscriptions = {
-                    subscriptions: {
-                      data: {
-                        subscription: data.data.removeProductFromSubscription,
-                      },
-                    },
-                  };
-
-                  setSubscriptions(updateSubscriptions);
-
-                  setOrderComplete(true);
-                });
-            });
-          });
-      } else if (changes[i].action == "qty") {
-        client
-          .mutate({
-            mutation: gql`
-              mutation MyMutation2($id: ID!, $productId: ID!) {
-                removeProductFromSubscription(
-                  input: { id: $id, productId: $productId }
-                ) {
-                  subscription {
-                    databaseId
-                    lineItems {
-                      nodes {
-                        databaseId
-                        quantity
-                        product {
-                          node {
-                            name
-                            description(format: RAW)
-                            databaseId
-                            featuredImage {
-                              node {
-                                sourceUrl
-                              }
-                            }
-                            ... on SimpleProduct {
-                              id
-                              name
-                              price
-                            }
-                          }
-                        }
-                      }
-                    }
-                    billingPeriod
-                    billingInterval
-                    nextPaymentDate
-                  }
-                }
-              }
-            `,
+          refreshToken({
             variables: {
-              id: subscriptions.data.subscription.subscription.databaseId,
-              productId: changes[i].product.databaseId,
+              refreshToken: localStorage.getItem("refreshtoken"),
             },
-          })
-          .then((data) => {
-            console.log("Old QTY Removed");
-
+          }).then((data) => {
             console.log(data);
 
-            console.log(changes[i]);
+            localStorage.setItem("authtoken", data.data.refreshToken.authToken);
 
             client
               .mutate({
@@ -1873,173 +2326,30 @@ export default function Dashboard({ data, categories, products, orders }) {
                 `,
                 variables: {
                   id: subscriptions.data.subscription.subscription.databaseId,
-                  productId: changes[i].product.product.node.databaseId + "",
-                  productQuantity: changes[i].difference,
+                  productId: planDetailsTemp[i].product.node.databaseId + "",
+                  productQuantity: planDetailsTemp[i].quantity,
                 },
               })
               .then((data) => {
-                console.log("New QTY Added");
-
-                console.log(data);
-
-                let updateSubscriptions = {
-                  subscriptions: {
-                    data: {
-                      subscription: data.data.addProductToSubscription,
-                    },
-                  },
-                };
-
-                setSubscriptions(updateSubscriptions);
-
-                setOrderComplete(true);
-              })
-              .catch((error) => {
-                console.log("new Qty error");
-              });
-          })
-          .catch((error) => {
-            setUpdateSubError(error.message + "");
-
-            console.log("error");
-
-            localStorage.setItem("authtoken", "");
-
-            refreshToken({
-              variables: {
-                refreshToken: localStorage.getItem("refreshtoken"),
-              },
-            }).then((data) => {
-              client
-                .mutate({
-                  mutation: gql`
-                    mutation MyMutation2($id: ID!, $productId: ID!) {
-                      removeProductFromSubscription(
-                        input: { id: $id, productId: $productId }
-                      ) {
-                        subscription {
-                          databaseId
-                          lineItems {
-                            nodes {
-                              databaseId
-                              quantity
-                              product {
-                                node {
-                                  name
-                                  description(format: RAW)
-                                  databaseId
-                                  featuredImage {
-                                    node {
-                                      sourceUrl
-                                    }
-                                  }
-                                  ... on SimpleProduct {
-                                    id
-                                    name
-                                    price
-                                  }
-                                }
-                              }
-                            }
-                          }
-                          billingPeriod
-                          billingInterval
-                          nextPaymentDate
-                        }
-                      }
-                    }
-                  `,
-                  variables: {
-                    id: subscriptions.data.subscription.subscription.databaseId,
-                    productId: changes[i].product.databaseId,
-                  },
-                })
-                .then((data) => {
-                  console.log("Old QTY Removed");
-
+                if (i == planDetailsTemp.length - 1) {
                   console.log(data);
 
-                  console.log(changes[i]);
-
-                  client
-                    .mutate({
-                      mutation: gql`
-                        mutation MyMutation2(
-                          $id: ID!
-                          $productId: ID!
-                          $productQuantity: Int!
-                        ) {
-                          addProductToSubscription(
-                            input: {
-                              id: $id
-                              productId: $productId
-                              productQuantity: $productQuantity
-                            }
-                          ) {
-                            subscription {
-                              databaseId
-                              lineItems {
-                                nodes {
-                                  databaseId
-                                  quantity
-                                  product {
-                                    node {
-                                      name
-                                      description(format: RAW)
-                                      databaseId
-                                      featuredImage {
-                                        node {
-                                          sourceUrl
-                                        }
-                                      }
-                                      ... on SimpleProduct {
-                                        id
-                                        name
-                                        price
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                              billingPeriod
-                              billingInterval
-                              nextPaymentDate
-                            }
-                          }
-                        }
-                      `,
-                      variables: {
-                        id: subscriptions.data.subscription.subscription
-                          .databaseId,
-                        productId:
-                          changes[i].product.product.node.databaseId + "",
-                        productQuantity: changes[i].difference,
+                  let updateSubscriptions = {
+                    subscriptions: {
+                      data: {
+                        subscription: data.data.addProductToSubscription,
                       },
-                    })
-                    .then((data) => {
-                      console.log("New QTY Added");
+                    },
+                  };
 
-                      console.log(data);
+                  setSubscriptions(updateSubscriptions);
 
-                      let updateSubscriptions = {
-                        subscriptions: {
-                          data: {
-                            subscription: data.data.addProductToSubscription,
-                          },
-                        },
-                      };
-
-                      setSubscriptions(updateSubscriptions);
-
-                      setOrderComplete(true);
-                    })
-                    .catch((error) => {
-                      console.log("new Qty error");
-                    });
-                });
-            });
+                  setOrderDetails(updateSubscriptions);
+                  setOrderComplete(true);
+                }
+              });
           });
-      }
+        });
     }
   };
 
@@ -2141,6 +2451,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                 refreshToken: localStorage.getItem("refreshtoken"),
               },
             }).then((data) => {
+              localStorage.setItem(
+                "authtoken",
+                data.data.refreshToken.authToken
+              );
+
               client
                 .mutate({
                   mutation: gql`
@@ -2272,6 +2587,8 @@ export default function Dashboard({ data, categories, products, orders }) {
             refreshToken: localStorage.getItem("refreshtoken"),
           },
         }).then((data) => {
+          localStorage.setItem("authtoken", data.data.refreshToken.authToken);
+
           client
             .mutate({
               mutation: gql`

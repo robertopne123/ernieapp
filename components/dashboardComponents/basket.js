@@ -1461,7 +1461,7 @@ export const Basket = ({
                       } else {
                         clearSubBasket();
 
-                        let data = [...orderDetails];
+                        let data = orderDetails;
                         console.log(data);
 
                         setSubscriptions(data);
