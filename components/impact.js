@@ -197,7 +197,9 @@ export default function Impact({
                   {console.log(client)}
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {client.impactFigures.bags}
+                      {client.impactFigures.bags != null
+                        ? client.impactFigures.bags
+                        : 0}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Bags directed from waste stream
@@ -214,7 +216,9 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {client.impactFigures.carbon}
+                      {client.impactFigures.carbon != null
+                        ? client.impactFigures.carbon
+                        : 0}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Kgs of carbon removed from the atmosphere
@@ -231,7 +235,9 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {client.impactFigures.trees}
+                      {client.impactFigures.trees != null
+                        ? client.impactFigures.trees
+                        : 0}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Trees planted
@@ -248,7 +254,9 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {client.impactFigures.coffee}
+                      {client.impactFigures.coffee != null
+                        ? client.impactFigures.coffee
+                        : 0}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Cups of coffee enjoyed by you
@@ -265,7 +273,9 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {client.impactFigures.phones}
+                      {client.impactFigures.phones != null
+                        ? client.impactFigures.phones
+                        : 0}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Phones charged from Tco2e saved
@@ -282,7 +292,9 @@ export default function Impact({
                   ></Image>
                   <div className="flex flex-col justify-center pr-1">
                     <p className="font-circe uppercase text-erniegreen text-4xl font-[900]">
-                      {client.impactFigures.m25}
+                      {client.impactFigures.m25 != null
+                        ? client.impactFigures.m25
+                        : 0}
                     </p>
                     <p className="font-circular font-[500] text-erniegreen">
                       Loops of the M25 worth of carbon saved
