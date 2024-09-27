@@ -400,7 +400,10 @@ export default function Dashboard({ data, categories, products, orders }) {
           console.log(clients[i].clientInformation.pointOfContactEmail);
           console.log(currentUser);
 
-          if (clients[i].clientInformation.pointOfContactEmail == currentUser) {
+          if (
+            clients[i].clientInformation.pointOfContactEmail ==
+            currentUser.toLowerCase()
+          ) {
             clientAcc = clients[i];
             break;
           }
