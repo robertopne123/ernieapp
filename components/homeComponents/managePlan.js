@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ConfirmSubscription } from "./managePlanComponents/confirmSubscription";
 import { ConfirmFrequency } from "./managePlanComponents/confirmFrequency";
 
@@ -17,7 +17,9 @@ export const ManagePlan = ({
   setManagingSubscription,
 }) => {
   const [currentSubscription, setCurrentSubscription] = useState(
-    subscriptions.data?.subscription?.subscription
+    subscriptions?.subscriptions
+      ? subscriptions?.subscriptions.data?.subscription?.subscription
+      : subscriptions?.data?.subscription?.subscription
   );
 
   const [existingSubscription, setExistingSubscription] = useState(

@@ -1415,8 +1415,8 @@ export const Basket = ({
                         Number:{" "}
                         {purchaseType == 1
                           ? managingSubscription
-                            ? orderDetails.subscriptions.data.subscription
-                                .subscription.databaseId
+                            ? orderDetails.data.subscription.subscription
+                                .databaseId
                             : orderDetails.data.createSubscription.subscription
                                 .databaseId
                           : orderDetails.data.createOrder.order.databaseId}
@@ -2298,24 +2298,43 @@ export const Basket = ({
                               className="w-fill mt-2"
                             ></img>
                             <div className="flex flex-col gap-1 mt-4">
-                              {subscriptions.data.subscription.subscription.lineItems.nodes.map(
-                                (item, index) => (
-                                  <div
-                                    className="w-full grid grid-cols-4 items-center"
-                                    key={index}
-                                  >
-                                    <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                      {item.product.node.name}
-                                    </p>
-                                    <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                      {item.product.node.price}
-                                    </p>
-                                    <p className="font-circular text-erniegreen col-span-1 text-sm text-right">
-                                      {item.quantity}
-                                    </p>
-                                  </div>
-                                )
-                              )}
+                              {subscriptions?.subscriptions
+                                ? subscriptions.subscriptions.data.subscription.subscription.lineItems.nodes.map(
+                                    (item, index) => (
+                                      <div
+                                        className="w-full grid grid-cols-4 items-center"
+                                        key={index}
+                                      >
+                                        <p className="font-circular text-erniegreen col-span-2 text-sm">
+                                          {item.product.node.name}
+                                        </p>
+                                        <p className="font-circular text-erniegreen col-span-1 text-sm">
+                                          {item.product.node.price}
+                                        </p>
+                                        <p className="font-circular text-erniegreen col-span-1 text-sm text-right">
+                                          {item.quantity}
+                                        </p>
+                                      </div>
+                                    )
+                                  )
+                                : subscriptions.data.subscription.subscription.lineItems.nodes.map(
+                                    (item, index) => (
+                                      <div
+                                        className="w-full grid grid-cols-4 items-center"
+                                        key={index}
+                                      >
+                                        <p className="font-circular text-erniegreen col-span-2 text-sm">
+                                          {item.product.node.name}
+                                        </p>
+                                        <p className="font-circular text-erniegreen col-span-1 text-sm">
+                                          {item.product.node.price}
+                                        </p>
+                                        <p className="font-circular text-erniegreen col-span-1 text-sm text-right">
+                                          {item.quantity}
+                                        </p>
+                                      </div>
+                                    )
+                                  )}
                             </div>
                           </div>
                         )}
