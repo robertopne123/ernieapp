@@ -141,7 +141,7 @@ export default function Impact({
   };
 
   return (
-    <div className="h-[calc(88vh-80px)] bg-erniecream overflow-hidden">
+    <div className="h-[calc(88vh-180px)] bg-erniecream overflow-auto">
       {!showingCert ? (
         <div className="flex flex-col h-full">
           <div className="flex flex-col gap-4 bg-erniedarkcream p-6">

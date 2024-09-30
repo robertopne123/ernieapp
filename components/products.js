@@ -46,23 +46,99 @@ export default function Products({
   function filteredCategories() {
     let filtered = [];
 
-    // console.log(productCategories);
+    console.log(productCategories);
 
-    for (let i = 0; i < productCategories.length; i++) {
-      if (
-        productCategories[i].tagCategoryImages.displayOrder != null &&
-        productCategories[i].tagCategoryImages.displayOrder != -1
-      ) {
-        filtered.push(productCategories[i]);
+    let productTags = [...productCategories];
+
+    let filteredTags = [];
+
+    for (let i = 0; i < productTags.length; i++) {
+      if (productTags[i].tagOrder.tagOrder != null) {
+        filteredTags.push(productTags[i]);
       }
     }
 
-    // console.log(filtered);
+    console.log(filteredTags);
+
+    const tags = Object.groupBy(
+      products,
+      (product) => product.productTags?.nodes[0].name
+    );
+
+    console.log(tags);
+    console.log(products);
+
+    for (const [key, value] of Object.entries(tags)) {
+      for (let j = 0; j < tags[key].length; j++) {
+        for (let k = 0; k < products.length; k++) {
+          if (tags[key][j].databaseId == products[k].databaseId) {
+            let temp = { arrIndex: k, product: products[k] };
+
+            tags[key][j] = temp;
+          }
+        }
+      }
+    }
+
+    console.log(tags);
+
+    let tagsWithBrands = [];
+
+    for (const [key, value] of Object.entries(tags)) {
+      tagsWithBrands.push({
+        category: key,
+        brands: Object.groupBy(
+          value,
+          (product) => product.product.brands?.nodes[0]?.name
+        ),
+      });
+    }
+
+    for (let i = 0; i < tagsWithBrands.length; i++) {
+      for (let j = 0; j < filteredTags.length; j++) {
+        if (tagsWithBrands[i].category == filteredTags[j].name) {
+          tagsWithBrands[i].order = filteredTags[j].tagOrder;
+        }
+      }
+
+      console.log(tagsWithBrands[i].brands);
+
+      let brandObjects = [];
+
+      for (const [key, value] of Object.entries(tagsWithBrands[i].brands)) {
+        tagsWithBrands[i].brands[key] = {};
+        tagsWithBrands[i].brands[key].name = key;
+        tagsWithBrands[i].brands[key].products = value;
+        tagsWithBrands[i].brands[key].description =
+          tagsWithBrands[i].brands[
+            key
+          ].products[0].product.brands?.nodes[0]?.description;
+        tagsWithBrands[i].brands[key].image =
+          tagsWithBrands[i].brands[
+            key
+          ].products[0].product.brands?.nodes[0]?.brandingImage.image?.sourceUrl;
+        tagsWithBrands[i].brands[key].order =
+          tagsWithBrands[i].brands[
+            key
+          ].products[0].product.brands?.nodes[0]?.brandOrder?.brandOrder;
+        brandObjects.push(tagsWithBrands[i].brands[key]);
+      }
+
+      tagsWithBrands[i].brands = brandObjects;
+
+      console.log(tagsWithBrands);
+    }
+
+    for (let i = 0; i < tagsWithBrands.length; i++) {
+      if (tagsWithBrands[i].order != null) {
+        filtered.push(tagsWithBrands[i]);
+      }
+    }
+
+    console.log(filtered);
 
     filtered.sort(function (a, b) {
-      return (
-        a.tagCategoryImages.displayOrder - b.tagCategoryImages.displayOrder
-      );
+      return a.order.tagOrder - b.order.tagOrder;
     });
 
     return filtered;
@@ -533,11 +609,7 @@ export default function Products({
         )}
         {previewing ? (
           <Preview
-            product={
-              getGroupedProducts()[selectedTab].brands[selectedBrand].products[
-                selectedProduct
-              ]
-            }
+            product={products[selectedProduct]}
             backAction={back}
             role={1}
             addToBasket={addToBasket}
@@ -602,142 +674,143 @@ export default function Products({
               ))}
 
             <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2 cursor-pointer">
-              {getGroupedProducts().map((group, index) => (
-                <div
-                  className={`py-2 px-3 rounded-lg text-nowrap w-full ${
-                    selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
-                  }`}
-                  key={index}
-                  onClick={() => {
-                    setSelectedTab(index);
-                  }}
-                >
-                  <p
-                    className={`font-circular font-[500] text-sm capitalize tab text-nowrap ${
-                      selectedTab == index
-                        ? "text-erniecream"
-                        : "text-erniegreen"
+              {filteredCategories()
+                .sort(function (a, b) {
+                  return a.order - b.order;
+                })
+                .map((tab, index) => (
+                  <div
+                    className={`py-2 px-3 rounded-lg text-nowrap w-full ${
+                      selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
                     }`}
+                    key={index}
+                    onClick={() => {
+                      setSelectedTab(index);
+                    }}
                   >
-                    {group.category}
-                  </p>
-                </div>
-              ))}
+                    <p
+                      className={`font-circular font-[500] text-sm capitalize tab text-nowrap ${
+                        selectedTab == index
+                          ? "text-erniecream"
+                          : "text-erniegreen"
+                      }`}
+                    >
+                      {tab.category}
+                    </p>
+                  </div>
+                ))}
             </div>
             <div className="flex flex-col-reverse">
-              {getGroupedProducts()[selectedTab].brands?.map((brand, index) => (
-                <div
-                  className={`flex flex-col gap-0 pb-4 px-6 pb-2 pt-4 w-full`}
-                  key={index}
-                >
-                  <div className="flex flex-row justify-between">
-                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
-                      {brand.name}
-                    </p>
+              {console.log(filteredCategories()[selectedTab])}
+
+              {filteredCategories()
+                [selectedTab].brands.sort(function (a, b) {
+                  return b.order - a.order;
+                })
+                .map((brand, index) => (
+                  <div
+                    className={`flex flex-col gap-0 pb-4 px-6 pb-2 pt-4 w-full`}
+                    key={index}
+                  >
+                    <div className="flex flex-row justify-between">
+                      <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                        {brand.name}
+                      </p>
+                      <img
+                        src="/info.svg"
+                        className="w-8 mt-1"
+                        onClick={() => {
+                          setShowingInfo(true);
+                          setInfoName(brand.name);
+                          setInfoDesc(brand.description);
+                          setInfoImage(brand.image);
+                        }}
+                      />
+                    </div>
                     <img
-                      src="/info.svg"
-                      className="w-8 mt-1"
-                      onClick={() => {
-                        setShowingInfo(true);
-                        setInfoName(brand.name);
-                        setInfoDesc(brand.description);
-                        setInfoImage(brand.image);
-                      }}
-                    />
-                  </div>
-                  <img
-                    src="/divider.png"
-                    className="h-1.5 w-full mt-2 mb-2"
-                  ></img>
-                  <div className="flex flex-col gap-4 mt-4">
-                    {brand.products.map((product, productIndex) => (
-                      <div
-                        key={productIndex}
-                        className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
-                      >
-                        <div className="flex relative aspect-[3/4] h-[100px]">
-                          <img
-                            src={product.image.sourceUrl}
-                            className={`h-[100px] w-auto aspect-[3/4] ${
-                              selectedTab == 1
-                                ? "object-contain"
-                                : "object-cover"
-                            }`}
-                          ></img>
-                          {product.productDisplayStyle.badgeImage
-                            ?.sourceUrl && (
-                            <img
-                              src={
-                                product.productDisplayStyle.badgeImage.sourceUrl
-                              }
-                              className="absolute w-10 -bottom-4 -right-4 rounded-full"
-                            ></img>
-                          )}
-                        </div>
-                        <div className="flex flex-col flex-shrink max-w-[calc(100vw-75px-48px-48px)] h-full pl-4">
-                          <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
-                            {product.name}
-                          </p>
-                          <p
-                            className={`font-circular text-erniegreen font-[400] text-xs mb-2 line-clamp-3 h-[4em] ${
-                              product.description ? "block" : "hidden"
-                            }`}
-                          >
-                            {product.description}
-                          </p>
-                          <div className="flex flex-row gap-1 items-end">
-                            <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
-                              from
-                            </p>
-                            <p
-                              className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
-                                product.description ? "mt-0" : "mt-2"
-                              }`}
-                            >
-                              {product.price}
-                            </p>
-
-                            {/* <div className="flex flex-row">
-                          <div className="flex flex-row gap-2 flex-grow items-center justify-end">
-                            <div
-                              className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
-                              onClick={(e) => {}}
-                            >
-                              <img src="/remove.svg" className="w-4 h-4"></img>
-                            </div>
-                            <p className="text-erniegreen inline font-circe uppercase font-[900] text-xl ">
-                              0
-                            </p>
-                            <div
-                              className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
-                              onClick={(e) => {}}
-                            >
-                              <img src="/add.svg" className="w-4 h-4"></img>
-                            </div>
-                          </div>
-                        </div> */}
-                          </div>
+                      src="/divider.png"
+                      className="h-1.5 w-full mt-2 mb-2"
+                    ></img>
+                    <div className="flex flex-col gap-4 mt-4">
+                      {console.log(brand.products)}
+                      {brand.products
+                        .sort(function (a, b) {
+                          return (
+                            a.product.productOrdering.productOrder -
+                            b.product.productOrdering.productOrder
+                          );
+                        })
+                        .map((product, productIndex) => (
                           <div
-                            className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer"
-                            onClick={() => {
-                              setSelectedBrands(index);
-                              setSelectedProduct(productIndex);
-                              // console.log(brand.products[productIndex]);
-                              // console.log(oneOffBasket);
-
-                              setPreviewing(true);
-                            }}
+                            key={productIndex}
+                            className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
                           >
-                            <p className="font-circe font-[900] text-sm">
-                              Choose Options
-                            </p>
+                            <div className="flex relative aspect-[3/4] h-[100px]">
+                              <img
+                                src={product.product.image.sourceUrl}
+                                className={`h-[100px] w-auto aspect-[3/4] ${
+                                  selectedTab == 1
+                                    ? "object-contain"
+                                    : "object-cover"
+                                }`}
+                              ></img>
+                              {product.product.productDisplayStyle.badgeImage
+                                ?.sourceUrl && (
+                                <img
+                                  src={
+                                    product.product.productDisplayStyle
+                                      .badgeImage.sourceUrl
+                                  }
+                                  className="absolute w-10 -bottom-4 -right-4 rounded-full"
+                                ></img>
+                              )}
+                            </div>
+                            <div className="flex flex-col flex-shrink max-w-[calc(100vw-75px-48px-48px)] h-full pl-4">
+                              <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
+                                {product.product.name}
+                              </p>
+                              <p
+                                className={`font-circular text-erniegreen font-[400] text-xs mb-2 line-clamp-3 h-[4em] ${
+                                  product.product.description
+                                    ? "block"
+                                    : "hidden"
+                                }`}
+                              >
+                                {product.product.description}
+                              </p>
+                              <div className="flex flex-row gap-1 items-end">
+                                <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
+                                  from
+                                </p>
+                                <p
+                                  className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
+                                    product.product.description
+                                      ? "mt-0"
+                                      : "mt-2"
+                                  }`}
+                                >
+                                  {product.product.price}
+                                </p>
+                              </div>
+                              <div
+                                className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer"
+                                onClick={() => {
+                                  setSelectedBrands(index);
+                                  setSelectedProduct(product.arrIndex);
+
+                                  setPreviewing(true);
+                                }}
+                              >
+                                <p className="font-circe font-[900] text-sm">
+                                  Choose Options
+                                </p>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    ))}
+                        ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         )}

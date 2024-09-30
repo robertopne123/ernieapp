@@ -189,6 +189,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                     sourceUrl
                   }
                 }
+                tagOrder {
+                  tagOrder
+                }
               }
             }
             customer(customerId: $employerUser) {
@@ -261,7 +264,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                           sourceUrl
                         }
                       }
+                      brandOrder {
+                        brandOrder
+                      }
                     }
+                  }
+                  productOrdering {
+                    productOrder
                   }
                 }
               }
@@ -559,6 +568,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                         tagImage {
                           sourceUrl
                         }
+                      }
+                      tagOrder {
+                        tagOrder
                       }
                     }
                   }

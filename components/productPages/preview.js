@@ -112,7 +112,7 @@ export default function Preview({
       >
         <div className="w-full bg-cover h-[300px] relative">
           <div className="z-10 h-[300px]">
-            {product.productTags.nodes[0].name != "squirrel sisters" && (
+            {product?.productTags.nodes[0].name != "squirrel sisters" && (
               <div className="h-full mx-auto relative z-10">
                 <Image
                   src={product.image.sourceUrl}
@@ -131,7 +131,7 @@ export default function Preview({
                 />
               </div>
             )}
-            {product.productTags.nodes[0].name == "squirrel sisters" && (
+            {product?.productTags.nodes[0].name == "squirrel sisters" && (
               <div className="h-full mx-auto relative z-10">
                 <Image
                   src={product.productDisplayStyle.secondaryImage.sourceUrl}
@@ -154,13 +154,12 @@ export default function Preview({
               className="min-w-[calc(100%-32px)] w-full h-1.5"
             ></Image>
           </div>
-          {category != "cups/bottles" && (
-            <p className="font-circular font-[500] text-sm text-erniegreen pt-1 pb-3 border-b-[1px] border-erniegreen">
-              {product.description}
-            </p>
-          )}
+          <p className="font-circular font-[500] text-sm text-erniegreen pt-1 pb-3 border-b-[1px] border-erniegreen">
+            {product.description}
+          </p>
           {product.productTags.nodes[0].name == "containers" ||
-          product.productTags.nodes[0].name == "machines" ? (
+          product.productTags.nodes[0].name == "machines" ||
+          product.productTags.nodes[0].name == "cups/bottles" ? (
             <div></div>
           ) : (
             <div className="flex flex-col">
