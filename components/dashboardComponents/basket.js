@@ -727,7 +727,10 @@ export const Basket = ({
             console.log(cInfo);
 
             let address = cInfo.deliveryCompanyAddress;
-            let coffeeMachine = cInfo.coffeeMachineOnSite;
+            let coffeeMachine =
+              cInfo.coffeeMachineOnSite != null
+                ? cInfo.coffeeMachineOnSite
+                : false;
             let contactNumber = cInfo.pointOfContactNumber;
             let noOfStaff = cInfo.numberOfStaff;
             let poiEmail = cInfo.pointOfContactEmail;

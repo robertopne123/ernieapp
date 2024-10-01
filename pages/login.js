@@ -651,7 +651,7 @@ export default function Login() {
   return (
     <div
       className={`${
-        testPlatform == "ios" ? "pt-[59px] pb-[34px]" : ""
+        testPlatform == "ios" ? "pt-[59px] pb-[34px] lg:pt-0 lg:pb-0" : ""
       } h-screen bg-ernieteal`}
     >
       {registerComplete && <Alert message={"Register Complete"}></Alert>}
@@ -772,30 +772,56 @@ export default function Login() {
         <div
           className={`flex ${
             testPlatform == "ios"
-              ? "max-h-[calc(100vh - 34px - 59px)]"
+              ? "max-h-[calc(100vh - 34px - 59px)] lg:max-h-[100vh]"
               : "max-h-[88vh]"
           } flex-col h-full items-center justify-between bg-erniecream ${
             circularstd.variable
           } font-sans ${circerounded.variable} font-sans`}
         >
-          <div className="lg:flex hidden text-erniegreen px-4">
-            <p>Please use a mobile phone to view this page</p>
-          </div>
           {loginType == 0 && (
-            <div className="w-screen h-screen flex flex-col bg-erniecream">
-              <div className="flex flex-col bg-ernieteal w-full p-4">
+            <div className="w-screen h-screen flex flex-col lg:flex-row bg-erniecream">
+              <div className="flex flex-col justify-center bg-ernieteal w-full lg:w-1/2 lg:min-h-screen p-4 lg:order-2 lg:gap-10">
                 <img
                   src="/Asset-1@2x2.png"
                   className="h-16 object-contain"
                 ></img>
+                <div className="p-6 lg:max-w-[70%] lg:mx-auto lg:flex flex-col gap-4 hidden">
+                  <p className="font-circe font-[900] text-bodylg text-erniegreen lg:text-erniecream uppercase  [@media(max-height:708px)]:leading-[1.8rem] [@media(min-height:900px)]:text-bodyxl lg:leading-[48px]">
+                    Sustainable Workplace Delivery Services
+                  </p>
+                  <img src="/divider.png" className="w-full lg:hidden"></img>
+                  <img
+                    src="/divider_cream.png"
+                    className="w-full hidden lg:flex"
+                  ></img>
+                  <p className="font-circular font-[900] text-erniegreen lg:text-erniecream">
+                    Coffee / Hot Chocolate / Tea / Snacks / Drinkware
+                  </p>
+                  <div
+                    className="bg-erniegold p-4 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer"
+                    onClick={() => setLoginType(1)}
+                  >
+                    <p className="font-circe text-erniegreen font-[900] text-xl uppercase text-center">
+                      Create Account
+                    </p>
+                  </div>
+                  <div
+                    className="bg-erniegold p-4 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer"
+                    onClick={() => setLoginType(2)}
+                  >
+                    <p className="font-circe text-erniegreen font-[900] text-xl uppercase text-center">
+                      Login
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="flex-grow">
+              <div className="flex-grow lg:w-1/2 lg:order-1">
                 <img
                   src="/login.jpg"
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top lg:object-center"
                 ></img>
               </div>
-              <div className="p-6 flex flex-col gap-4">
+              <div className="p-6 flex flex-col gap-4 lg:hidden">
                 <p className="font-circe font-[900] text-bodylg text-erniegreen uppercase  [@media(max-height:708px)]:leading-[1.8rem] [@media(min-height:900px)]:text-bodyxl">
                   Sustainable Workplace Delivery Services
                 </p>
@@ -823,7 +849,7 @@ export default function Login() {
             </div>
           )}
           {loginType == 1 && (
-            <div className="h-screen w-screen flex flex-col bg-erniecream">
+            <div className="h-screen w-screen flex flex-col lg:flex-row bg-erniecream">
               <div className="flex flex-col bg-ernieteal w-full p-4">
                 <img
                   src="/Asset-1@2x2.png"
@@ -1175,14 +1201,159 @@ export default function Login() {
             </div>
           )}
           {loginType == 2 && (
-            <div className="h-screen w-screen flex flex-col bg-erniecream">
-              <div className="flex flex-col bg-ernieteal w-full p-4">
+            <div className="h-screen w-screen flex flex-col lg:flex-row bg-erniecream">
+              <div className="flex-grow lg:w-1/2 lg:order-1 hidden lg:flex lg:order-1">
                 <img
-                  src="/Asset-1@2x2.png"
-                  className="h-20 object-contain"
+                  src="/login.jpg"
+                  className="w-full h-full object-cover object-top lg:object-center"
                 ></img>
               </div>
-              <div className="flex-grow p-6 bg-erniemint flex flex-col gap-4">
+              <div className="flex flex-col bg-ernieteal lg:bg-erniemint justify-center w-full p-4 lg:w-1/2 lg:min-h-screen lg:gap-10 lg:order-2">
+                <img
+                  src="/Asset-1@2x2.png"
+                  className="h-16 object-contain"
+                ></img>
+                <div className="flex-grow lg:flex-none p-6 bg-erniemint lg:flex flex-col gap-4 hidden lg:max-w-[70%] lg:mx-auto">
+                  <div className="flex flex-col rounded-lg bg-erniecream p-6 gap-2">
+                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+                      Login
+                    </p>
+                    <img src="/divider.png" className="w-full"></img>
+                    {console.log(prevUser)}
+                    {prevUser == null ? (
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                          <label
+                            htmlFor="emailaddress"
+                            className="font-circular text-erniegreen text-sm font-[500]"
+                          >
+                            Email Address
+                          </label>
+                          <input
+                            type="text"
+                            name="emailaddress"
+                            onChange={(e) => {
+                              setUsername(e.currentTarget.value);
+                            }}
+                            className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                          ></input>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label
+                            htmlFor="password"
+                            className="font-circular text-erniegreen text-sm font-[500]"
+                          >
+                            Password
+                          </label>
+                          <input
+                            type="password"
+                            name="password"
+                            onChange={(e) => {
+                              setPassword(e.currentTarget.value);
+                            }}
+                            className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                          ></input>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col pt-4">
+                        <div className="flex border-[1px] border-erniegreen p-4 rounded-xl flex-row justify-between items-center">
+                          <div className="flex flex-col">
+                            <p className="font-circular text-erniegreen font-[500] mb-2">
+                              Previously logged in as...
+                            </p>
+                            <p className="font-circe text-erniegreen font-[900] uppercase text-2xl">
+                              {localStorage.getItem("firstName")}
+                            </p>
+                            <p className="font-circular text-erniegreen font-[500] opacity-50">
+                              {prevUser.u}
+                            </p>
+                          </div>
+                          <p className="font-circe text-erniegreen font-[900] uppercase text-4xl">
+                            {">"}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (prevUser == null) {
+                        loginUser(username, password, false);
+                      } else {
+                        let pUser = prevUser.u;
+                        let pPass = prevUser.p;
+
+                        loginUser(pUser, pPass, false);
+
+                        localStorage.setItem("prevUser", pUser);
+                        localStorage.setItem("prevPass", pPass);
+                      }
+                    }}
+                  >
+                    {prevUser == null
+                      ? "Login"
+                      : `Login as ${localStorage.getItem("firstName")}`}
+                  </button>
+                  {prevUser != null && (
+                    <button
+                      className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
+                      onClick={(e) => {
+                        localStorage.removeItem("prevUser");
+                        localStorage.removeItem("prevPass");
+                        setPrevUser(null);
+                      }}
+                    >
+                      Login with a different user
+                    </button>
+                  )}
+                  {/* <button
+                  type="button"
+                  className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    loginUser("apptestlogin", "App1Test2Login3!");
+                  }}
+                >
+                  Test Login (has sub)
+                </button>
+                <button
+                  type="button"
+                  className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer font-circe text-erniegreen font-[900] text-xl text-center"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    loginUser("rob@dolcestudio.co", "Yksijavain1!");
+                  }}
+                >
+                  Test Login (no sub)
+                </button> */}
+                  <p
+                    className="font-circular font-[500] text-erniegreen text-sm text-center cursor-pointer"
+                    onClick={(e) => {
+                      setForgotPassword(true);
+                    }}
+                  >
+                    Forgot password?
+                  </p>
+                  <div className="flex flex-row gap-2 justify-center">
+                    <p className="font-circular font-[500] text-erniegreen text-sm">
+                      Don&apos;t have an account?
+                    </p>
+                    <p
+                      className="font-circular font-[500] text-erniecream text-sm cursor-pointer"
+                      onClick={() => {
+                        setLoginType(1);
+                      }}
+                    >
+                      Register here
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-grow p-6 bg-erniemint flex flex-col gap-4 lg:hidden">
                 <div className="flex flex-col rounded-lg bg-erniecream p-6 gap-2">
                   <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
                     Login
