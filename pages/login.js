@@ -609,6 +609,7 @@ export default function Login() {
       "N7",
       "N15",
       "N19",
+      "W1C",
     ];
 
     let postcodeParts = postcode.split(" ");

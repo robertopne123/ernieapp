@@ -410,7 +410,7 @@ export default function Dashboard({ data, categories, products, orders }) {
           console.log(currentUser);
 
           if (
-            clients[i].clientInformation.pointOfContactEmail ==
+            clients[i].clientInformation.pointOfContactEmail.toLowerCase() ==
             currentUser.toLowerCase()
           ) {
             clientAcc = clients[i];
@@ -432,12 +432,42 @@ export default function Dashboard({ data, categories, products, orders }) {
         );
 
         localStorage.setItem("clientID", clientAcc.databaseId);
-        localStorage.setItem("bags", clientAcc.impactFigures?.bags);
-        localStorage.setItem("carbon", clientAcc.impactFigures?.carbon);
-        localStorage.setItem("trees", clientAcc.impactFigures?.trees);
-        localStorage.setItem("coffee", clientAcc.impactFigures?.coffee);
-        localStorage.setItem("phones", clientAcc.impactFigures?.phones);
-        localStorage.setItem("m25", clientAcc.impactFigures?.m25);
+        localStorage.setItem(
+          "bags",
+          clientAcc.impactFigures?.bags != null
+            ? clientAcc.impactFigures?.bags
+            : 0
+        );
+        localStorage.setItem(
+          "carbon",
+          clientAcc.impactFigures?.carbon != null
+            ? clientAcc.impactFigures?.carbon
+            : 0
+        );
+        localStorage.setItem(
+          "trees",
+          clientAcc.impactFigures?.trees != null
+            ? clientAcc.impactFigures?.trees
+            : 0
+        );
+        localStorage.setItem(
+          "coffee",
+          clientAcc.impactFigures?.coffee != null
+            ? clientAcc.impactFigures?.coffee
+            : 0
+        );
+        localStorage.setItem(
+          "phones",
+          clientAcc.impactFigures?.phones != null
+            ? clientAcc.impactFigures?.phones
+            : 0
+        );
+        localStorage.setItem(
+          "m25",
+          clientAcc.impactFigures?.m25 != null
+            ? clientAcc.impactFigures?.m25
+            : 0
+        );
 
         localStorage.setItem(
           "clientInformation",
@@ -1028,51 +1058,6 @@ export default function Dashboard({ data, categories, products, orders }) {
       loadData(customerId, employerEmail, employerEmail);
     }
   }, []);
-
-  useEffect(() => {
-    if (dataObject != null) {
-      let eNameObjs = dataObject.data.employeeLists.nodes[0]?.employeeListFields
-        .employeeEmail
-        ? Object.values(
-            JSON.parse(
-              dataObject.data.employeeLists.nodes[0]?.employeeListFields
-                .employeeName
-            )
-          )
-        : "";
-
-      console.log(eNameObjs);
-
-      let eEmailObjs = dataObject.data.employeeLists.nodes[0]
-        ?.employeeListFields.employeeEmail
-        ? Object.values(
-            JSON.parse(
-              dataObject.data.employeeLists.nodes[0]?.employeeListFields
-                .employeeEmail
-            )
-          )
-        : "";
-
-      let employeeObjs = [];
-
-      for (let i = 0; i < eNameObjs.length; i++) {
-        let eObj;
-
-        eObj = {
-          name: eNameObjs[i],
-          email: eEmailObjs[i],
-        };
-
-        console.log(eObj);
-
-        employeeObjs.push(eObj);
-      }
-
-      console.log(employeeObjs);
-
-      setEmployees(employeeObjs);
-    }
-  }, [dataObject]);
 
   const getUserNumberOrders = () => {
     let total = 0;
