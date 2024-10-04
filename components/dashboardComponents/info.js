@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const Info = ({ close, name, description }) => {
+export const Info = ({ close, name, description, link }) => {
   const [loading, setLoading] = useState(false);
 
   return (
@@ -26,6 +26,12 @@ export const Info = ({ close, name, description }) => {
             </p>
           </div>
         </div>
+        <a
+          href={link}
+          className="bg-erniegold p-2 rounded-lg w-full font-circe text-erniegreen font-[900] text-lg text-center"
+        >
+          Visit Website
+        </a>
       </div>
     </div>
   );

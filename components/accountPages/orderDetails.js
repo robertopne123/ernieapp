@@ -39,8 +39,14 @@ export const OrderDetails = ({ close, order }) => {
                 <p className="font-circular text-erniegreen text-sm italic">
                   Order {order.orderNumber}
                 </p>
-                <p className="font-circular text-erniegreen text-sm italic">
-                  {order.status}
+                <p
+                  className={`font-circular text-sm italic ${
+                    order.status == "PENDING"
+                      ? "text-red-500"
+                      : "test-erniegreen"
+                  }`}
+                >
+                  {order.status == "PENDING" ? "INVOICE DUE" : order.status}
                 </p>
               </div>
               <div className="flex flex-col">

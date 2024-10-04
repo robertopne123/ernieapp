@@ -69,6 +69,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [cartObject, setCart] = useState(null);
 
   const [justRegistered, setJustRegistered] = useState(newUser === "true");
+  //const [justRegistered, setJustRegistered] = useState(true);
 
   const [employees, setEmployees] = useState(null);
 
@@ -398,6 +399,8 @@ export default function Dashboard({ data, categories, products, orders }) {
         setOrders(data.data.orders.nodes);
 
         setCoupons(data.data.coupons.nodes);
+
+        setOrderHistory(getLoggedInUserOrders(data.data.orders.nodes));
 
         let clients = data.data.clients.nodes;
 
@@ -1105,7 +1108,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const getLoggedInUserOrders = (orders) => {
     let userOrders = [];
 
-    for (let i = 0; i < orders.length; i++) {
+    for (let i = 0; i < orders?.length; i++) {
       if (orders[i].customer?.email == email) {
         userOrders.push(orders[i]);
       }
@@ -1113,6 +1116,8 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     return userOrders;
   };
+
+  const [orderHistory, setOrderHistory] = useState(null);
 
   const getSubscriptionPaymentDate = () => {
     let date;
@@ -2758,6 +2763,8 @@ export default function Dashboard({ data, categories, products, orders }) {
               setShowingBasket={setShowingBasket}
               coupons={couponData}
               products={dataObject.data.products.nodes}
+              orderHistory={orderHistory}
+              setOrderHistory={setOrderHistory}
             />
             <div
               className={`${
@@ -2844,7 +2851,7 @@ export default function Dashboard({ data, categories, products, orders }) {
               {activeTab == 4 && (
                 <Accounts
                   userQuantity={getUserTotalOrderQty()}
-                  orders={getLoggedInUserOrders(dataObject.data.orders.nodes)}
+                  orders={orderHistory}
                   subsidy={dataObject.data.coupons.nodes[0]}
                   subsidyType={dataObject.data.coupons.nodes[0]?.discountType}
                   usageLimit={

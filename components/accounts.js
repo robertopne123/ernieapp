@@ -85,10 +85,8 @@ export default function Accounts({
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
-              Delivery, Data, <br className="xlmb:hidden" />
-              Returns &
-              <br />
-              Policy
+              Our
+              <br className="xlmb:hidden" /> Policies
             </p>
           </div>
           <div

@@ -177,7 +177,7 @@ export default function Impact({
               </div>
             )}
           </div>
-          <div className="bg-erniemint flex flex-col overflow-hidden h-[calc(100%-36px)] pb-[84px]">
+          <div className="bg-erniemint flex flex-col overflow-hidden h-[calc(100%-36px)]">
             {impactTab == 0 && (
               <div className="flex flex-col gap-6 px-6 pt-6 pb-6 overflow-auto flex-grow h-[calc(100%-36px)]">
                 <div className="flex flex-col">

@@ -4,7 +4,7 @@ import { gql } from "@apollo/client";
 import CheckoutForm from "../shopPages/checkoutElements/checkoutForm";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import graphqlClient from "@/apollo-client";
 import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
@@ -38,6 +38,8 @@ export const Basket = ({
   setShowingBasket,
   coupons,
   products,
+  orderHistory,
+  setOrderHistory,
 }) => {
   const stripePromise = loadStripe(
     "pk_live_51Pglrw2Kqe9gzhhxqUyBOvx7Zfyn7z51eC6170fBY07jjDRD6wro4hyDYtvjfQyOwhxAxsGLFV6X0N8UMqo40n4d00LXY8HJl4"
@@ -184,6 +186,14 @@ export const Basket = ({
               productId
             }
           }
+          createdVia
+          customer {
+            databaseId
+            email
+          }
+          date
+          orderNumber
+          status
         }
       }
     }
@@ -383,6 +393,46 @@ export const Basket = ({
     }
   `;
 
+  const REFRESHORDERS = gql`
+    query MyQuery2($customerId: Int!) {
+      orders(
+        first: 10000
+        where: { customerId: $customerId, orderby: { field: DATE } }
+      ) {
+        nodes {
+          id
+          createdVia
+          lineItems {
+            nodes {
+              quantity
+              product {
+                node {
+                  name
+                  databaseId
+                  terms {
+                    nodes {
+                      ... on ProductTag {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          customer {
+            databaseId
+            email
+          }
+          date
+          orderNumber
+          status
+        }
+      }
+    }
+  `;
+
   const [login, { data, loading, error }] = useMutation(LOGIN, {
     client: client,
   });
@@ -391,6 +441,11 @@ export const Basket = ({
     useMutation(REFRESH, {
       client: client,
     });
+
+  const [refreshOrderHistory, { oHData, oHLoading, oHError }] = useLazyQuery(
+    REFRESHORDERS,
+    { client: client }
+  );
 
   const loginUser = (un, pw, jr) => {
     if (localStorage.getItem("authtoken") != null) {
@@ -711,6 +766,34 @@ export const Basket = ({
 
             let totalQty = 0;
 
+            console.log(orderHistory);
+
+            let employerUser = localStorage.getItem("employeruser");
+            let employerEmail = localStorage.getItem("employeremail");
+
+            let orderData = data;
+
+            refreshOrderHistory({
+              variables: {
+                customerId: parseInt(employerUser),
+              },
+            }).then((data) => {
+              console.log(data.data.orders.nodes);
+
+              let employerUser = localStorage.getItem("employeruser");
+              let employerEmail = localStorage.getItem("employeremail");
+
+              refreshOrderHistory({
+                variables: {
+                  customerId: parseInt(employerUser),
+                },
+              }).then((data) => {
+                console.log(data.data.orders.nodes);
+
+                setOrderHistory(data.data.orders.nodes);
+              });
+            });
+
             for (
               let i = 0;
               i < data.data.createOrder.order.lineItems.nodes.length;
@@ -833,6 +916,32 @@ export const Basket = ({
 
                 let totalQty = 0;
 
+                let employerUser = localStorage.getItem("employeruser");
+                let employerEmail = localStorage.getItem("employeremail");
+
+                let orderData = data;
+
+                refreshOrderHistory({
+                  variables: {
+                    customerId: parseInt(employerUser),
+                  },
+                }).then((data) => {
+                  console.log(data.data.orders.nodes);
+
+                  let employerUser = localStorage.getItem("employeruser");
+                  let employerEmail = localStorage.getItem("employeremail");
+
+                  refreshOrderHistory({
+                    variables: {
+                      customerId: parseInt(employerUser),
+                    },
+                  }).then((data) => {
+                    console.log(data.data.orders.nodes);
+
+                    setOrderHistory(data.data.orders.nodes);
+                  });
+                });
+
                 for (
                   let i = 0;
                   i < data.data.createOrder.order.lineItems.nodes.length;
@@ -951,13 +1060,30 @@ export const Basket = ({
 
             let totalQty = 0;
 
+            let employerUser = localStorage.getItem("employeruser");
+            let employerEmail = localStorage.getItem("employeremail");
+
+            let orderData = data;
+
+            refreshOrderHistory({
+              variables: {
+                customerId: parseInt(employerUser),
+              },
+            }).then((data) => {
+              console.log(data.data.orders.nodes);
+
+              setOrderHistory(data.data.orders.nodes);
+            });
+
             for (
               let i = 0;
-              i < data.data.createOrder.order.lineItems.nodes.length;
+              i <
+              data.data.createSubscription.subscription.lineItems.nodes.length;
               i++
             ) {
               totalQty +=
-                data.data.createOrder.order.lineItems.nodes[i].quantity;
+                data.data.createSubscription.subscription.lineItems.nodes[i]
+                  .quantity;
             }
 
             console.log(totalQty);
@@ -1066,11 +1192,14 @@ export const Basket = ({
 
                 for (
                   let i = 0;
-                  i < data.data.createOrder.order.lineItems.nodes.length;
+                  i <
+                  data.data.createSubscription.subscription.lineItems.nodes
+                    .length;
                   i++
                 ) {
                   totalQty +=
-                    data.data.createOrder.order.lineItems.nodes[i].quantity;
+                    data.data.createSubscription.subscription.lineItems.nodes[i]
+                      .quantity;
                 }
 
                 console.log(totalQty);
@@ -1217,6 +1346,18 @@ export const Basket = ({
   useEffect(() => {
     setProcessingOrder(false);
   }, [orderComplete]);
+
+  const getLoggedInUserOrders = (orders, email) => {
+    let userOrders = [];
+
+    for (let i = 0; i < orders?.length; i++) {
+      if (orders[i].customer?.email == email) {
+        userOrders.push(orders[i]);
+      }
+    }
+
+    return userOrders;
+  };
 
   useEffect(() => {
     if (managingSubscription) {
@@ -1371,6 +1512,7 @@ export const Basket = ({
             "Ernie London is proud to partner with Groundswell, a charity creating healthier lives, stronger voices and better futures for anyone with experience of homelessness. We share the belief that everyone deserves to be seen, heard and supported. Our contribution will fuel Groundswell’s person-centered and participatory approach to tackling homelessness, where often the most powerful first step is connecting over a cup of coffee. Together, we’re turning every sip into a step towards solving homelessness, recognising that change often begins with a simple, human gesture. "
           }
           close={close}
+          link={"https://groundswell.org.uk/"}
         />
       )}
       <div className="relative cursor-pointer hover:bg-erniemint p-2 mr-[-8px]">
@@ -1395,15 +1537,16 @@ export const Basket = ({
           {showingCheckout ? (
             <div>
               {orderComplete ? (
-                <div className="absolute right-0 top-20 h-full w-full bg-erniedarkcream px-6 z-[990] pb-6 flex flex-col gap-4 pt-6">
-                  <p className="font-circe font-[900] text-center text-3xl  text-erniegreen">
-                    Thank you
+                <div className="absolute right-0 top-20 h-full w-full bg-erniedarkcream px-6 z-[990] pb-6 flex flex-col gap-2 pt-6">
+                  <p className="font-circe font-[900] text-center text-2xl  text-erniegreen uppercase">
+                    Thank you for <br />
+                    your order
                   </p>
-                  <p className="font-circular font-[500] text-erniegreen text-center">
+                  <p className="font-circular font-[500] text-erniegreen text-center text-sm mb-2">
                     {managingSubscription
                       ? "Your subscription has been updated"
                       : purchaseType == 0
-                      ? "Your one-off order is now complete"
+                      ? "You will receive an email confirming the details of your order, and including your invoice. Please check your spam if you don't receive it."
                       : "Your new subscription is now active"}
                   </p>
                   <div className="bg-erniecream rounded-xl p-6">
@@ -1436,6 +1579,8 @@ export const Basket = ({
                     className="bg-erniegold py-2 w-full rounded-xl"
                     onClick={() => {
                       setOrderComplete(false);
+
+                      console.log(orderHistory);
 
                       if (!managingSubscription) {
                         if (purchaseType == 0) {
@@ -2198,6 +2343,41 @@ export const Basket = ({
                     </div>
                   </div>
                   {console.log(subAdjBasket)}
+                  <div className="flex flex-col p-6 bg-ernieteal rounded-xl">
+                    <p className="font-circular text-erniecream text-sm">
+                      Experience issues ordering? Please get in touch with our
+                      team:
+                    </p>
+                    <div className="w-full h-px bg-erniecream my-2"></div>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <a
+                        className="bg-erniegold rounded-lg p-2 font-circe font-[900] text-erniegreen text-center"
+                        href="tel:07711834804"
+                      >
+                        Phone
+                      </a>
+                      <a
+                        className="bg-erniegold rounded-lg p-2 font-circe font-[900] text-erniegreen text-center"
+                        href="mailto:hello@ernie.london"
+                      >
+                        Email
+                      </a>
+                    </div>
+                    {/* <a
+                      className="font-circular text-erniecream text-md mb-1"
+                      href="tel:07711834804"
+                    >
+                      <span className="text-erniecream">Phone:</span>{" "}
+                      07711834804
+                    </a>
+                    <a
+                      className="font-circular text-erniecream text-md"
+                      href="mailto:hello@ernie.london"
+                    >
+                      <span className="text-erniecream">Email:</span>{" "}
+                      hello@ernie.london
+                    </a> */}
+                  </div>
                   <div
                     className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer`}
                     onClick={(e) => {
@@ -2553,13 +2733,21 @@ export const Basket = ({
                     src="/groundswellimg.jpg"
                     className="bg-groundswell w-36 p-2 object-cover rounded-lg"
                   ></img>
-                  <img
-                    src="/info.svg"
-                    className="w-10"
-                    onClick={(e) => {
-                      setShowingInfo(true);
-                    }}
-                  ></img>
+                  <div className="flex flex-row">
+                    <a href="https://groundswell.org.uk/">
+                      <img
+                        src="/Language icon wght200.svg"
+                        className="w-10"
+                      ></img>
+                    </a>
+                    <img
+                      src="/info.svg"
+                      className="w-10"
+                      onClick={(e) => {
+                        setShowingInfo(true);
+                      }}
+                    ></img>
+                  </div>
                 </div>
                 <p className="font-circe font-[900] uppercase text-erniecream text-xl mt-4">
                   Donate to Groundswell

@@ -9,6 +9,15 @@ export const Tutorial = ({ completeTutorial }) => {
 
   return (
     <div className="absolute top-0 z-[999] h-full w-full px-4 flex flex-col justify-center bg-ernieteal backdrop-blur-sm bg-opacity-50">
+      <div
+        className="flex flex-row items-center absolute top-6 right-6 gap-2"
+        onClick={(e) => {
+          completeTutorial();
+        }}
+      >
+        <p className="font-circular text-erniecream text-md">Skip</p>
+        <img src="/cross_cream.svg" className="w-5 h-5"></img>
+      </div>
       <div className="h-[70%] w-full bg-erniecream ">
         <div className="flex flex-row h-4 w-full bg-erniedarkcream">
           <div

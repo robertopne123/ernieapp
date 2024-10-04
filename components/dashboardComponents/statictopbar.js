@@ -28,6 +28,8 @@ export const StaticTopBar = ({
   setShowingBasket,
   coupons,
   products,
+  orderHistory,
+  setOrderHistory,
 }) => {
   const addToSubBasketFromBar = (item) => {
     addToSubBasket(item);
@@ -85,6 +87,10 @@ export const StaticTopBar = ({
     setShowingBasket(val);
   };
 
+  const setOrderHistoryFromBar = (val) => {
+    setOrderHistory(val);
+  };
+
   return (
     <div className="h-20 w-full bg-ernieteal py-4 px-6 flex flex-row justify-between z-[20]">
       <img src="/Asset-1@2x2.png" className="w-32 my-auto"></img>
@@ -116,6 +122,8 @@ export const StaticTopBar = ({
         setShowingBasket={setShowingBasketFromBar}
         coupons={coupons}
         products={products}
+        orderHistory={orderHistory}
+        setOrderHistory={setOrderHistoryFromBar}
       />
     </div>
   );
