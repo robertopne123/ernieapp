@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { Browser } from "@capacitor/browser";
 
 export const Info = ({ close, name, description, link }) => {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+
+  const openCapacitorSite = async (link) => {
+    await Browser.open({ url: link });
+  };
 
   return (
     <div className="fixed top-0 left-0 bg-erniegreen h-screen w-full z-[999] bg-opacity-70 p-6 flex flex-col justify-center">
@@ -32,7 +37,7 @@ export const Info = ({ close, name, description, link }) => {
         <div
           className="bg-erniegold p-2 rounded-lg w-full"
           onClick={(e) => {
-            router.push(link);
+            openCapacitorSite(link);
           }}
         >
           <p className="font-circe text-erniegreen font-[900] text-lg text-center">

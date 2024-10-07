@@ -9,6 +9,7 @@ import graphqlClient from "@/apollo-client";
 import { useRouter } from "next/router";
 import { usePathname } from "next/navigation";
 import { Info } from "./info";
+import { Browser } from "@capacitor/browser";
 
 export const Basket = ({
   addToSubBasket,
@@ -1373,6 +1374,10 @@ export const Basket = ({
     }
 
     return userOrders;
+  };
+
+  const openCapacitorSite = async (link) => {
+    await Browser.open({ url: link });
   };
 
   useEffect(() => {
@@ -2898,7 +2903,7 @@ export const Basket = ({
                   <div className="flex flex-row">
                     <div
                       onClick={(e) => {
-                        router.push("https://groundswell.org.uk/");
+                        openCapacitorSite("https://groundswell.org.uk/");
                       }}
                     >
                       <img
