@@ -393,6 +393,14 @@ export const Basket = ({
     }
   `;
 
+  const CHECKCOUPON = gql`
+    mutation MyMutation($coupon: String!, $id: ID!) {
+      checkCouponUsage(input: { coupon: $coupon, id: $id }) {
+        usage
+      }
+    }
+  `;
+
   const REFRESHORDERS = gql`
     query MyQuery2($customerId: Int!) {
       orders(
@@ -444,6 +452,11 @@ export const Basket = ({
 
   const [refreshOrderHistory, { oHData, oHLoading, oHError }] = useLazyQuery(
     REFRESHORDERS,
+    { client: client }
+  );
+
+  const [checkCoupon, { cCData, cCLoading, cCError }] = useMutation(
+    CHECKCOUPON,
     { client: client }
   );
 
@@ -557,6 +570,7 @@ export const Basket = ({
   });
 
   const [processingOrder, setProcessingOrder] = useState(false);
+  const [applyingVoucher, setApplyingVoucher] = useState(false);
 
   const [url, setUrl] = useState("");
 
@@ -730,6 +744,8 @@ export const Basket = ({
         : "0.0";
 
     if (purchaseType == 0) {
+      console.log;
+
       try {
         checkout({
           variables: {
@@ -755,7 +771,7 @@ export const Basket = ({
                 {
                   methodId: mId,
                   methodTitle: mTitle,
-                  total: appliedVoucher == "FREECOFFEE" ? "0.0" : total,
+                  total: total,
                 },
               ],
             },
@@ -906,7 +922,7 @@ export const Basket = ({
                       {
                         methodId: mId,
                         methodTitle: mTitle,
-                        total: appliedVoucher == "FREECOFFEE" ? "0.0" : total,
+                        total: total,
                       },
                     ],
                   },
@@ -1873,6 +1889,8 @@ export const Basket = ({
                       <div
                         className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer`}
                         onClick={(e) => {
+                          setApplyingVoucher(true);
+
                           console.log(voucher);
 
                           console.log(coupons);
@@ -1881,149 +1899,293 @@ export const Basket = ({
 
                           let vFound = false;
 
+                          let id = localStorage.getItem("employeruser");
+
                           let productsForCode = [];
 
-                          for (let i = 0; i < coupons.length; i++) {
-                            if (coupons[i].code == voucher.toLowerCase()) {
-                              console.log(
-                                coupons[i].code,
-                                voucher.toLowerCase()
-                              );
-                              if (coupons[i].limitUsageToXItems == 1) {
-                                if (purchaseType == 0) {
-                                  productsForCode = coupons[i].products.nodes;
+                          let usage = 0;
 
-                                  let matchingProducts = [];
+                          checkCoupon({
+                            variables: {
+                              id: id,
+                              coupon: appliedVoucher.toLowerCase(),
+                            },
+                          })
+                            .then((data) => {
+                              usage = data.data.checkCouponUsage.usage;
 
-                                  for (
-                                    let a = 0;
-                                    a < productsForCode.length;
-                                    a++
+                              console.log(usage);
+
+                              setApplyingVoucher(false);
+
+                              for (let i = 0; i < coupons.length; i++) {
+                                if (coupons[i].code == voucher.toLowerCase()) {
+                                  console.log(
+                                    coupons[i].code,
+                                    voucher.toLowerCase()
+                                  );
+                                  console.log(
+                                    usage,
+                                    coupons[i].couponDetails.maxUsage
+                                  );
+                                  if (
+                                    usage < coupons[i].couponDetails.maxUsage
                                   ) {
-                                    for (
-                                      let b = 0;
-                                      b < oneOffBasket.length;
-                                      b++
-                                    ) {
-                                      console.log(
-                                        productsForCode[a].databaseId,
-                                        oneOffBasket[b].product.databaseId
-                                      );
-                                      if (
-                                        productsForCode[a].databaseId ==
-                                        oneOffBasket[b].product.databaseId
+                                    if (purchaseType == 0) {
+                                      productsForCode =
+                                        coupons[i].products.nodes;
+
+                                      let matchingProducts = [];
+
+                                      for (
+                                        let a = 0;
+                                        a < productsForCode.length;
+                                        a++
                                       ) {
-                                        matchingProducts.push(oneOffBasket[b]);
-                                        break;
-                                      } else {
+                                        for (
+                                          let b = 0;
+                                          b < oneOffBasket.length;
+                                          b++
+                                        ) {
+                                          console.log(
+                                            productsForCode[a].databaseId,
+                                            oneOffBasket[b].product.databaseId
+                                          );
+                                          if (
+                                            productsForCode[a].databaseId ==
+                                            oneOffBasket[b].product.databaseId
+                                          ) {
+                                            matchingProducts.push(
+                                              oneOffBasket[b]
+                                            );
+                                            break;
+                                          } else {
+                                          }
+                                        }
                                       }
+
+                                      console.log(matchingProducts);
+
+                                      if (matchingProducts.length > 0) {
+                                        console.log(purchaseType);
+                                        setVoucherApplied(true);
+                                        setVoucherFound(true);
+                                        vFound = true;
+                                        setVoucherInvalid(false);
+                                        setAppliedVoucher(voucher);
+                                        console.log(matchingProducts);
+                                        setMProducts(matchingProducts);
+                                      } else {
+                                        console.log("sub");
+                                        console.log(purchaseType);
+                                        setVoucherApplied(false);
+                                        setVoucherFound(true);
+                                        vFound = true;
+                                        setVoucherInvalid(true);
+                                        setVoucherInvalidMsg(
+                                          "You have no valid items in your basket"
+                                        );
+                                      }
+                                    } else {
+                                      console.log("sub");
+                                      console.log(purchaseType);
+                                      setVoucherApplied(false);
+                                      setVoucherFound(true);
+                                      vFound = true;
+                                      setVoucherInvalid(true);
+                                      setVoucherInvalidMsg(
+                                        "This coupon can only be applied to one-off orders"
+                                      );
                                     }
-                                  }
-
-                                  console.log(matchingProducts);
-
-                                  if (matchingProducts.length > 0) {
-                                    console.log(purchaseType);
-                                    setVoucherApplied(true);
-                                    setVoucherFound(true);
-                                    vFound = true;
-                                    setVoucherInvalid(false);
-                                    setAppliedVoucher(voucher);
-                                    console.log(matchingProducts);
-                                    setMProducts(matchingProducts);
                                   } else {
-                                    console.log("sub");
+                                    console.log("limit");
                                     console.log(purchaseType);
                                     setVoucherApplied(false);
                                     setVoucherFound(true);
                                     vFound = true;
                                     setVoucherInvalid(true);
                                     setVoucherInvalidMsg(
-                                      "You have no valid items in your basket"
+                                      "You can only use this voucher once"
                                     );
                                   }
+
+                                  break;
                                 } else {
-                                  console.log("sub");
-                                  console.log(purchaseType);
-                                  setVoucherApplied(false);
-                                  setVoucherFound(true);
-                                  vFound = true;
-                                  setVoucherInvalid(true);
-                                  setVoucherInvalidMsg(
-                                    "This coupon can only be applied to one-off orders"
-                                  );
-                                }
-                              } else {
-                                console.log(coupons[i].limitUsageToXItems);
-                                setVoucherApplied(true);
-                                setVoucherFound(true);
-                                vFound = true;
-                                setVoucherInvalid(false);
-                                setAppliedVoucher(voucher);
-
-                                productsForCode = coupons[i].products.nodes;
-
-                                let matchingProducts = [];
-
-                                for (
-                                  let a = 0;
-                                  a < productsForCode.length;
-                                  a++
-                                ) {
-                                  for (
-                                    let b = 0;
-                                    b < oneOffBasket.length;
-                                    b++
-                                  ) {
-                                    console.log(
-                                      productsForCode[a].databaseId,
-                                      oneOffBasket[b].product.databaseId
-                                    );
-                                    if (
-                                      productsForCode[a].databaseId ==
-                                      oneOffBasket[b].product.databaseId
-                                    ) {
-                                      matchingProducts.push(oneOffBasket[b]);
-                                    }
-                                  }
-                                }
-
-                                console.log(matchingProducts);
-
-                                if (matchingProducts.length > 0) {
-                                  console.log(purchaseType);
-                                  setVoucherApplied(true);
-                                  setVoucherFound(true);
-                                  vFound = true;
-                                  setVoucherInvalid(false);
-                                  setAppliedVoucher(voucher);
-                                } else {
-                                  console.log("sub");
-                                  console.log(purchaseType);
-                                  setVoucherApplied(false);
-                                  setVoucherFound(true);
-                                  vFound = true;
-                                  setVoucherInvalid(true);
-                                  setVoucherInvalidMsg(
-                                    "You have no valid items in your basket"
-                                  );
+                                  continue;
                                 }
                               }
 
-                              break;
-                            } else {
-                              continue;
-                            }
-                          }
+                              if (!vFound) {
+                                console.log(voucher);
+                                setVoucherInvalid(true);
+                                setVoucherInvalidMsg("Invalid coupon");
+                                setVoucherApplied(false);
+                              }
+                            })
+                            .catch((error) => {
+                              console.log(error);
 
-                          if (!vFound) {
-                            console.log(voucher);
-                            setVoucherInvalid(true);
-                            setVoucherInvalidMsg("Invalid coupon");
-                            setVoucherApplied(false);
-                          }
+                              localStorage.setItem("authtoken", "");
+
+                              refreshToken({
+                                variables: {
+                                  refreshToken:
+                                    localStorage.getItem("refreshtoken"),
+                                },
+                              }).then((data) => {
+                                console.log(data);
+
+                                localStorage.setItem(
+                                  "authtoken",
+                                  data.data.refreshToken.authToken
+                                );
+
+                                checkCoupon({
+                                  variables: {
+                                    id: id,
+                                    coupon: voucher.toLowerCase(),
+                                  },
+                                }).then((data) => {
+                                  usage = data.data.checkCouponUsage.usage;
+
+                                  console.log(usage);
+
+                                  setApplyingVoucher(false);
+
+                                  for (let i = 0; i < coupons.length; i++) {
+                                    if (
+                                      coupons[i].code == voucher.toLowerCase()
+                                    ) {
+                                      console.log(
+                                        coupons[i].code,
+                                        voucher.toLowerCase()
+                                      );
+                                      console.log(
+                                        usage,
+                                        coupons[i].limitUsageToXItems
+                                      );
+                                      if (
+                                        usage < coupons[i].limitUsageToXItems
+                                      ) {
+                                        if (purchaseType == 0) {
+                                          productsForCode =
+                                            coupons[i].products.nodes;
+
+                                          let matchingProducts = [];
+
+                                          for (
+                                            let a = 0;
+                                            a < productsForCode.length;
+                                            a++
+                                          ) {
+                                            for (
+                                              let b = 0;
+                                              b < oneOffBasket.length;
+                                              b++
+                                            ) {
+                                              console.log(
+                                                productsForCode[a].databaseId,
+                                                oneOffBasket[b].product
+                                                  .databaseId
+                                              );
+                                              if (
+                                                productsForCode[a].databaseId ==
+                                                oneOffBasket[b].product
+                                                  .databaseId
+                                              ) {
+                                                matchingProducts.push(
+                                                  oneOffBasket[b]
+                                                );
+                                                break;
+                                              } else {
+                                              }
+                                            }
+                                          }
+
+                                          console.log(matchingProducts);
+
+                                          if (matchingProducts.length > 0) {
+                                            console.log(purchaseType);
+                                            setVoucherApplied(true);
+                                            setVoucherFound(true);
+                                            vFound = true;
+                                            setVoucherInvalid(false);
+                                            setAppliedVoucher(voucher);
+                                            console.log(matchingProducts);
+                                            setMProducts(matchingProducts);
+                                          } else {
+                                            console.log("sub");
+                                            console.log(purchaseType);
+                                            setVoucherApplied(false);
+                                            setVoucherFound(true);
+                                            vFound = true;
+                                            setVoucherInvalid(true);
+                                            setVoucherInvalidMsg(
+                                              "You have no valid items in your basket"
+                                            );
+                                          }
+                                        } else {
+                                          console.log("sub");
+                                          console.log(purchaseType);
+                                          setVoucherApplied(false);
+                                          setVoucherFound(true);
+                                          vFound = true;
+                                          setVoucherInvalid(true);
+                                          setVoucherInvalidMsg(
+                                            "This coupon can only be applied to one-off orders"
+                                          );
+                                        }
+                                      } else {
+                                        console.log("limit");
+                                        console.log(purchaseType);
+                                        setVoucherApplied(false);
+                                        setVoucherFound(true);
+                                        vFound = true;
+                                        setVoucherInvalid(true);
+                                        setVoucherInvalidMsg(
+                                          "You can only use this voucher once"
+                                        );
+                                      }
+
+                                      break;
+                                    } else {
+                                      continue;
+                                    }
+                                  }
+
+                                  if (!vFound) {
+                                    console.log(voucher);
+                                    setVoucherInvalid(true);
+                                    setVoucherInvalidMsg("Invalid coupon");
+                                    setVoucherApplied(false);
+                                  }
+                                });
+                              });
+                            });
                         }}
                       >
+                        {applyingVoucher && (
+                          <svg
+                            className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              stroke-width="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                        )}
                         <p
                           className={`font-circe font-[900] text-erniegreen text-center text-lg`}
                         >
@@ -2734,12 +2896,16 @@ export const Basket = ({
                     className="bg-groundswell w-36 p-2 object-cover rounded-lg"
                   ></img>
                   <div className="flex flex-row">
-                    <a href="https://groundswell.org.uk/">
+                    <div
+                      onClick={(e) => {
+                        router.push("https://groundswell.org.uk/");
+                      }}
+                    >
                       <img
                         src="/Language icon wght200.svg"
                         className="w-10"
                       ></img>
-                    </a>
+                    </div>
                     <img
                       src="/info.svg"
                       className="w-10"

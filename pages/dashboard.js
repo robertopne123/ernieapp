@@ -366,6 +366,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                 }
                 discountType
                 freeShipping
+                couponDetails {
+                  maxUsage
+                }
               }
             }
             employeeLists(where: { name: $email }) {

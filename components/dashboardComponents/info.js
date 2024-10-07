@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export const Info = ({ close, name, description, link }) => {
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   return (
     <div className="fixed top-0 left-0 bg-erniegreen h-screen w-full z-[999] bg-opacity-70 p-6 flex flex-col justify-center">
@@ -26,12 +29,16 @@ export const Info = ({ close, name, description, link }) => {
             </p>
           </div>
         </div>
-        <a
-          href={link}
-          className="bg-erniegold p-2 rounded-lg w-full font-circe text-erniegreen font-[900] text-lg text-center"
+        <div
+          className="bg-erniegold p-2 rounded-lg w-full"
+          onClick={(e) => {
+            router.push(link);
+          }}
         >
-          Visit Website
-        </a>
+          <p className="font-circe text-erniegreen font-[900] text-lg text-center">
+            Visit Website
+          </p>
+        </div>
       </div>
     </div>
   );
