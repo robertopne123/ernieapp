@@ -25,15 +25,15 @@ export const MySubscription = ({
   const [showingPaymentNotice, setShowingPaymentNotice] = useState(false);
 
   return (
-    <div className="py-6 px-6 w-full">
-      <div className="bg-erniegold rounded-lg p-6 gap-4 flex flex-col">
+    <div className="w-full h-full">
+      <div className="bg-erniegold rounded-lg p-6 gap-4 flex flex-col h-full">
         <div className="flex flex-col gap-2">
           <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
             My Subscription
           </p>
           <img src="/divider.png" className="w-full"></img>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 lg:mt-2">
           <div className="grid grid-cols-2 gap-6">
             <p className="font-circular font-[500] text-sm text-erniegreen">
               Frequency
@@ -44,7 +44,7 @@ export const MySubscription = ({
             </p>
           </div>
           <div className="bg-erniegreen h-[1px] w-full"></div>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6 lg:mt-4">
             <p className="font-circe font-[900] text-2xl text-erniegreen uppercase">
               {subscriptions.subscriptions
                 ? subscriptions?.subscriptions?.data?.subscription?.subscription
@@ -114,7 +114,7 @@ export const MySubscription = ({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6 lg:mt-2">
           <div
             className="bg-ernielightgold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
             onClick={() => {

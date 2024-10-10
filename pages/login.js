@@ -59,6 +59,8 @@ export default function Login() {
 
   const [loginType, setLoginType] = useState(0);
 
+  const [registerPage, setRegisterPage] = useState(0);
+
   const [registerComplete, setRegisterComplete] = useState(false);
 
   const [postcode, setPostcode] = useState("");
@@ -563,6 +565,50 @@ export default function Login() {
   function isz1orz2(postcode) {
     let z1z2postcodes = [
       "W1",
+      "W1C",
+      "WC1",
+      "WC2",
+      "EC1",
+      "EC2",
+      "EC3",
+      "EC4",
+      "NW1",
+      "NW3",
+      "NW5",
+      "NW6",
+      "NW8",
+      "SW1",
+      "SW3",
+      "SW4",
+      "SW5",
+      "SW6",
+      "SW7",
+      "SW8",
+      "SW9",
+      "SE1",
+      "SE4",
+      "SE5",
+      "SE8",
+      "SE10",
+      "SE11",
+      "SE14",
+      "SE15",
+      "SE16",
+      "SE17",
+      "E1",
+      "E1W",
+      "E2",
+      "E3",
+      "E5",
+      "E8",
+      "E9",
+      "E14",
+      "N1",
+      "N4",
+      "N5",
+      "N7",
+      "N16",
+      "N19",
       "W2",
       "W6",
       "W8",
@@ -571,45 +617,10 @@ export default function Login() {
       "W11",
       "W12",
       "W14",
-      "NW1",
-      "NW3",
-      "NW5",
-      "NW6",
-      "NW8",
-      "WC1",
-      "WC2",
-      "EC1",
-      "EC2",
-      "EC3",
-      "EC4",
-      "SW1",
-      "SW4",
-      "SW5",
-      "SW6",
-      "SW7",
-      "SW9",
-      "SE1",
-      "SE4",
-      "SE5",
-      "SE10",
-      "SE11",
-      "SE14",
-      "SE15",
-      "SE16",
-      "SE17",
-      "E1",
-      "E2",
-      "E3",
-      "E8",
-      "E9",
-      "E14",
-      "N1",
-      "N4",
-      "N5",
-      "N7",
-      "N15",
-      "N19",
-      "W1C",
+      "SE1P",
+      "EC50",
+      "WC99",
+      "E98",
     ];
 
     let postcodeParts = postcode.split(" ");
@@ -785,7 +796,7 @@ export default function Login() {
                   src="/Asset-1@2x2.png"
                   className="h-16 object-contain"
                 ></img>
-                <div className="p-6 lg:max-w-[70%] lg:mx-auto lg:flex flex-col gap-4 hidden">
+                <div className="p-6 lg:max-w-[80%] lg:mx-auto lg:flex flex-col gap-4 hidden">
                   <p className="font-circe font-[900] text-bodylg text-erniegreen lg:text-erniecream uppercase  [@media(max-height:708px)]:leading-[1.8rem] [@media(min-height:900px)]:text-bodyxl lg:leading-[48px]">
                     Sustainable Workplace Delivery Services
                   </p>
@@ -850,13 +861,403 @@ export default function Login() {
           )}
           {loginType == 1 && (
             <div className="h-screen w-screen flex flex-col lg:flex-row bg-erniecream">
-              <div className="flex flex-col bg-ernieteal w-full p-4">
+              <div className="flex flex-col justify-center bg-ernieteal w-full p-4  lg:w-1/2 lg:min-h-screen p-4 lg:order-2 lg:gap-10 lg:bg-erniemint">
                 <img
                   src="/Asset-1@2x2.png"
-                  className="h-20 object-contain"
+                  className="h-16 object-contain"
+                ></img>
+                <div className="p-6 lg:max-w-[80%] lg:mx-auto ">
+                  <div className="flex-col rounded-lg bg-erniecream p-6 gap-2 p-6 lg:flex flex-col gap-4 hidden">
+                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+                      Create An Account
+                    </p>
+                    <img src="/divider.png" className="w-full"></img>
+                    <div className="grid gap-4">
+                      {registerPage == 0 && (
+                        <div className="gap-4 grid">
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="businessname"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Name of Company *
+                            </label>
+                            <input
+                              type="text"
+                              name="businessname"
+                              onChange={(e) => {
+                                setRBusinessName(e.currentTarget.value);
+                              }}
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                            ></input>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="poifirstname"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Point of Contact First Name *
+                            </label>
+                            <input
+                              type="text"
+                              name="poifirstname"
+                              onChange={(e) => {
+                                setRPFirstName(e.currentTarget.value);
+                              }}
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                            ></input>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="address"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Delivery Address *
+                            </label>
+                            <input
+                              type="text"
+                              name="address"
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                              onChange={(e) => {
+                                setRPAddress(e.currentTarget.value);
+                              }}
+                            ></input>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="postcode"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Postcode *
+                            </label>
+                            <input
+                              type="text"
+                              name="postcode"
+                              onChange={(e) => {
+                                setPostcode(e.currentTarget.value);
+                                checkPostcode(e.currentTarget.value);
+                                setRPostcode(e.currentTarget.value);
+                              }}
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                            ></input>
+                          </div>
+                          {showPCRegex ||
+                            (showPCWarning && (
+                              <div className="flex flex-col gap-2">
+                                {showPCRegex && (
+                                  <label className="font-circular text-erniegreen text-sm">
+                                    Your postcode isn&apos;t valid. Please
+                                    format it as follows, SE17 1BA
+                                  </label>
+                                )}
+                                {showPCWarning && (
+                                  <label className="font-circular text-erniegreen text-sm">
+                                    We only deliver to London Zone 1 &amp; 2,
+                                    and you seem to be outside of our delivery
+                                    zone. We may still be able to deliver to
+                                    you.
+                                  </label>
+                                )}
+                              </div>
+                            ))}
+                        </div>
+                      )}
+                      {registerPage == 1 && (
+                        <div className="grid gap-4">
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="contactnumber"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Contact Number *
+                            </label>
+                            <input
+                              type="text"
+                              name="contactnumber"
+                              onChange={(e) => {
+                                setRCNumber(e.currentTarget.value);
+                              }}
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen rounded-lg outline-erniegold outline-[1px]"
+                            ></input>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="emailaddress"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Email Address *
+                            </label>
+                            <input
+                              type="text"
+                              name="emailaddress"
+                              onChange={(e) => {
+                                setREmailAddress(e.currentTarget.value);
+                              }}
+                              required
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                            ></input>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="password"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Password *
+                            </label>
+                            <input
+                              type="password"
+                              name="password"
+                              required
+                              onChange={(e) => {
+                                setRPassword(e.currentTarget.value);
+                              }}
+                              className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                            ></input>
+                          </div>
+                        </div>
+                      )}
+                      {registerPage == 2 && (
+                        <div className="grid gap-4">
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="numberofstaff"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Number of Staff *
+                            </label>
+                            <div className="grid grid-cols-4 gap-2">
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="nosoptions"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  1-20
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="nosoptions"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"1-20"}
+                                  checked={true}
+                                  onChange={(e) => {
+                                    setRNoOfStaff(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="nosoptions"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  21-50
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="nosoptions"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"21-50"}
+                                  onChange={(e) => {
+                                    setRNoOfStaff(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="nosoptions"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  51-100
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="nosoptions"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"51-100"}
+                                  onChange={(e) => {
+                                    setRNoOfStaff(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="nosoptions"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  100+
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="nosoptions"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"100+"}
+                                  onChange={(e) => {
+                                    setRNoOfStaff(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="numberofstaff"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Do you have a coffee machine on site?
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="coffeemachine"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  Yes
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="coffeemachine"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"Yes"}
+                                  checked={true}
+                                  onChange={(e) => {
+                                    setRMachine(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="coffeemachine"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  No
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="coffeemachine"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"No"}
+                                  onChange={(e) => {
+                                    setRMachine(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <label
+                              htmlFor="numberofstaff"
+                              className="font-circular text-erniegreen text-sm font-[500]"
+                            >
+                              Do you have work from home days?
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="wfhdays"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  Yes
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="wfhdays"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"Yes"}
+                                  checked={true}
+                                  onChange={(e) => {
+                                    setRWFH(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                              <div className="flex flex-row gap-2 relative">
+                                <label
+                                  htmlFor="wfhdays"
+                                  className="font-circular text-erniegreen text-sm font-[500] absolute left-1/2 top-1/2 translate-x-[-50%] translate-y-[-50%] w-full text-center pointer-events-none"
+                                >
+                                  No
+                                </label>
+                                <input
+                                  type="radio"
+                                  name="wfhdays"
+                                  className="bg-erniecream border-[1px] border-erniegreen appearance-none flex w-full checked:bg-erniegold checked:border-erniegold rounded-lg h-10"
+                                  value={"No"}
+                                  onChange={(e) => {
+                                    setRWFH(e.currentTarget.value);
+                                  }}
+                                ></input>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex flex-row justify-end gap-4">
+                        {registerPage != 0 && (
+                          <div
+                            className="bg-erniegold rounded-lg py-2 px-4 cursor-pointer"
+                            onClick={(e) => {
+                              setRegisterPage(registerPage - 1);
+                            }}
+                          >
+                            <p className="font-circe text-erniegreen font-[900]">
+                              Previous
+                            </p>
+                          </div>
+                        )}
+                        {registerPage != 2 && (
+                          <div
+                            className="bg-erniegold rounded-lg py-2 px-4 cursor-pointer"
+                            onClick={(e) => {
+                              setRegisterPage(registerPage + 1);
+                            }}
+                          >
+                            <p className="font-circe text-erniegreen font-[900]">
+                              Next
+                            </p>
+                          </div>
+                        )}
+                        {registerPage == 2 && (
+                          <div
+                            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              registerUser(
+                                rEmailAddress,
+                                rPassword,
+                                postcode,
+                                rBusinessName
+                              );
+                            }}
+                          >
+                            <p className="font-circe text-erniegreen font-[900] text-center">
+                              Create Account
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-row gap-2 justify-center">
+                      <p className="font-circular font-[500] text-erniegreen text-sm">
+                        Already have an account?
+                      </p>
+                      <p
+                        className="font-circular font-[500] text-ernieteal text-sm cursor-pointer"
+                        onClick={() => {
+                          setLoginType(2);
+                        }}
+                      >
+                        Login here
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-grow lg:w-1/2 lg:order-1 hidden lg:flex">
+                <img
+                  src="/login.jpg"
+                  className="w-full h-full object-cover object-top lg:object-center"
                 ></img>
               </div>
-              <div className="flex-grow p-6 bg-erniemint flex flex-col gap-4">
+              <div className="flex-grow p-6 bg-erniemint flex flex-col gap-4  lg:hidden">
                 <div className="flex flex-col flex-grow rounded-lg bg-erniecream p-6 gap-2">
                   <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
                     Create An Account
@@ -1213,7 +1614,7 @@ export default function Login() {
                   src="/Asset-1@2x2.png"
                   className="h-16 object-contain"
                 ></img>
-                <div className="flex-grow lg:flex-none p-6 bg-erniemint lg:flex flex-col gap-4 hidden lg:max-w-[70%] lg:mx-auto">
+                <div className="flex-grow lg:flex-none p-6 bg-erniemint lg:flex flex-col gap-4 hidden lg:max-w-[80%] lg:mx-auto">
                   <div className="flex flex-col rounded-lg bg-erniecream p-6 gap-2">
                     <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
                       Login

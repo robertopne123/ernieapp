@@ -2728,16 +2728,13 @@ export default function Dashboard({ data, categories, products, orders }) {
       {dataObject != null && (
         <main
           className={`flex max-h-screen h-screen ${
-            testPlatform == "ios" ? "pt-[59px] pb-[34px]" : ""
+            testPlatform == "ios" ? "pt-[59px] pb-[34px] lg:pt-0 lg:pb-0 " : ""
           } flex-col items-center justify-between bg-ernieteal ${
             circularstd.variable
           } font-sans ${circerounded.variable} font-sans`}
         >
           {justRegistered && <Tutorial completeTutorial={completeTutorial} />}
-          <div className="xl:flex hidden text-erniegreen px-4">
-            <p>Please use a mobile phone to view this page</p>
-          </div>
-          <div className="xl:hidden flex flex-col text-erniegreen relative w-full flex-grow">
+          <div className="flex flex-col text-erniegreen relative w-full flex-grow">
             <StaticTopBar
               addToSubBasket={addToSubBasket}
               addToOneOffBasket={addToOneOffBasket}
@@ -2772,7 +2769,7 @@ export default function Dashboard({ data, categories, products, orders }) {
             <div
               className={`${
                 testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
-              } h-auto flex-grow w-full`}
+              } h-auto flex-grow w-full lg:ml-28 lg:w-[calc(100vw-112px)] lg:max-h-[calc(100vh-80px)] lg:h-[calc(100vh-80px)]`}
             >
               {activeTab == 0 && (
                 <Home
@@ -2786,6 +2783,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   companyName={cName}
                   products={dataObject.data.products.nodes}
                   orders={orderData}
+                  ordersHistory={orderHistory}
                   subscriptions={subscriptions}
                   updateOrder={updateOrder}
                   updateSubError={updateSubError}
@@ -2869,14 +2867,14 @@ export default function Dashboard({ data, categories, products, orders }) {
               )}
             </div>
             <div
-              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0
+              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28
             `}
             >
               {role == 0 &&
                 tabs.map((tab, index) => (
                   <div
                     key={index}
-                    className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint ${
+                    className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
                       tab.index == activeTab ? "bg-erniemint" : ""
                     } `}
                     onClick={(e) => {

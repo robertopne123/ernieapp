@@ -589,7 +589,7 @@ export default function Products({
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full w-full relative flex flex-col bg-erniedarkcream pt-8 pb-8 overflow-auto">
+      <div className="h-full w-full relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
         {showingInfo && (
           <BrandInfo
             close={close}
@@ -607,32 +607,243 @@ export default function Products({
             setNewPurchase={setNewP}
           />
         )}
-        {previewing ? (
-          <Preview
-            product={products[selectedProduct]}
-            backAction={back}
-            role={1}
-            addToBasket={addToBasket}
-            category={getGroupedProducts()[selectedTab].category}
-            addToSubBasket={addToSubBasketFromProducts}
-            addToOneOffBasket={addToOneOffBasketFromProducts}
-            subBasket={subBasket}
-            oneOffBasket={oneOffBasket}
-            pType={purchaseType}
-            subscriptions={subscriptions}
-            managingSubscription={managingSubscription}
-            setTab={setTabFromProducts}
-            productsContext={productsContext}
-            setProductsContext={setProductsContextFromProducts}
-            addingToSBasket={addingToSBasket}
-            addingToOBasket={addingToOBasket}
-            setAddingToSBasket={setAddingToSBasketFromProductPage}
-            setAddingToOBasket={setAddingToOBasketFromProductPage}
-          />
-        ) : (
+        <div className="flex lg:hidden">
+          {previewing ? (
+            <Preview
+              product={products[selectedProduct]}
+              backAction={back}
+              role={1}
+              addToBasket={addToBasket}
+              category={getGroupedProducts()[selectedTab].category}
+              addToSubBasket={addToSubBasketFromProducts}
+              addToOneOffBasket={addToOneOffBasketFromProducts}
+              subBasket={subBasket}
+              oneOffBasket={oneOffBasket}
+              pType={purchaseType}
+              subscriptions={subscriptions}
+              managingSubscription={managingSubscription}
+              setTab={setTabFromProducts}
+              productsContext={productsContext}
+              setProductsContext={setProductsContextFromProducts}
+              addingToSBasket={addingToSBasket}
+              addingToOBasket={addingToOBasket}
+              setAddingToSBasket={setAddingToSBasketFromProductPage}
+              setAddingToOBasket={setAddingToOBasketFromProductPage}
+            />
+          ) : (
+            <div className="flex flex-col gap-0 h-auto pb-16">
+              {purchaseType == 0 && (
+                <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
+                  <div className="flex flex-row justify-between">
+                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                      One-off Purchase
+                    </p>
+                  </div>
+                  <img
+                    src="/divider.png"
+                    className="h-1.5 w-full mt-2 mb-2"
+                  ></img>
+                </div>
+              )}
+
+              {console.log(managingSubscription)}
+              {purchaseType == 1 &&
+                (managingSubscription ? (
+                  <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
+                    <div className="flex flex-row justify-between">
+                      <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                        Managing Subscription
+                      </p>
+                    </div>
+                    <img
+                      src="/divider.png"
+                      className="h-1.5 w-full mt-2 mb-2"
+                    ></img>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-0 mx-6 mb-4">
+                    <div className="flex flex-row justify-between">
+                      <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                        Add To Subscription
+                      </p>
+                    </div>
+                    <img
+                      src="/divider.png"
+                      className="h-1.5 w-full mt-2 mb-2"
+                    ></img>
+                  </div>
+                ))}
+
+              <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer">
+                {filteredCategories()
+                  .sort(function (a, b) {
+                    return a.order - b.order;
+                  })
+                  .map((tab, index) => (
+                    <div
+                      className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
+                        selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
+                      }`}
+                      key={index}
+                      onClick={() => {
+                        setSelectedTab(index);
+                      }}
+                    >
+                      <p
+                        className={`font-circular font-[500] text-sm capitalize tab text-nowrap lg:text-base ${
+                          selectedTab == index
+                            ? "text-erniecream"
+                            : "text-erniegreen"
+                        }`}
+                      >
+                        {tab.category}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+              <div className="flex flex-col-reverse">
+                {console.log(filteredCategories()[selectedTab])}
+
+                {filteredCategories()
+                  [selectedTab].brands.sort(function (a, b) {
+                    return b.order - a.order;
+                  })
+                  .map((brand, index) => (
+                    <div
+                      className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full`}
+                      key={index}
+                    >
+                      <div className="flex flex-row justify-between">
+                        <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                          {brand.name}
+                        </p>
+                        <img
+                          src="/info.svg"
+                          className="w-8 mt-1"
+                          onClick={() => {
+                            setShowingInfo(true);
+                            setInfoName(brand.name);
+                            setInfoDesc(brand.description);
+                            setInfoImage(brand.image);
+                          }}
+                        />
+                      </div>
+                      <img
+                        src="/divider.png"
+                        className="h-1.5 w-full mt-2 mb-2"
+                      ></img>
+                      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 mt-4">
+                        {console.log(brand.products)}
+                        {brand.products
+                          .sort(function (a, b) {
+                            return (
+                              a.product.productOrdering.productOrder -
+                              b.product.productOrdering.productOrder
+                            );
+                          })
+                          .map((product, productIndex) => (
+                            <div
+                              key={productIndex}
+                              className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
+                            >
+                              <div className="flex relative aspect-[3/4] h-[100px]">
+                                <img
+                                  src={product.product.image.sourceUrl}
+                                  className={`h-[100px] w-auto aspect-[3/4] ${
+                                    selectedTab == 1
+                                      ? "object-contain"
+                                      : "object-cover"
+                                  }`}
+                                ></img>
+                                {product.product.productDisplayStyle.badgeImage
+                                  ?.sourceUrl && (
+                                  <img
+                                    src={
+                                      product.product.productDisplayStyle
+                                        .badgeImage.sourceUrl
+                                    }
+                                    className="absolute w-10 -bottom-4 -right-4 rounded-full"
+                                  ></img>
+                                )}
+                              </div>
+                              <div className="flex flex-col flex-shrink max-w-[calc(100vw-75px-48px-48px)] h-full pl-4">
+                                <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
+                                  {product.product.name}
+                                </p>
+                                <p
+                                  className={`font-circular text-erniegreen font-[400] text-xs mb-2 line-clamp-3 h-[4em] ${
+                                    product.product.description
+                                      ? "block"
+                                      : "hidden"
+                                  }`}
+                                >
+                                  {product.product.description}
+                                </p>
+                                <div className="flex flex-row gap-1 items-end">
+                                  <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
+                                    from
+                                  </p>
+                                  <p
+                                    className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
+                                      product.product.description
+                                        ? "mt-0"
+                                        : "mt-2"
+                                    }`}
+                                  >
+                                    {product.product.price}
+                                  </p>
+                                </div>
+                                <div
+                                  className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer"
+                                  onClick={() => {
+                                    setSelectedBrands(index);
+                                    setSelectedProduct(product.arrIndex);
+
+                                    setPreviewing(true);
+                                  }}
+                                >
+                                  <p className="font-circe font-[900] text-sm">
+                                    Choose Options
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden lg:flex">
+          {previewing && (
+            <Preview
+              product={products[selectedProduct]}
+              backAction={back}
+              role={1}
+              addToBasket={addToBasket}
+              category={getGroupedProducts()[selectedTab].category}
+              addToSubBasket={addToSubBasketFromProducts}
+              addToOneOffBasket={addToOneOffBasketFromProducts}
+              subBasket={subBasket}
+              oneOffBasket={oneOffBasket}
+              pType={purchaseType}
+              subscriptions={subscriptions}
+              managingSubscription={managingSubscription}
+              setTab={setTabFromProducts}
+              productsContext={productsContext}
+              setProductsContext={setProductsContextFromProducts}
+              addingToSBasket={addingToSBasket}
+              addingToOBasket={addingToOBasket}
+              setAddingToSBasket={setAddingToSBasketFromProductPage}
+              setAddingToOBasket={setAddingToOBasketFromProductPage}
+            />
+          )}
           <div className="flex flex-col gap-0 h-auto pb-16">
             {purchaseType == 0 && (
-              <div className="flex flex-col gap-0 mx-6 mb-4">
+              <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                 <div className="flex flex-row justify-between">
                   <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
                     One-off Purchase
@@ -648,7 +859,7 @@ export default function Products({
             {console.log(managingSubscription)}
             {purchaseType == 1 &&
               (managingSubscription ? (
-                <div className="flex flex-col gap-0 mx-6 mb-4">
+                <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                   <div className="flex flex-row justify-between">
                     <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
                       Managing Subscription
@@ -673,14 +884,14 @@ export default function Products({
                 </div>
               ))}
 
-            <div className="flex flex-row overflow-auto flex-nowrap px-6 gap-2 cursor-pointer">
+            <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer">
               {filteredCategories()
                 .sort(function (a, b) {
                   return a.order - b.order;
                 })
                 .map((tab, index) => (
                   <div
-                    className={`py-2 px-3 rounded-lg text-nowrap w-full ${
+                    className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
                       selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
                     }`}
                     key={index}
@@ -689,7 +900,7 @@ export default function Products({
                     }}
                   >
                     <p
-                      className={`font-circular font-[500] text-sm capitalize tab text-nowrap ${
+                      className={`font-circular font-[500] text-sm capitalize tab text-nowrap lg:text-base ${
                         selectedTab == index
                           ? "text-erniecream"
                           : "text-erniegreen"
@@ -709,7 +920,7 @@ export default function Products({
                 })
                 .map((brand, index) => (
                   <div
-                    className={`flex flex-col gap-0 pb-4 px-6 pb-2 pt-4 w-full`}
+                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full`}
                     key={index}
                   >
                     <div className="flex flex-row justify-between">
@@ -731,7 +942,7 @@ export default function Products({
                       src="/divider.png"
                       className="h-1.5 w-full mt-2 mb-2"
                     ></img>
-                    <div className="flex flex-col gap-4 mt-4">
+                    <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 mt-4">
                       {console.log(brand.products)}
                       {brand.products
                         .sort(function (a, b) {
@@ -813,7 +1024,7 @@ export default function Products({
                 ))}
             </div>
           </div>
-        )}
+        </div>
 
         {/* {productFilter == -1 && (
           <div

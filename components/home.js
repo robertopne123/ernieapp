@@ -11,6 +11,7 @@ import { About } from "./homeComponents/about";
 import { HowItWorks } from "./homeComponents/howItWorks";
 import { QuickOrderView } from "./homeComponents/quickOrderView";
 import Alert from "./alert";
+import { OrderDetails } from "./accountPages/orderDetails";
 
 export default function Home({
   quantity,
@@ -127,6 +128,21 @@ export default function Home({
     return grouped;
   };
 
+  const getDate = (date) => {
+    let formattedDateTime = new Date(date).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "numeric",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    let formattedDate = formattedDateTime.split(",")[0];
+
+    return formattedDate;
+  };
+
   const setPurchaseTypeFromHome = (val) => {
     setPurchaseType(val);
   };
@@ -143,63 +159,278 @@ export default function Home({
     setManagingSubscription(val);
   };
 
+  const [orderShowing, setOrderShowing] = useState(-1);
+
+  const [subscriptionOrders, setSubOrders] = useState([]);
+  const [otherOrders, setOtherOrders] = useState([]);
+
+  const sortedOrders = () => {
+    let sub = [];
+    let other = [];
+
+    for (let i = 0; i < orders.length; i++) {
+      if (orders[i].createdVia == "subscription") {
+        sub.push(orders[i]);
+      } else {
+        other.push(orders[i]);
+      }
+    }
+
+    setSubOrders(sub);
+    setOtherOrders(other);
+  };
+
+  const itemCount = (order) => {
+    let count = 0;
+
+    for (let i = 0; i < order.lineItems.nodes.length; i++) {
+      count += order.lineItems.nodes[i].quantity;
+    }
+
+    return count;
+  };
+
+  useEffect(() => {
+    sortedOrders();
+  }, []);
+
+  const [currentOrder, setCurrentOrder] = useState({});
+
+  const close = () => {
+    setOrderShowing(-1);
+  };
+
   return (
-    <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh-96px)] ">
+    <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh-96px)] lg:h-full">
+      {orderShowing != -1 && (
+        <OrderDetails order={currentOrder} close={close} />
+      )}
       {homeTab == -1 && (
         <div className="flex flex-col">
           <WelcomeMsg name={firstName} />
           {subscriptionAttempt ? (
             hasSubscription ? (
-              <MySubscription
-                subscriptions={subscriptions}
-                manageSubscription={manageSubscription}
-                quickOrderView={quickOrderView}
-                setPurchaseType={setPurchaseTypeFromHome}
-                setPurchasing={setPurchasingFromHome}
-                setNewPurchase={setNewPurchaseFromHome}
-              />
+              <div className="flex flex-col lg:grid lg:grid-cols-3 lg:auto-rows-fr lg:h-[400px] gap-6 p-6 lg:p-10">
+                <MySubscription
+                  subscriptions={subscriptions}
+                  manageSubscription={manageSubscription}
+                  quickOrderView={quickOrderView}
+                  setPurchaseType={setPurchaseTypeFromHome}
+                  setPurchasing={setPurchasingFromHome}
+                  setNewPurchase={setNewPurchaseFromHome}
+                />
+
+                <div className="w-full p-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex ">
+                  <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                    Subscription History
+                  </p>
+                  <img src="/divider.png" className="w-full"></img>
+                  <div className="flex flex-col gap-2 mt-2 flex-grow overflow-auto">
+                    {subscriptionOrders.length == 0 && (
+                      <div className="h-full flex-grow w-full flex flex-col justify-center">
+                        <p className="font-circular text-erniegreen font-[500] text-center">
+                          You currently have no subscription orders.
+                        </p>
+                      </div>
+                    )}
+                    {subscriptionOrders.map((order, index) => (
+                      <div className="flex flex-col relative" key={index}>
+                        <div className="flex flex-row gap-2">
+                          <div className="flex flex-row justify-between flex-grow">
+                            <p className="font-circular text-erniegreen font-[900] text-sm">
+                              {getDate(order.date)}
+                            </p>
+                            <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                              {itemCount(order) == 1
+                                ? `${itemCount(order)} item`
+                                : `${itemCount(order)} items`}
+                            </p>
+                          </div>
+                          <img
+                            src="/info.svg"
+                            className="w-8 h-8 mb-1"
+                            onClick={() => {
+                              setOrderShowing(0);
+                              setCurrentOrder(order);
+                            }}
+                          ></img>
+                        </div>
+                        <div className="flex flex-row absolute bottom-0">
+                          <p className="font-circular text-erniegreen italic text-xs">
+                            Order {order.orderNumber}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="w-full px-6 pt-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex h-auto">
+                  <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                    One Off Order History
+                  </p>
+                  <img src="/divider.png" className="w-full"></img>
+                  <div className="flex flex-col gap-2 mt-2 overflow-auto h-[calc(100%-72px)] pb-2">
+                    {otherOrders.length == 0 && (
+                      <div className="h-full flex-grow w-full flex flex-col justify-center">
+                        <p className="font-circular text-erniegreen font-[500] text-center">
+                          You currently have no one-off orders.
+                        </p>
+                      </div>
+                    )}
+                    {otherOrders.map((order, index) => (
+                      <div className="flex flex-col relative" key={index}>
+                        <div className="flex flex-row gap-2">
+                          <div className="flex flex-row justify-between flex-grow">
+                            <p className="font-circular text-erniegreen font-[900] text-sm">
+                              {getDate(order.date)}
+                            </p>
+                            <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                              {itemCount(order) == 1
+                                ? `${itemCount(order)} item`
+                                : `${itemCount(order)} items`}
+                            </p>
+                          </div>
+                          <img
+                            src="/info.svg"
+                            className="w-8 h-8 mb-1"
+                            onClick={() => {
+                              setOrderShowing(0);
+                              setCurrentOrder(order);
+                            }}
+                          ></img>
+                        </div>
+                        <div className="flex flex-row absolute bottom-0">
+                          <p className="font-circular text-erniegreen italic text-xs">
+                            Order {order.orderNumber}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             ) : (
-              <div className="flex flex-col p-6">
-                <div className="bg-erniegold p-6 rounded-xl">
+              <div className="flex flex-col lg:flex-row p-6 lg:p-10">
+                <div className="bg-erniegold p-6 lg:p-10 rounded-xl">
                   <div className="flex flex-col gap-2">
-                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-2xl">
                       My Subscription
                     </p>
-                    <img src="/divider.png" className="w-full"></img>
+                    <img src="/divider.png" className="w-full w-[300px]"></img>
                   </div>
                   <p className="font-circular text-erniegreen font-[500] mt-2">
                     You currently don&apos;t have an active subscription
                   </p>
-                  <div
-                    className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
-                    onClick={() => {
-                      setPurchaseType(1);
-                      setPurchasing(true);
-                      setNewPurchase(true);
-                    }}
-                  >
-                    <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-                      Start Subscription
-                    </p>
-                  </div>
-                  <div
-                    className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
-                    onClick={() => {
-                      setPurchaseType(0);
+                  <div className="grid grid-cols-1 lg:grid-cols-2 w-full gap-0 lg:gap-4">
+                    <div
+                      className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
+                      onClick={() => {
+                        setPurchaseType(1);
+                        setPurchasing(true);
+                        setNewPurchase(true);
+                      }}
+                    >
+                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                        Start Subscription
+                      </p>
+                    </div>
+                    <div
+                      className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
+                      onClick={() => {
+                        setPurchaseType(0);
 
-                      setPurchasing(true);
-                      setNewPurchase(true);
-                    }}
-                  >
-                    <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-                      Quick Order
+                        setPurchasing(true);
+                        setNewPurchase(true);
+                      }}
+                    >
+                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                        Quick Order
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid-rows-2 grid h-[calc(100%-37px)] gap-4 pb-6">
+                  <div className="w-full p-6 bg-erniecream flex flex-col flex- gap-2 rounded-xl">
+                    <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
+                      Subscription History
                     </p>
+                    <img src="/divider.png" className="w-full"></img>
+                    <div className="flex flex-col gap-2 mt-2 flex-shrink overflow-auto">
+                      {subscriptionOrders.map((order, index) => (
+                        <div className="flex flex-col relative" key={index}>
+                          <div className="flex flex-row gap-2">
+                            <div className="flex flex-row justify-between flex-grow">
+                              <p className="font-circular text-erniegreen font-[900] text-sm">
+                                {getDate(order.date)}
+                              </p>
+                              <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                                {itemCount(order) == 1
+                                  ? `${itemCount(order)} item`
+                                  : `${itemCount(order)} items`}
+                              </p>
+                            </div>
+                            <img
+                              src="/info.svg"
+                              className="w-8 h-8 mb-1"
+                              onClick={() => {
+                                setOrderShowing(0);
+                                setCurrentOrder(order);
+                              }}
+                            ></img>
+                          </div>
+                          <div className="flex flex-row absolute bottom-0">
+                            <p className="font-circular text-erniegreen italic text-xs">
+                              Order {order.orderNumber}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="w-full p-6 bg-erniecream flex flex-col gap-2 rounded-xl">
+                    <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
+                      One Off Order History
+                    </p>
+                    <img src="/divider.png" className="w-full"></img>
+                    <div className="flex flex-col gap-2 mt-2 flex-grow overflow-auto">
+                      {otherOrders.map((order, index) => (
+                        <div className="flex flex-col relative" key={index}>
+                          <div className="flex flex-row gap-2">
+                            <div className="flex flex-row justify-between flex-grow">
+                              <p className="font-circular text-erniegreen font-[900] text-sm">
+                                {getDate(order.date)}
+                              </p>
+                              <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                                {itemCount(order) == 1
+                                  ? `${itemCount(order)} item`
+                                  : `${itemCount(order)} items`}
+                              </p>
+                            </div>
+                            <img
+                              src="/info.svg"
+                              className="w-8 h-8 mb-1"
+                              onClick={() => {
+                                setOrderShowing(0);
+                                setCurrentOrder(order);
+                              }}
+                            ></img>
+                          </div>
+                          <div className="flex flex-row absolute bottom-0">
+                            <p className="font-circular text-erniegreen italic text-xs">
+                              Order {order.orderNumber}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
             )
           ) : (
-            <div className="p-6">
+            <div className="p-6 lg:p-10">
               <div className="bg-erniegold p-6 rounded-xl">
                 <p className="font-circe font-[900] text-erniegreen text-xl uppercase">
                   Loading...

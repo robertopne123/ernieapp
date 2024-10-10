@@ -2,12 +2,12 @@ import { Step } from "./howItWorksComponents/step";
 
 export const HowItWorks = () => {
   return (
-    <div className="flex flex-col gap-8 bg-erniemint p-6">
+    <div className="flex flex-col gap-8 lg:gap-10 bg-erniemint p-6 lg:p-10">
       <div className="flex flex-col gap-2">
-        <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+        <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-3xl lg:text-center">
           How it works
         </p>
-        <img src="/divider.png" className="w-full"></img>
+        <img src="/divider.png" className="w-full lg:hidden"></img>
       </div>
       <div className="grid grid-cols-2">
         <Step
@@ -31,7 +31,7 @@ export const HowItWorks = () => {
           gif={"/REFIL-TUB_COLOURED.webp"}
         />
       </div>
-      <p className="font-circular text-erniegreen">
+      <p className="font-circular text-erniegreen lg:text-center">
         *The refill option only applies to purchases packaged in a white tub.
       </p>
     </div>
