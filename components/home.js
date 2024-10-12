@@ -40,6 +40,8 @@ export default function Home({
   setPurchasing,
   purchaseType,
   setManagingSubscription,
+  setCurrentTab,
+  setShowingCert,
 }) {
   const updateOrderFromSummary = (orderDetails) => {
     updateOrder(orderDetails);
@@ -190,6 +192,16 @@ export default function Home({
     return count;
   };
 
+  const getTotalItemCount = () => {
+    let count = 0;
+
+    for (let i = 0; i < orders.length; i++) {
+      count += itemCount(orders[i]);
+    }
+
+    return count;
+  };
+
   useEffect(() => {
     sortedOrders();
   }, []);
@@ -199,6 +211,10 @@ export default function Home({
   const close = () => {
     setOrderShowing(-1);
   };
+
+  const [client, setClient] = useState(
+    JSON.parse(localStorage.getItem("client"))
+  );
 
   return (
     <div className="flex flex-col bg-erniecream overflow-auto h-[calc(100vh-80px-12vh-96px)] lg:h-full">
@@ -222,46 +238,58 @@ export default function Home({
 
                 <div className="w-full p-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex ">
                   <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
-                    Subscription History
+                    Order Summary
                   </p>
                   <img src="/divider.png" className="w-full"></img>
-                  <div className="flex flex-col gap-2 mt-2 flex-grow overflow-auto">
-                    {subscriptionOrders.length == 0 && (
-                      <div className="h-full flex-grow w-full flex flex-col justify-center">
-                        <p className="font-circular text-erniegreen font-[500] text-center">
-                          You currently have no subscription orders.
+                  <div className="grid grid-cols-2 gap-6 mt-4">
+                    <p className="font-circular font-[500] text-sm text-erniegreen">
+                      Orders Placed
+                    </p>
+
+                    <p className="font-circular font-[500] text-sm text-erniegreen">
+                      Carbon Saved
+                    </p>
+                  </div>
+                  <div className="bg-erniegreen h-[1px] w-full"></div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="flex flex-row gap-2">
+                      <p className="font-circe text-4xl text-erniegreen mt-6">
+                        {orders.length}
+                      </p>
+                    </div>
+                    <div className="flex flex-row gap-2">
+                      <p className="font-circe text-6xl text-erniegreen">
+                        <p className="font-circe text-4xl text-erniegreen mt-6">
+                          {client.impactFigures.carbon != null
+                            ? client.impactFigures.carbon
+                            : 0}
+                          <span className="text-2xl">kg</span>
                         </p>
-                      </div>
-                    )}
-                    {subscriptionOrders.map((order, index) => (
-                      <div className="flex flex-col relative" key={index}>
-                        <div className="flex flex-row gap-2">
-                          <div className="flex flex-row justify-between flex-grow">
-                            <p className="font-circular text-erniegreen font-[900] text-sm">
-                              {getDate(order.date)}
-                            </p>
-                            <p className="font-circular text-erniegreen italic font-[900] text-xs">
-                              {itemCount(order) == 1
-                                ? `${itemCount(order)} item`
-                                : `${itemCount(order)} items`}
-                            </p>
-                          </div>
-                          <img
-                            src="/info.svg"
-                            className="w-8 h-8 mb-1"
-                            onClick={() => {
-                              setOrderShowing(0);
-                              setCurrentOrder(order);
-                            }}
-                          ></img>
-                        </div>
-                        <div className="flex flex-row absolute bottom-0">
-                          <p className="font-circular text-erniegreen italic text-xs">
-                            Order {order.orderNumber}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-6 lg:mt-2">
+                    <div
+                      className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                      onClick={() => {
+                        setCurrentTab(2);
+                      }}
+                    >
+                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                        View Impact
+                      </p>
+                    </div>
+                    <div
+                      className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                      onClick={() => {
+                        setCurrentTab(2);
+                        setShowingCert(true);
+                      }}
+                    >
+                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                        Impact Certificate
+                      </p>
+                    </div>
                   </div>
                 </div>
 

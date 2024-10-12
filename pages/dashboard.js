@@ -2721,6 +2721,12 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [managingSubscription, setManagingSubscription] = useState(false);
 
+  const setCurrentTab = (tab) => {
+    setTab(tab);
+  };
+
+  const [showingCert, setShowingCert] = useState(false);
+
   return (
     <div>
       {console.log(managingSubscription)}
@@ -2800,6 +2806,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setPurchasing={setPurchasing}
                   firstName={fn}
                   setManagingSubscription={setManagingSubscription}
+                  setCurrentTab={setCurrentTab}
+                  setShowingCert={setShowingCert}
                 />
               )}
               {activeTab == 1 && (
@@ -2847,6 +2855,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                   role={role}
                   impactCertificateURL={impactCertificateURL}
                   // companyName={company}
+                  showingCert={showingCert}
+                  setShowingCert={setShowingCert}
                 />
               )}
               {activeTab == 4 && (

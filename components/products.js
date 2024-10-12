@@ -589,7 +589,7 @@ export default function Products({
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full w-full relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
+      <div className="h-full w-screen relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
         {showingInfo && (
           <BrandInfo
             close={close}
@@ -631,7 +631,7 @@ export default function Products({
               setAddingToOBasket={setAddingToOBasketFromProductPage}
             />
           ) : (
-            <div className="flex flex-col gap-0 h-auto pb-16">
+            <div className="flex flex-col gap-0 h-auto pb-16 w-full">
               {purchaseType == 0 && (
                 <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                   <div className="flex flex-row justify-between">
