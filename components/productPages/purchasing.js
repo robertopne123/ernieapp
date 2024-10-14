@@ -11,7 +11,7 @@ export const Purchasing = ({
 
   return (
     <div className="fixed top-0 left-0 bg-erniegreen h-screen w-full z-[20] bg-opacity-70 backdrop-blur p-6 flex flex-col justify-center">
-      <div className="flex flex-col justify-center gap-6">
+      <div className="flex flex-col justify-center gap-6 w-full lg:w-[60%] lg:mx-auto">
         <div
           className="bg-erniegold rounded-lg py-2"
           onClick={() => {

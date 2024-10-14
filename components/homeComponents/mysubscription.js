@@ -34,7 +34,7 @@ export const MySubscription = ({
           <img src="/divider.png" className="w-full"></img>
         </div>
         <div className="flex flex-col gap-2 lg:mt-2">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6 lg:gap-4">
             <p className="font-circular font-[500] text-sm text-erniegreen">
               Frequency
             </p>
@@ -44,7 +44,7 @@ export const MySubscription = ({
             </p>
           </div>
           <div className="bg-erniegreen h-[1px] w-full"></div>
-          <div className="grid grid-cols-2 gap-6 lg:mt-4">
+          <div className="grid grid-cols-2 gap-6 lg:gap-4 lg:mt-4">
             <p className="font-circe font-[900] text-2xl text-erniegreen uppercase">
               {subscriptions.subscriptions
                 ? subscriptions?.subscriptions?.data?.subscription?.subscription
@@ -114,7 +114,7 @@ export const MySubscription = ({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6 lg:mt-2">
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-6 lg:gap-4 lg:mt-2">
           <div
             className="bg-ernielightgold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
             onClick={() => {

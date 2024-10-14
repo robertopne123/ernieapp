@@ -2,15 +2,15 @@ import Image from "next/image";
 
 export const DeliveryAndReturns = ({ backAction }) => {
   return (
-    <div className="bg-erniedarkcream h-full px-6 flex flex-col gap-6 overflow-y-scroll">
+    <div className="bg-erniedarkcream h-full px-6 lg:px-10 flex flex-col gap-6 overflow-y-scroll">
       <div
-        className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
+        className="py-2 lg:pt-10 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
         onClick={backAction}
       >
-        <div className="h-3 w-3 relative">
+        <div className="h-3 w-3 lg:w-4 lg:h-4 relative">
           <Image src="/left-arrow.svg" fill={true} className="h-6"></Image>
         </div>
-        <p className="font-circular font-[500] text-center text-sm text-erniegreen">
+        <p className="font-circular font-[500] text-center text-sm text-erniegreen lg:text-base">
           Back
         </p>
       </div>
@@ -32,7 +32,7 @@ export const DeliveryAndReturns = ({ backAction }) => {
         questions, please reach out to our customer service team at
         Hello@ernie.london. Refunds will be processed to your original payment
         method within 10 working days after the returned item is received and
-        inspected. Please note that custom-made or personalized items are
+        inspected. Please note that custom-made or personalised items are
         non-returnable unless they are damaged or faulty. We appreciate your
         understanding and are here to help ensure your experience with Ernie
         London is a positive one.

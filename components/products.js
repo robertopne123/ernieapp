@@ -589,7 +589,7 @@ export default function Products({
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full w-screen relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
+      <div className="h-full lg:w-[calc(100vw-112px)] relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
         {showingInfo && (
           <BrandInfo
             close={close}
@@ -770,16 +770,18 @@ export default function Products({
                                 <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
                                   {product.product.name}
                                 </p>
-                                <p
-                                  className={`font-circular text-erniegreen font-[400] text-xs mb-2 line-clamp-3 h-[4em] ${
-                                    product.product.description
-                                      ? "block"
-                                      : "hidden"
-                                  }`}
-                                >
-                                  {product.product.description}
-                                </p>
-                                <div className="flex flex-row gap-1 items-end">
+                                <div className="line-clamp-3">
+                                  <p
+                                    className={`font-circular text-erniegreen font-[400] text-xs mb-2 mt-2 ${
+                                      product.product.description
+                                        ? "block"
+                                        : "hidden"
+                                    }`}
+                                  >
+                                    {product.product.description}
+                                  </p>
+                                </div>
+                                <div className="flex flex-row gap-1 items-end mt-2">
                                   <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
                                     from
                                   </p>
@@ -980,19 +982,22 @@ export default function Products({
                               <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
                                 {product.product.name}
                               </p>
-                              <p
-                                className={`font-circular text-erniegreen font-[400] text-xs mb-2 line-clamp-3 h-[4em] ${
-                                  product.product.description
-                                    ? "block"
-                                    : "hidden"
-                                }`}
-                              >
-                                {product.product.description}
-                              </p>
-                              <div className="flex flex-row gap-1 items-end">
+                              <div className="line-clamp-3">
+                                <p
+                                  className={`font-circular text-erniegreen font-[400] text-xs mb-2 mt-2 ${
+                                    product.product.description
+                                      ? "block"
+                                      : "hidden"
+                                  }`}
+                                >
+                                  {product.product.description}
+                                </p>
+                              </div>
+                              <div className="flex flex-row gap-1 items-end mt-2">
                                 <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
                                   from
                                 </p>
+
                                 <p
                                   className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
                                     product.product.description

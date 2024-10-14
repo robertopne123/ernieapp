@@ -221,7 +221,7 @@ export default function Preview({
           )}
           {pType == 0 && (
             <div className="hidden lg:flex w-full flex-grow">
-              <div className="bg-erniecream rounded-xl mt-6 mb-10 w-full">
+              <div className="bg-erniecream rounded-xl mt-6 w-full">
                 <div className="flex flex-col gap-4 order-b-[1px] border-erniegreen">
                   <div className="w-full flex flex-row gap-6">
                     <div
@@ -307,7 +307,7 @@ export default function Preview({
           )}
           {pType == 1 && (
             <div className="hidden lg:flex">
-              <div className="bg-erniecream rounded-xl p-6 mb-10">
+              <div className="bg-erniecream rounded-xl">
                 <div className="flex flex-col gap-4 py-4">
                   <div className="w-full flex flex-row gap-6">
                     <div

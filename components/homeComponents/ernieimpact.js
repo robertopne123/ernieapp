@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function ErnieImpact({ quantity, role }) {
   return (
-    <div className="flex flex-col gap-6 p-6 lg:gap-8 lg:p-12 bg-erniemint overflow-auto flex-grow  h-[calc(100%-84px)]">
+    <div className="flex flex-col gap-6 p-6 lg:gap-8 lg:p-20 bg-erniemint overflow-auto flex-grow  h-[calc(100%-84px)]">
       <div className="flex flex-col">
         <p className="font-circe text-xl text-erniegreen font-[900] uppercase lg:text-4xl lg:text-center">
           Ernie&apos;s Impact

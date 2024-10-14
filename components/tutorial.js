@@ -8,9 +8,9 @@ export const Tutorial = ({ completeTutorial }) => {
   const [showingTerms, setShowingTerms] = useState(false);
 
   return (
-    <div className="absolute top-0 z-[999] h-full w-full px-4 flex flex-col justify-center bg-ernieteal backdrop-blur-sm bg-opacity-50">
+    <div className="absolute top-0 z-[999] h-full w-full px-4 lg:px-10 flex flex-col justify-center bg-ernieteal backdrop-blur-sm bg-opacity-50">
       <div
-        className="flex flex-row items-center absolute top-6 right-6 gap-2"
+        className="flex flex-row items-center absolute top-6 right-6 lg:top-10 lg:right-10 gap-2"
         onClick={(e) => {
           completeTutorial();
         }}
@@ -57,7 +57,7 @@ export const Tutorial = ({ completeTutorial }) => {
           </div>
         )}
         {tutorialStage == 1 && (
-          <div className="h-full h-full flex flex-col justify-center px-6">
+          <div className="h-full h-full flex flex-col justify-center px-6 lg:px-10 lg:gap-4">
             {showingTerms ? (
               <div className="flex flex-col h-full pt-6 gap-6">
                 <div
@@ -82,7 +82,7 @@ export const Tutorial = ({ completeTutorial }) => {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col">
+              <div className="flex flex-col lg:gap-2">
                 <img
                   src="/ordersummary.png"
                   className="aspect-square w-32 mx-auto mb-8"
@@ -91,7 +91,7 @@ export const Tutorial = ({ completeTutorial }) => {
                   Try our coffee
                 </h4>
                 <p className="font-circular text-erniegreen text-center">
-                  Use the code below to claim your FREE 1kg of our coffee.
+                  Use the code below to claim your FREE 1kg (tub) of our coffee
                 </p>
                 <div
                   className="flex flex-row gap-2 mt-4 justify-center group cursor-pointer"
@@ -124,7 +124,7 @@ export const Tutorial = ({ completeTutorial }) => {
                 Terms & Conditions
               </p>
             </div>
-            <div className="absolute w-[calc(100%-72px)] grid grid-cols-2 bottom-20">
+            <div className="absolute w-[calc(100%-72px)] lg:w-full lg:left-0 lg:px-10 grid grid-cols-2 bottom-20">
               <div
                 className={`flex flex-row gap-4 cursor-pointer ${
                   tutorialStage == 1 && "invisible"
@@ -148,7 +148,7 @@ export const Tutorial = ({ completeTutorial }) => {
           </div>
         )}
         {tutorialStage == 2 && (
-          <div className="h-full h-full flex flex-col justify-center px-6">
+          <div className="h-full h-full flex flex-col justify-center px-6 lg:px-10 lg:gap-2">
             <img
               src="/BIKE-WHEEL_COLOURED.webp"
               className="aspect-square w-36 mx-auto mb-8"
@@ -157,11 +157,11 @@ export const Tutorial = ({ completeTutorial }) => {
               Start your subscription
             </h4>
             <p className="font-circular text-erniegreen text-center">
-              You can set up and manage your subscription right from the Ernie
-              App! Pick your products, and how often, and we&apos;ll deliver
-              them to your office using pedal or electric power.
+              You can set up and manage your subscription from the Ernie App!
+              Pick your products, and how often, and we&apos;ll deliver them to
+              your office using pedal or electric power.
             </p>
-            <div className="absolute w-[calc(100%-72px)] grid grid-cols-2 bottom-20">
+            <div className="absolute w-[calc(100%-72px)] lg:w-full lg:left-0 lg:px-10 grid grid-cols-2 bottom-20">
               <div
                 className={`flex flex-row gap-4 cursor-pointer ${
                   tutorialStage == 1 && "invisible"
@@ -185,7 +185,7 @@ export const Tutorial = ({ completeTutorial }) => {
           </div>
         )}
         {tutorialStage == 3 && (
-          <div className="h-full h-full flex flex-col justify-center px-6">
+          <div className="h-full h-full flex flex-col justify-center px-6 lg:px-10 lg:gap-2">
             <img
               src="/ROASTERY_COLOURED.webp"
               className="aspect-square w-36 mx-auto mb-8"
@@ -197,7 +197,7 @@ export const Tutorial = ({ completeTutorial }) => {
               Need to top-up your beverages? Or want to try something new? Why
               not create a one-off order with us through the Ernie App.
             </p>
-            <div className="absolute w-[calc(100%-72px)] grid grid-cols-2 bottom-20">
+            <div className="absolute w-[calc(100%-72px)] lg:w-full lg:left-0 lg:px-10 grid grid-cols-2 bottom-20">
               <div
                 className={`flex flex-row gap-4 cursor-pointer ${
                   tutorialStage == 1 && "invisible"
@@ -221,7 +221,7 @@ export const Tutorial = ({ completeTutorial }) => {
           </div>
         )}
         {tutorialStage == 4 && (
-          <div className="h-full h-full flex flex-col justify-center px-6">
+          <div className="h-full h-full flex flex-col justify-center px-6 lg:px-10 lg:gap-2">
             <img
               src="/HUGGING-WORLD_COLOURED.gif"
               className="aspect-square w-36 mx-auto mb-8"
@@ -230,10 +230,11 @@ export const Tutorial = ({ completeTutorial }) => {
               Measure your impact
             </h4>
             <p className="font-circular text-erniegreen text-center">
-              Ordering through us makes a positive impact to our impact. You can
-              measure your impact through the impact tab.
+              Ordering through us makes a positive impact to our environment.
+              You can measure your own savings and download certificates to show
+              your contribution.
             </p>
-            <div className="absolute w-[calc(100%-72px)] flex flex-row justify-between bottom-16">
+            <div className="absolute w-[calc(100%-72px)] lg:w-full lg:left-0 lg:px-10 flex flex-row justify-between bottom-16">
               <div
                 className={`flex flex-row gap-4 cursor-pointer items-center ${
                   tutorialStage == 1 && "invisible"

@@ -28,15 +28,15 @@ export default function Accounts({
   };
 
   return (
-    <div className={`w-full h-full bg-erniemint pb-[80px]`}>
+    <div className={`w-full h-full bg-erniemint pb-[80px] lg:pb-0`}>
       {selectedPage == -1 && (
         <div
-          className={`grid grid-rows-4 gap-4 px-6 pt-6 bg-erniemint overflow-auto pb-6 cursor-pointer ${
+          className={`grid grid-rows-4 lg:grid-cols-2 lg:grid-rows-2 lg:h-full gap-4 lg:gap-10 p-6 lg:p-10 bg-erniemint overflow-auto cursor-pointer ${
             role == 0 ? "h-full" : "h-1/2"
           } w-full`}
         >
           <div
-            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
             onClick={() => {
               setSelectedPage(4);
             }}
@@ -45,7 +45,7 @@ export default function Accounts({
               width={100}
               height={100}
               src="/PENCIL TICKING_COLOURED.png"
-              className="w-24 h-24 object-contain"
+              className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
@@ -54,7 +54,7 @@ export default function Accounts({
             </p>
           </div>
           <div
-            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
             onClick={() => {
               setSelectedPage(1);
             }}
@@ -63,7 +63,7 @@ export default function Accounts({
               width={100}
               height={100}
               src="/orderhistory.png"
-              className="w-24 h-24 object-contain"
+              className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
@@ -72,7 +72,7 @@ export default function Accounts({
             </p>
           </div>
           <div
-            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
             onClick={() => {
               setSelectedPage(5);
             }}
@@ -81,7 +81,7 @@ export default function Accounts({
               width={100}
               height={100}
               src="/BIKE_COLOURED.png"
-              className="w-24 h-24 object-contain -translate-y-[10px]"
+              className="w-24 h-24 lg:w-32 lg:h-32 object-contain -translate-y-[10px]"
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
@@ -90,7 +90,7 @@ export default function Accounts({
             </p>
           </div>
           <div
-            className="bg-erniecream rounded-xl p-6 flex flex-row gap-4 items-center"
+            className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
             onClick={() => {
               setSelectedPage(3);
             }}
@@ -99,7 +99,7 @@ export default function Accounts({
               width={100}
               height={100}
               src="/aboutapp.png"
-              className="w-24 h-24 object-contain"
+              className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
               priority
             ></Image>
             <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">

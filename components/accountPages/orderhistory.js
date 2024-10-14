@@ -65,15 +65,15 @@ export default function OrderHistory({
   };
 
   return (
-    <div className="flex flex-col px-6 gap-6 pb-6 h-full max-h-[100%] bg-erniedarkcream">
+    <div className="flex flex-col p-6 gap-6 lg:gap-10 lg:p-10 h-full max-h-[100%] bg-erniedarkcream">
       <div
         className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
         onClick={backAction}
       >
-        <div className="h-3 w-3 relative">
+        <div className="h-3 w-3 lg:w-4 lg:h-4 relative">
           <Image src="/left-arrow.svg" fill={true} className="h-6"></Image>
         </div>
-        <p className="font-circular font-[500] text-center text-sm text-erniegreen">
+        <p className="font-circular font-[500] text-center text-sm text-erniegreen lg:text-base">
           Back
         </p>
       </div>
@@ -81,13 +81,20 @@ export default function OrderHistory({
         <OrderDetails order={currentOrder} close={close} />
       )}
 
-      <div className="grid-rows-2 grid h-[calc(100%-37px)] gap-4 pb-6">
+      <div className="grid-rows-2 lg:grid-cols-2 lg:grid-rows-1 grid h-[calc(100%-37px)] gap-4 lg:gap-10 pb-6 lg:pb-0">
         <div className="w-full p-6 bg-erniecream flex flex-col flex- gap-2 rounded-xl">
-          <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
+          <p className="font-circe font-[900] text-lg text-erniegreen uppercase lg:text-xl">
             Subscription History
           </p>
           <img src="/divider.png" className="w-full"></img>
-          <div className="flex flex-col gap-2 mt-2 flex-shrink overflow-auto">
+          <div className="flex flex-col gap-2 mt-2 lg:mt-4 flex-shrink lg:flex-grow overflow-auto">
+            {subscriptionOrders.length == 0 && (
+              <div className="flex flex-col justify-center h-full flex-grow">
+                <p className="font-circular text-erniegreen text-center font-[500]">
+                  You currently have no orders.
+                </p>
+              </div>
+            )}
             {subscriptionOrders.map((order, index) => (
               <div className="flex flex-col relative" key={index}>
                 <div className="flex flex-row gap-2">
@@ -121,19 +128,26 @@ export default function OrderHistory({
         </div>
 
         <div className="w-full p-6 bg-erniecream flex flex-col gap-2 rounded-xl">
-          <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
+          <p className="font-circe font-[900] text-lg text-erniegreen uppercase lg:text-xl">
             One Off Order History
           </p>
           <img src="/divider.png" className="w-full"></img>
-          <div className="flex flex-col gap-2 mt-2 flex-grow overflow-auto">
+          <div className="flex flex-col gap-2 lg:gap-3 mt-2 lg:mt-4 flex-grow overflow-auto">
+            {otherOrders.length == 0 && (
+              <div className="flex flex-col justify-center h-full flex-grow">
+                <p className="font-circular text-erniegreen text-center font-[500]">
+                  You currently have no orders.
+                </p>
+              </div>
+            )}
             {otherOrders.map((order, index) => (
               <div className="flex flex-col relative" key={index}>
                 <div className="flex flex-row gap-2">
                   <div className="flex flex-row justify-between flex-grow">
-                    <p className="font-circular text-erniegreen font-[900] text-sm">
+                    <p className="font-circular text-erniegreen font-[900] text-sm lg:text-base">
                       {getDate(order.date)}
                     </p>
-                    <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                    <p className="font-circular text-erniegreen italic font-[900] text-xs lg:text-sm">
                       {itemCount(order) == 1
                         ? `${itemCount(order)} item`
                         : `${itemCount(order)} items`}
@@ -148,8 +162,8 @@ export default function OrderHistory({
                     }}
                   ></img>
                 </div>
-                <div className="flex flex-row absolute bottom-0">
-                  <p className="font-circular text-erniegreen italic text-xs">
+                <div className="flex flex-row absolute bottom-0 lg:bottom-[-4px]">
+                  <p className="font-circular text-erniegreen italic text-xs lg:text-sm">
                     Order {order.orderNumber}
                   </p>
                 </div>

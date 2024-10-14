@@ -78,6 +78,7 @@ export default function Login() {
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState(false);
 
   const [forgotPasswordDone, setForgotPasswordDone] = useState(false);
+  const [sendingForgotPW, setSendingForgotPW] = useState(false);
 
   const [testPlatform, setTestPlatform] = useState("ios");
 
@@ -167,6 +168,9 @@ export default function Login() {
             parentUser
             usedApp
             company
+          }
+          avatar {
+            url
           }
         }
       }
@@ -351,6 +355,8 @@ export default function Login() {
         data?.data?.login?.user.userCompanyField.company.title
       );
 
+      localStorage.setItem("avatar", data?.data?.login?.user.avatar.url);
+
       console.log(data);
 
       createUser({
@@ -500,6 +506,8 @@ export default function Login() {
         );
 
         localStorage.setItem("firstName", data?.data?.login?.user?.firstName);
+
+        localStorage.setItem("avatar", data?.data?.login?.user.avatar.url);
 
         console.log(data);
 
@@ -673,78 +681,183 @@ export default function Login() {
           <div className="liquidernie w-24 h-24 mx-auto my-auto relative flex flex-row"></div>
         </div>
       )}
-      {forgotPassword && !forgotPasswordDone && (
+      {forgotPassword && (
         <div
-          className={`flex flex-col bg-erniecream ${
-            testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
-          }`}
+          className={`flex flex-col bg-erniecream h-full ${
+            forgotPasswordDone && "hidden lg:flex"
+          } `}
         >
-          <div className="w-screen h-screen flex flex-col bg-erniedarkcream">
-            <div className="flex flex-col bg-ernieteal w-full p-4">
-              <img src="/Asset-1@2x2.png" className="h-20 object-contain"></img>
+          <div className="w-screen h-screen flex flex-col bg-erniedarkcream  lg:flex-row">
+            <div className="flex flex-col justify-center bg-ernieteal w-full p-4  lg:w-1/2 lg:min-h-screen p-4 lg:order-2 lg:gap-10 lg:bg-erniemint">
+              <img src="/Asset-1@2x2.png" className="h-16 object-contain"></img>
+              <div className="lg:flex flex-col gap-2 hidden ">
+                <div
+                  className="py-2 lg:pt-10 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mx-6 lg:mx-20 lg:max-w-[80%] lg:mx-auto"
+                  onClick={backAction}
+                >
+                  <div className="h-3 w-3 lg:w-4 lg:h-4 relative">
+                    <Image
+                      src="/left-arrow.svg"
+                      fill={true}
+                      className="h-6"
+                    ></Image>
+                  </div>
+                  <p className="font-circular font-[500] text-center text-sm text-erniegreen lg:text-base">
+                    Back
+                  </p>
+                </div>
+                <div className="p-6 lg:max-w-[80%] lg:mx-auto ">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col flex-grow rounded-lg bg-erniecream p-6 gap-2">
+                      <p className="font-circe font-[900] text-xl uppercase">
+                        Forgot Password
+                      </p>
+                      <img src="/divider.png" className="w-full"></img>
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                          <label
+                            htmlFor="emailaddress"
+                            className="font-circular text-erniegreen text-sm font-[500]"
+                          >
+                            Email Address *
+                          </label>
+                          <input
+                            type="text"
+                            name="emailaddress"
+                            onChange={(e) => {
+                              setForgotPasswordEmail(e.currentTarget.value);
+                            }}
+                            required
+                            className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                          ></input>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                      onClick={(e) => {
+                        setSendingForgotPW(true);
+
+                        e.preventDefault();
+                        resetPassword({
+                          variables: { username: forgotPasswordEmail },
+                        })
+                          .catch((error) => {
+                            console.log(error);
+
+                            setForgotPasswordDone(true);
+                          })
+                          .then((data) => {
+                            setForgotPasswordDone(true);
+                            setSendingForgotPW(false);
+                          });
+                      }}
+                    >
+                      {sendingForgotPW && (
+                        <svg
+                          className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                      )}
+                      <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                        Reset Password
+                      </p>
+                    </div>
+                    {forgotPasswordDone && (
+                      <p className="font-circular text-erniegreen text-center hidden lg:flex">
+                        We&apos;ve sent you a password reset email.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex-grow lg:w-1/2 lg:order-1 hidden lg:flex">
+              <img
+                src="/login.jpg"
+                className="w-full h-full object-cover object-top lg:object-center"
+              ></img>
             </div>
             <div
-              className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mx-6"
+              className="py-2 lg:pt-10 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mx-6 lg:mx-10 lg:hidden"
               onClick={backAction}
             >
-              <div className="h-3 w-3 relative">
+              <div className="h-3 w-3 lg:w-4 lg:h-4 relative">
                 <Image
                   src="/left-arrow.svg"
                   fill={true}
                   className="h-6"
                 ></Image>
               </div>
-              <p className="font-circular font-[500] text-center text-sm text-erniegreen">
+              <p className="font-circular font-[500] text-center text-sm text-erniegreen lg:text-base">
                 Back
               </p>
             </div>
-            <div className="p-6">
-              <div className="flex flex-col flex-grow rounded-lg bg-erniecream p-6 gap-2">
-                <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
-                  Forgot Password
-                </p>
-                <img src="/divider.png" className="w-full"></img>
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="emailaddress"
-                      className="font-circular text-erniegreen text-sm font-[500]"
-                    >
-                      Email Address *
-                    </label>
-                    <input
-                      type="text"
-                      name="emailaddress"
-                      onChange={(e) => {
-                        setForgotPasswordEmail(e.currentTarget.value);
-                      }}
-                      required
-                      className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
-                    ></input>
+            <div className="p-6 lg:p-10 lg:grid lg:grid-cols-2 lg:hidden h-full flex-grow">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col flex-grow rounded-lg bg-erniecream p-6 gap-2">
+                  <p className="font-circe font-[900] text-xl uppercase">
+                    Forgot Password
+                  </p>
+                  <img src="/divider.png" className="w-full"></img>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label
+                        htmlFor="emailaddress"
+                        className="font-circular text-erniegreen text-sm font-[500]"
+                      >
+                        Email Address *
+                      </label>
+                      <input
+                        type="text"
+                        name="emailaddress"
+                        onChange={(e) => {
+                          setForgotPasswordEmail(e.currentTarget.value);
+                        }}
+                        required
+                        className="bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] border-erniegreen outline-erniegold outline-[1px] rounded-lg"
+                      ></input>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div
-              className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer mx-6"
-              onClick={(e) => {
-                e.preventDefault();
-                resetPassword({
-                  variables: { username: forgotPasswordEmail },
-                })
-                  .catch((error) => {
-                    console.log(error);
+                <div
+                  className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    resetPassword({
+                      variables: { username: forgotPasswordEmail },
+                    })
+                      .catch((error) => {
+                        console.log(error);
 
-                    setForgotPasswordDone(true);
-                  })
-                  .then((data) => {
-                    setForgotPasswordDone(true);
-                  });
-              }}
-            >
-              <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-                Reset Password
-              </p>
+                        setForgotPasswordDone(true);
+                      })
+                      .then((data) => {
+                        setForgotPasswordDone(true);
+                      });
+                  }}
+                >
+                  <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                    Reset Password
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -753,7 +866,7 @@ export default function Login() {
         <div
           className={`flex ${
             testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
-          } flex-col bg-erniecream`}
+          } flex-col bg-erniecream lg:hidden`}
         >
           <div className="w-screen h-screen flex flex-col bg-erniedarkcream">
             <div className="flex flex-col bg-ernieteal w-full p-4">

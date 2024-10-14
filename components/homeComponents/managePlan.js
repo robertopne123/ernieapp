@@ -508,74 +508,89 @@ export const ManagePlan = ({
         />
       )}
 
-      <div className="bg-erniedarkcream h-full flex flex-col gap-6 pb-8 px-6 overflow-y-scroll">
+      <div className="bg-erniedarkcream h-full flex flex-col gap-6 pb-8 px-6 lg:p-10 overflow-y-scroll ">
         <div
-          className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
+          className="py-2 lg:pb-2 lg:pt-0 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
           onClick={backAction}
         >
-          <div className="h-3 w-3 relative">
+          <div className="h-3 w-3 lg:w-4 lg:w-4 relative">
             <Image src="/left-arrow.svg" fill={true} className="h-6"></Image>
           </div>
-          <p className="font-circular font-[500] text-center text-sm text-erniegreen">
+          <p className="font-circular font-[500] text-center text-sm text-erniegreen lg:text-base">
             Back
           </p>
         </div>
-        <div className="bg-erniecream p-6 rounded-lg flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
-              My Subscription
-            </p>
-            <img src="/divider.png" className="w-full"></img>
-          </div>
-          <div className="flex flex-col py-2">
-            {productsContext.map((group, index) => (
-              <div key={index}>
-                {group.highlighted ? (
-                  <div
-                    className={`flex flex-col gap-0 w-full`}
-                    style={{ order: group.displayOrder }}
-                  >
-                    <div
-                      className={`flex flex-col w-full `}
-                      style={{
-                        gridTemplateRows:
-                          "repeat(" +
-                          group.products.length +
-                          ", minmax(0, 1fr))",
-                        gap: "",
-                      }}
-                    >
-                      {}
-                      {group.products.map((product, productIndex) => (
-                        <div key={productIndex}>
-                          {product.highlighted ? (
-                            <div className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea">
-                              <div className="flex flex-row justify-between w-full">
-                                <p className="font-circular text-erniegreen font-[500] w-full text-sm">
-                                  {product.product.name}
-                                </p>
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2">
+          <div className="flex flex-col gap-4">
+            <div className="bg-erniecream p-6 rounded-lg flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <p className="font-circe font-[900] text-lg text-erniegreen uppercase lg:text-xl">
+                  My Subscription
+                </p>
+                <img src="/divider.png" className="w-full"></img>
+              </div>
+              <div className="flex flex-col py-2">
+                {productsContext.map((group, index) => (
+                  <div key={index}>
+                    {group.highlighted ? (
+                      <div
+                        className={`flex flex-col gap-0 w-full`}
+                        style={{ order: group.displayOrder }}
+                      >
+                        <div
+                          className={`flex flex-col w-full `}
+                          style={{
+                            gridTemplateRows:
+                              "repeat(" +
+                              group.products.length +
+                              ", minmax(0, 1fr))",
+                            gap: "4px",
+                          }}
+                        >
+                          {}
+                          {group.products.map((product, productIndex) => (
+                            <>
+                              <div
+                                key={productIndex}
+                                className={`${
+                                  product.highlighted ? "flex" : "hidden"
+                                }`}
+                              >
+                                {product.highlighted ? (
+                                  <div className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea">
+                                    <div className="flex flex-row justify-between w-full">
+                                      <p className="font-circular text-erniegreen font-[500] w-full text-sm">
+                                        {product.product.name}
+                                      </p>
 
-                                <div className="flex flex-row justify-between">
-                                  <div className={`flex flex-row`}>
-                                    <div className="flex flex-row gap-2 flex-grow items-center justify-end">
-                                      <div
-                                        className="flex flex-col justify-center items-center border-[1px] border-erniegreen rounded-full aspect-[1/1] p-1 min-w-[22px] max-h-[20px] cursor-pointer"
-                                        onClick={(e) => {
-                                          decQuantity(productIndex, index);
-                                        }}
-                                      >
-                                        <img
-                                          src="/remove-green.svg"
-                                          className="w-3 h-3"
-                                        ></img>
-                                      </div>
-                                      {console.log(product.quantity)}
-                                      {console.log(
-                                        existingSubscription?.lineItems.nodes[
-                                          getFilteredLoc(group, productIndex)
-                                        ]?.quantity
-                                      )}
-                                      {/* {product.quantity <
+                                      <div className="flex flex-row justify-between">
+                                        <div className={`flex flex-row`}>
+                                          <div className="flex flex-row gap-2 flex-grow items-center justify-end">
+                                            <div
+                                              className="flex flex-col justify-center items-center border-[1px] border-erniegreen rounded-full aspect-[1/1] p-1 min-w-[22px] max-h-[20px] cursor-pointer"
+                                              onClick={(e) => {
+                                                decQuantity(
+                                                  productIndex,
+                                                  index
+                                                );
+                                              }}
+                                            >
+                                              <img
+                                                src="/remove-green.svg"
+                                                className="w-3 h-3"
+                                              ></img>
+                                            </div>
+                                            {console.log(product.quantity)}
+                                            {console.log(
+                                              existingSubscription?.lineItems
+                                                .nodes[
+                                                getFilteredLoc(
+                                                  group,
+                                                  productIndex
+                                                )
+                                              ]?.quantity
+                                            )}
+                                            {/* {product.quantity <
                                         existingSubscription?.lineItems.nodes[
                                           getFilteredLoc(group, productIndex) -
                                             1
@@ -587,18 +602,18 @@ export const ManagePlan = ({
                                           {product.quantity}
                                         </p>
                                       )} */}
-                                      {/* {product.quantity ==
+                                            {/* {product.quantity ==
                                         existingSubscription?.lineItems.nodes[
                                           getFilteredLoc(group, productIndex) - 1
                                         ]?.quantity && ( */}
-                                      <p
-                                        className={`
+                                            <p
+                                              className={`
                                           
                                           text-erniegreen inline font-circular text-sm font-[500] w-3 text-center`}
-                                      >
-                                        {product.quantity}
-                                      </p>
-                                      {/* {product.quantity >
+                                            >
+                                              {product.quantity}
+                                            </p>
+                                            {/* {product.quantity >
                                         existingSubscription?.lineItems.nodes[
                                           getFilteredLoc(group, productIndex) - 1
                                         ]?.quantity && (
@@ -609,304 +624,323 @@ export const ManagePlan = ({
                                           {product.quantity}
                                         </p>
                                       )} */}
-                                      <div
-                                        className="flex flex-col justify-center items-center border-[1px] border-erniegreen rounded-full aspect-[1/1] p-1 min-w-[22px] max-h-[20px] cursor-pointer"
-                                        onClick={(e) => {
-                                          incQuantity(productIndex, index);
-                                        }}
-                                      >
+                                            <div
+                                              className="flex flex-col justify-center items-center border-[1px] border-erniegreen rounded-full aspect-[1/1] p-1 min-w-[22px] max-h-[20px] cursor-pointer"
+                                              onClick={(e) => {
+                                                incQuantity(
+                                                  productIndex,
+                                                  index
+                                                );
+                                              }}
+                                            >
+                                              <img
+                                                src="/add-green.svg"
+                                                className="w-3 h-3"
+                                              ></img>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div>
+                                    {showingHiddenProducts && (
+                                      <div className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea">
                                         <img
-                                          src="/add-green.svg"
-                                          className="w-3 h-3"
+                                          src={product.product.image.sourceUrl}
+                                          className="w-24 aspect-square object-contain"
                                         ></img>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            <div>
-                              {showingHiddenProducts && (
-                                <div className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea">
-                                  <img
-                                    src={product.product.image.sourceUrl}
-                                    className="w-24 aspect-square object-contain"
-                                  ></img>
-                                  <div className="flex flex-col flex-shrink min-w-[calc(100%-112px)] ">
-                                    <p className="font-circe text-erniegreen uppercase text-lg truncate font-[900] w-full">
-                                      {product.product.name}
-                                    </p>
-                                    <p
-                                      className={`font-circular text-erniegreen font-[400] text-sm mb-4 line-clamp-3 h-[4em] ${
-                                        product.product.description
-                                          ? "block"
-                                          : "hidden"
-                                      }`}
-                                    >
-                                      {product.product.description}
-                                    </p>
-                                    <div className="flex flex-row justify-between">
-                                      <p
-                                        className={`font-circe text-erniegreen uppercase text-3xl font-[900] ${
-                                          product.product.description
-                                            ? "mt-0"
-                                            : "mt-2"
-                                        }`}
-                                      >
-                                        {product.product.price}
-                                      </p>
-
-                                      <div className="flex flex-row">
-                                        <div className="flex flex-row gap-2 flex-grow items-center justify-end">
-                                          <div
-                                            className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
-                                            onClick={(e) => {
-                                              decQuantity(productIndex, index);
-                                            }}
-                                          >
-                                            <img
-                                              src="/remove.svg"
-                                              className="w-4 h-4"
-                                            ></img>
-                                          </div>
-                                          <p className="text-erniegreen inline font-circe uppercase font-[900] text-xl ">
-                                            {product.quantity}
+                                        <div className="flex flex-col flex-shrink min-w-[calc(100%-112px)] ">
+                                          <p className="font-circe text-erniegreen uppercase text-lg truncate font-[900] w-full">
+                                            {product.product.name}
                                           </p>
-                                          <div
-                                            className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
-                                            onClick={(e) => {
-                                              incQuantity(productIndex, index);
-                                            }}
+                                          <p
+                                            className={`font-circular text-erniegreen font-[400] text-sm mb-4 line-clamp-3 h-[4em] ${
+                                              product.product.description
+                                                ? "block"
+                                                : "hidden"
+                                            }`}
                                           >
-                                            <img
-                                              src="/add.svg"
-                                              className="w-4 h-4"
-                                            ></img>
+                                            {product.product.description}
+                                          </p>
+                                          <div className="flex flex-row justify-between">
+                                            <p
+                                              className={`font-circe text-erniegreen uppercase text-3xl font-[900] ${
+                                                product.product.description
+                                                  ? "mt-0"
+                                                  : "mt-2"
+                                              }`}
+                                            >
+                                              {product.product.price}
+                                            </p>
+
+                                            <div className="flex flex-row">
+                                              <div className="flex flex-row gap-2 flex-grow items-center justify-end">
+                                                <div
+                                                  className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
+                                                  onClick={(e) => {
+                                                    decQuantity(
+                                                      productIndex,
+                                                      index
+                                                    );
+                                                  }}
+                                                >
+                                                  <img
+                                                    src="/remove.svg"
+                                                    className="w-4 h-4"
+                                                  ></img>
+                                                </div>
+                                                <p className="text-erniegreen inline font-circe uppercase font-[900] text-xl ">
+                                                  {product.quantity}
+                                                </p>
+                                                <div
+                                                  className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
+                                                  onClick={(e) => {
+                                                    incQuantity(
+                                                      productIndex,
+                                                      index
+                                                    );
+                                                  }}
+                                                >
+                                                  <img
+                                                    src="/add.svg"
+                                                    className="w-4 h-4"
+                                                  ></img>
+                                                </div>
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
+                                    )}
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    {showingHiddenProducts ? (
-                      <div
-                        className={`flex flex-col gap-0 px-4 pb-2 pt-4 w-full bg-erniedarkcream`}
-                        style={{ order: group.displayOrder }}
-                      >
-                        <p className="font-circe text-3xl text-erniegreen font-[900] uppercase mt-2">
-                          {group.category}
-                        </p>
-                        <img
-                          src="/divider.png"
-                          className="h-1.5 w-full mt-2 mb-2"
-                        ></img>
-                        <div
-                          className={`grid w-full`}
-                          style={{
-                            gridTemplateRows:
-                              "repeat(" +
-                              group.products.length +
-                              ", minmax(0, 1fr))",
-                            gap: "",
-                          }}
-                        >
-                          {group.products.map((product, productIndex) => (
-                            <div key={productIndex}>
-                              <div className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea">
-                                <img
-                                  src={product.product.image.sourceUrl}
-                                  className="w-24 aspect-square object-contain"
-                                ></img>
-                                <div className="flex flex-col flex-shrink min-w-[calc(100%-112px)] ">
-                                  <p className="font-circe text-erniegreen uppercase text-lg truncate font-[900] w-full">
-                                    {product.product.name}
-                                  </p>
-                                  <p
-                                    className={`font-circular text-erniegreen font-[400] text-sm mb-4 line-clamp-3 h-[4em] ${
-                                      product.product.description
-                                        ? "block"
-                                        : "hidden"
-                                    }`}
-                                  >
-                                    {product.product.description}
-                                  </p>
-                                  <div className="flex flex-row justify-between">
-                                    <p
-                                      className={`font-circe text-erniegreen uppercase text-3xl font-[900] ${
-                                        product.product.description
-                                          ? "mt-0"
-                                          : "mt-2"
-                                      }`}
-                                    >
-                                      {product.product.price}
-                                    </p>
-
-                                    <div className="flex flex-row">
-                                      <div className="flex flex-row gap-2 flex-grow items-center justify-end">
-                                        <div
-                                          className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
-                                          onClick={(e) => {
-                                            decQuantity(productIndex, index);
-                                          }}
-                                        >
-                                          <img
-                                            src="/remove.svg"
-                                            className="w-4 h-4"
-                                          ></img>
-                                        </div>
-                                        <p className="text-erniegreen inline font-circe uppercase font-[900] text-xl ">
-                                          {product.quantity}
-                                        </p>
-                                        <div
-                                          className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
-                                          onClick={(e) => {
-                                            incQuantity(productIndex, index);
-                                          }}
-                                        >
-                                          <img
-                                            src="/add.svg"
-                                            className="w-4 h-4"
-                                          ></img>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
+                                )}
                               </div>
-                            </div>
+                            </>
                           ))}
                         </div>
                       </div>
                     ) : (
-                      <div></div>
+                      <div>
+                        {showingHiddenProducts ? (
+                          <div
+                            className={`flex flex-col gap-0 px-4 pb-2 pt-4 w-full bg-erniedarkcream`}
+                            style={{ order: group.displayOrder }}
+                          >
+                            <p className="font-circe text-3xl text-erniegreen font-[900] uppercase mt-2">
+                              {group.category}
+                            </p>
+                            <img
+                              src="/divider.png"
+                              className="h-1.5 w-full mt-2 mb-2"
+                            ></img>
+                            <div
+                              className={`grid w-full`}
+                              style={{
+                                gridTemplateRows:
+                                  "repeat(" +
+                                  group.products.length +
+                                  ", minmax(0, 1fr))",
+                                gap: "",
+                              }}
+                            >
+                              {group.products.map((product, productIndex) => (
+                                <div key={productIndex}>
+                                  <div className="flex flex-row gap-4 w-full items-center bg-erniedarkcrea">
+                                    <img
+                                      src={product.product.image.sourceUrl}
+                                      className="w-24 aspect-square object-contain"
+                                    ></img>
+                                    <div className="flex flex-col flex-shrink min-w-[calc(100%-112px)] ">
+                                      <p className="font-circe text-erniegreen uppercase text-lg truncate font-[900] w-full">
+                                        {product.product.name}
+                                      </p>
+                                      <p
+                                        className={`font-circular text-erniegreen font-[400] text-sm mb-4 line-clamp-3 h-[4em] ${
+                                          product.product.description
+                                            ? "block"
+                                            : "hidden"
+                                        }`}
+                                      >
+                                        {product.product.description}
+                                      </p>
+                                      <div className="flex flex-row justify-between">
+                                        <p
+                                          className={`font-circe text-erniegreen uppercase text-3xl font-[900] ${
+                                            product.product.description
+                                              ? "mt-0"
+                                              : "mt-2"
+                                          }`}
+                                        >
+                                          {product.product.price}
+                                        </p>
+
+                                        <div className="flex flex-row">
+                                          <div className="flex flex-row gap-2 flex-grow items-center justify-end">
+                                            <div
+                                              className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
+                                              onClick={(e) => {
+                                                decQuantity(
+                                                  productIndex,
+                                                  index
+                                                );
+                                              }}
+                                            >
+                                              <img
+                                                src="/remove.svg"
+                                                className="w-4 h-4"
+                                              ></img>
+                                            </div>
+                                            <p className="text-erniegreen inline font-circe uppercase font-[900] text-xl ">
+                                              {product.quantity}
+                                            </p>
+                                            <div
+                                              className="flex flex-col justify-center items-center bg-erniegreen px-2 py-1 max-w-[24px] min-w-[24px]"
+                                              onClick={(e) => {
+                                                incQuantity(
+                                                  productIndex,
+                                                  index
+                                                );
+                                              }}
+                                            >
+                                              <img
+                                                src="/add.svg"
+                                                className="w-4 h-4"
+                                              ></img>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
-          <div
-            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
-            onClick={() => {
-              setPurchaseType(1);
-              setPurchasing(true);
-              setNewPurchase(true);
-              setManagingSubscription(true);
-            }}
-          >
-            <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-              Add More Products
-            </p>
-          </div>
-          <div
-            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer flex flex-row justify-center items-center"
-            onClick={() => {
-              getChangesItems();
-              setShowingSubConfirmation(true);
-              // runOrderUpdate();
-              setProcessingOrder(true);
-            }}
-          >
-            {processingOrder && (
-              <svg
-                className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+              <div
+                className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => {
+                  setPurchaseType(1);
+                  setPurchasing(true);
+                  setNewPurchase(true);
+                  setManagingSubscription(true);
+                }}
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            )}
-            <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-              Save Selection
-            </p>
+                <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                  Add More Products
+                </p>
+              </div>
+              <div
+                className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer flex flex-row justify-center items-center"
+                onClick={() => {
+                  getChangesItems();
+                  setShowingSubConfirmation(true);
+                  // runOrderUpdate();
+                  setProcessingOrder(true);
+                }}
+              >
+                {processingOrder && (
+                  <svg
+                    className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen`}
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                )}
+                <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                  Save Selection
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-
-        <div className="bg-erniecream p-6 rounded-lg flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <p className="font-circe font-[900] text-lg text-erniegreen uppercase">
-              Frequency
-            </p>
-            <img src="/divider.png" className="w-full"></img>
-          </div>
-          <div className="flex flex-col">
-            <select
-              name="frequency"
-              onChange={(e) => {
-                changeFrequency(e.target.value);
-              }}
-              className="border-[1px] border-erniegreen bg-erniecream rounded-lg font-circular px-2 py-2 text-erniegreen text-sm font-[500]"
-            >
-              <option
-                value="weekly"
-                selected={
-                  currentSubscription?.billingPeriod == "week" &&
-                  currentSubscription?.billingInterval == "1"
-                }
+          <div className="flex flex-col gap-4">
+            <div className="bg-erniecream p-6 rounded-lg flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <p className="font-circe font-[900] text-lg text-erniegreen uppercase lg:text-xl">
+                  Frequency
+                </p>
+                <img src="/divider.png" className="w-full"></img>
+              </div>
+              <div className="flex flex-col">
+                <select
+                  name="frequency"
+                  onChange={(e) => {
+                    changeFrequency(e.target.value);
+                  }}
+                  className="border-[1px] border-erniegreen bg-erniecream rounded-lg font-circular px-2 py-2 text-erniegreen text-sm font-[500]"
+                >
+                  <option
+                    value="weekly"
+                    selected={
+                      currentSubscription?.billingPeriod == "week" &&
+                      currentSubscription?.billingInterval == "1"
+                    }
+                  >
+                    Weekly
+                  </option>
+                  <option
+                    value="bi-weekly"
+                    selected={
+                      currentSubscription?.billingPeriod == "week" &&
+                      currentSubscription?.billingInterval == "2"
+                    }
+                  >
+                    {"Bi-weekly (once every two weeks)"}
+                  </option>
+                  <option
+                    value="monthly"
+                    selected={
+                      currentSubscription?.billingPeriod == "month" &&
+                      currentSubscription?.billingInterval == "1"
+                    }
+                  >
+                    Monthly
+                  </option>
+                  <option
+                    value="bi-monthly"
+                    selected={
+                      currentSubscription?.billingPeriod == "month" &&
+                      currentSubscription?.billingInterval == "2"
+                    }
+                  >
+                    {"Bi-monthly (once every two months)"}
+                  </option>
+                </select>
+              </div>
+              <div
+                className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => {
+                  setShowingFreqConfirmation(true);
+                }}
               >
-                Weekly
-              </option>
-              <option
-                value="bi-weekly"
-                selected={
-                  currentSubscription?.billingPeriod == "week" &&
-                  currentSubscription?.billingInterval == "2"
-                }
-              >
-                {"Bi-weekly (once every two weeks)"}
-              </option>
-              <option
-                value="monthly"
-                selected={
-                  currentSubscription?.billingPeriod == "month" &&
-                  currentSubscription?.billingInterval == "1"
-                }
-              >
-                Monthly
-              </option>
-              <option
-                value="bi-monthly"
-                selected={
-                  currentSubscription?.billingPeriod == "month" &&
-                  currentSubscription?.billingInterval == "2"
-                }
-              >
-                {"Bi-monthly (once every two months)"}
-              </option>
-            </select>
-          </div>
-          <div
-            className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
-            onClick={() => {
-              setShowingFreqConfirmation(true);
-            }}
-          >
-            <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-              Save Selection
-            </p>
+                <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                  Save Selection
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         {/* <div

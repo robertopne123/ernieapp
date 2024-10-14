@@ -5,6 +5,7 @@ import graphqlClient from "@/apollo-client";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { useEffect } from "react";
+import { Browser } from "@capacitor/browser";
 
 export default function About({ backAction }) {
   const router = useRouter();
@@ -51,8 +52,12 @@ export default function About({ backAction }) {
     setUserID(localStorage.getItem("employeruser"));
   }, []);
 
+  const openCapacitorSite = async (link) => {
+    await Browser.open({ url: link });
+  };
+
   return (
-    <div className="flex flex-col flex-grow gap-6 h-full bg-erniedarkcream px-6 ">
+    <div className="flex flex-col flex-grow gap-6 h-full bg-erniedarkcream px-6 lg:px-10 pb-6 overflow-scroll">
       {deletionComplete && (
         <div className="flex min-h-screen flex-col bg-erniecream">
           <div className="w-full h-screen flex flex-col bg-erniedarkcream">
@@ -78,7 +83,7 @@ export default function About({ backAction }) {
       {!deletionComplete && (
         <div>
           <div
-            className="py-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
+            className="py-2 lg:pt-10 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
             onClick={backAction}
           >
             <div className="h-3 w-3 relative">
@@ -88,64 +93,79 @@ export default function About({ backAction }) {
               Back
             </p>
           </div>
-          <div className="flex flex-col gap-6 flex-grow mt-4">
-            <div className="rounded-xl bg-erniecream p-6">
-              <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
-                About
-              </p>
-              <img src="/divider.png" className="w-full"></img>
-              <p className="font-circular text-sm text-erniegreen font-[500] mt-4">
-                Welcome to the Ernie London App
-              </p>
-              <p className="font-circular text-sm text-erniegreen font-[400] mt-2">
-                We deliver locally roasted, specialty coffee and office pantry
-                goodies via cargo bikes with zero reusable, recyclable packaging
-                exclusively in London.
-              </p>
-              <p className="font-circular text-sm text-erniegreen font-[500] mt-2">
-                Contact us:{" "}
-                <a className="text-ernieteal" href="mailto:hello@ernie.london">
-                  hello@ernie.london
-                </a>
-              </p>
-              <p className="font-circular text-sm text-erniegreen italic mt-2">
-                <span className="font-[500]">App Version: </span>
-                {process.env.NEXT_PUBLIC_APP_VERSION}
-              </p>
-              <p className="font-circular text-sm text-erniegreen italic">
-                <span className="font-[500]">Build Number: </span>
-                {process.env.NEXT_PUBLIC_BUILD_NUMBER}
-              </p>
-              <p className="font-circular text-sm text-erniegreen font-[500] mt-2">
-                © 2024 Ernie London Ltd
-              </p>
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 flex-grow mt-4 lg:mt-10">
+            <div className="flex flex-col gap-6">
+              <div className="rounded-xl bg-erniecream p-6">
+                <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                  About
+                </p>
+                <img src="/divider.png" className="w-full"></img>
+                <p className="font-circular text-sm text-erniegreen font-[500] mt-4">
+                  Welcome to the Ernie London App
+                </p>
+                <p className="font-circular text-sm text-erniegreen font-[400] mt-2">
+                  We deliver locally roasted, specialty coffee and office pantry
+                  goodies via cargo bikes with zero reusable, recyclable
+                  packaging exclusively in London.
+                </p>
+                <p className="font-circular text-sm text-erniegreen font-[500] mt-2">
+                  Contact us:{" "}
+                  <a
+                    className="text-ernieteal"
+                    href="mailto:hello@ernie.london"
+                  >
+                    hello@ernie.london
+                  </a>
+                </p>
+                <p className="font-circular text-sm text-erniegreen italic mt-2">
+                  <span className="font-[500]">App Version: </span>
+                  {process.env.NEXT_PUBLIC_APP_VERSION}
+                </p>
+                <p className="font-circular text-sm text-erniegreen italic">
+                  <span className="font-[500]">Build Number: </span>
+                  {process.env.NEXT_PUBLIC_BUILD_NUMBER}
+                </p>
+                <p className="font-circular text-sm text-erniegreen font-[500] mt-2">
+                  © 2024 Ernie London Ltd
+                </p>
+              </div>
+              <div
+                className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => {
+                  logout();
+                }}
+              >
+                <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                  Log Out
+                </p>
+              </div>
+              <div
+                className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
+                onClick={() => {
+                  deleteUser();
+                }}
+              >
+                <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+                  Delete Account
+                </p>
+              </div>
             </div>
-            <div
-              className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
-              onClick={() => {
-                logout();
-              }}
-            >
-              <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-                Log Out
-              </p>
-            </div>
-            <div
-              className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer"
-              onClick={() => {
-                deleteUser();
-              }}
-            >
-              <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-                Delete Account
-              </p>
-            </div>
-            <div className="rounded-xl bg-erniecream p-6 flex flex-col gap-3">
-              <img src="/dolcearch.svg" className="w-8"></img>
-              <p className="font-circular text-erniegreen font-[500] text-sm">
-                The Ernie App was designed, developed and is maintained by Dolce
-                Studio.
-              </p>
+            <div className="flex flex-col gap-6">
+              <div className="rounded-xl bg-erniecream p-6 flex flex-col gap-3">
+                <img src="/dolcearch.svg" className="w-8"></img>
+                <p className="font-circular text-erniegreen font-[500] text-sm">
+                  The Ernie App is powered by 100% renewable energy, from sun,
+                  wind and water power. Designed, developed and maintained by{" "}
+                  <span
+                    className="text-ernieteal"
+                    onClick={(e) => {
+                      openCapacitorSite("https://dolcestudio.co");
+                    }}
+                  >
+                    Dolce Studio.
+                  </span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
