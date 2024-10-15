@@ -68,8 +68,8 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [dataObject, setData] = useState(null);
   const [cartObject, setCart] = useState(null);
 
-  //const [justRegistered, setJustRegistered] = useState(newUser === "true");
-  const [justRegistered, setJustRegistered] = useState(true);
+  const [justRegistered, setJustRegistered] = useState(newUser === "true");
+  //const [justRegistered, setJustRegistered] = useState(true);
 
   const [employees, setEmployees] = useState(null);
 
