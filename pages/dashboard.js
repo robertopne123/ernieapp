@@ -218,6 +218,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                     dietType
                     ingredients
                     type
+                    allergens
+                    health
                   }
                   coffeeExtraInfo {
                     flavours
@@ -225,12 +227,21 @@ export default function Dashboard({ data, categories, products, orders }) {
                     roast
                     type
                     varietal
+                    appearance
                   }
                   hotChocolateExtraInfo {
                     dietType
                     ingredients
                     origin
                     type
+                  }
+                  teaExtraInfo {
+                    origin
+                    elavation
+                    flavours
+                    process
+                    howToDrink
+                    packaging
                   }
                   productDisplayStyle {
                     badgeImage {
@@ -244,6 +255,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     }
                     titleStyle
                     priceSuffix
+                    shortDescription
                   }
                   productTags {
                     nodes {

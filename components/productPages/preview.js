@@ -90,6 +90,19 @@ export default function Preview({
 
   console.log(category);
 
+  const [showFullDesc, setShowingFullDesc] = useState(false);
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  const howToDrink = (data) => {
+    return data.teaExtraInfo.howToDrink
+      .replace("<p>", "")
+      .replace("</p>", "")
+      .split("<br />");
+  };
+
   return (
     <div
       className={`absolute top-0 flex flex-col gap-6 h-full w-full overflow-auto bg-erniedarkcream pb-16 px-6 lg:px-10 z-10 lg:w-[80%] lg:h-[80%] lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl`}
@@ -110,7 +123,7 @@ export default function Preview({
         </p>
       </div>
       <div
-        className="absolute right-0 top-0 bg-ernieteal p-4 rounded-bl-lg"
+        className="absolute right-0 top-0 bg-ernieteal p-4 rounded-bl-lg hidden lg:flex"
         onClick={backAction}
       >
         <img src="/cross_cream.svg" className="w-5 "></img>
@@ -122,7 +135,7 @@ export default function Preview({
       >
         <div className="w-full lg:w-1/2 lg:min-w-[40%] bg-cover h-[300px] lg:h-[400px] relative">
           <div className="z-10 h-[300px] lg:h-[400px]">
-            {product?.productTags.nodes[0].name != "squirrel sisters" && (
+            {product?.productTags.nodes[0].name != "healthy snacks" && (
               <div className="h-full mx-auto relative z-10">
                 <Image
                   src={product.image.sourceUrl}
@@ -141,7 +154,7 @@ export default function Preview({
                 />
               </div>
             )}
-            {product?.productTags.nodes[0].name == "squirrel sisters" && (
+            {product?.productTags.nodes[0].name == "healthy snacks" && (
               <div className="h-full mx-auto relative z-10">
                 <Image
                   src={product.productDisplayStyle.secondaryImage.sourceUrl}
@@ -164,9 +177,34 @@ export default function Preview({
               className="min-w-[calc(100%-32px)] w-full h-1.5"
             ></Image>
           </div>
-          <p className="font-circular font-[500] text-sm text-erniegreen pt-1 pb-3 border-b-[1px] border-erniegreen lg:text-base lg:pt-4 lg:pb-5">
-            {product.description}
-          </p>
+          <div className="">
+            {product.productDisplayStyle.shortDescription ? (
+              <div className="flex flex-col gap-0 border-b-[1px] border-erniegreen pb-3">
+                {showFullDesc ? (
+                  <p className="font-circular font-[500] text-sm text-erniegreen pt-1 lg:text-base lg:pt-4 lg:pb-5 lg:">
+                    {product.description}
+                  </p>
+                ) : (
+                  <p className="font-circular font-[500] text-sm text-erniegreen pt-1 lg:text-base lg:pt-4 lg:pb-5 lg:">
+                    {product.productDisplayStyle.shortDescription}
+                  </p>
+                )}
+
+                <p
+                  className="font-circular font-[500] text-base text-erniegreen hover:text-erniegold cursor-pointer"
+                  onClick={(e) => {
+                    setShowingFullDesc(!showFullDesc);
+                  }}
+                >
+                  {showFullDesc ? "Show less" : "Find out more"}
+                </p>
+              </div>
+            ) : (
+              <p className="font-circular font-[500] text-sm text-erniegreen pt-1 pb-3 border-b-[1px] border-erniegreen lg:text-base lg:pt-4 lg:pb-5 lg:">
+                {product.description}
+              </p>
+            )}
+          </div>
           {product.productTags.nodes[0].name == "containers" ||
           product.productTags.nodes[0].name == "machines" ||
           product.productTags.nodes[0].name == "cups/bottles" ? (
@@ -176,36 +214,172 @@ export default function Preview({
               <p
                 className={`font-circular text-sm lg:text-base text-erniegreen`}
               >
-                <span className="font-[900]">Taste notes: </span>
-                {product.productTags.nodes[0].name == "coffee" &&
-                  product.coffeeExtraInfo.flavours}{" "}
-                {product.productTags.nodes[0].name == "hot chocolate" &&
-                  product.hotChocolateExtraInfo.ingredients}{" "}
-                {product.productTags.nodes[0].name == "squirrel sisters" &&
-                  product.chocolateBarsExtraInfo.ingredients}
+                {product.productTags.nodes[0].name == "coffee" && (
+                  <span className="font-[400]">
+                    <span className="font-[900]">Taste notes:</span>{" "}
+                    {product.coffeeExtraInfo.flavours}
+                  </span>
+                )}
+                {product.productTags.nodes[0].name == "hot chocolate" && (
+                  <span className="font-[400]">
+                    <span className="font-[900]">Ingredients:</span>{" "}
+                    {product.hotChocolateExtraInfo.ingredients}
+                  </span>
+                )}
+                {product.productTags.nodes[0].name == "healthy snacks" && (
+                  <span className="font-[400]">
+                    <span className="font-[900]">Ingredients:</span>{" "}
+                    {product.chocolateBarsExtraInfo.ingredients}
+                  </span>
+                )}
+                {product.productTags.nodes[0].name == "tea" && (
+                  <>
+                    {product.teaExtraInfo.origin && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Origin:</span>{" "}
+                        {product.teaExtraInfo.origin}
+                      </span>
+                    )}
+                  </>
+                )}
               </p>
               <p className="font-circular text-sm lg:text-base text-erniegreen">
-                <span className="font-[900]">Origin: </span>
-                {product.productTags.nodes[0].name == "coffee" &&
-                  product.coffeeExtraInfo.origin}{" "}
-                {product.productTags.nodes[0].name == "hot chocolate" &&
-                  product.hotChocolateExtraInfo.origin}{" "}
-                {product.productTags.nodes[0].name == "squirrel sisters" &&
-                  product.chocolateBarsExtraInfo.origin}
+                {product.productTags.nodes[0].name == "coffee" && (
+                  <>
+                    {product.coffeeExtraInfo.origin && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Origin:</span>{" "}
+                        {product.coffeeExtraInfo.origin}
+                      </span>
+                    )}
+                  </>
+                )}
+                {product.productTags.nodes[0].name == "hot chocolate" && (
+                  <>
+                    {product.hotChocolateExtraInfo.origin && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Origin:</span>{" "}
+                        {product.hotChocolateExtraInfo.origin}
+                      </span>
+                    )}
+                  </>
+                )}
+                {product.productTags.nodes[0].name == "tea" && (
+                  <>
+                    {product.teaExtraInfo.origin && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Elevation:</span>{" "}
+                        {product.teaExtraInfo.elavation}
+                      </span>
+                    )}
+                  </>
+                )}
               </p>
               <p className="font-circular text-sm lg:text-base text-erniegreen">
-                <span className="font-[900]">
-                  {product.productTags.nodes[0].name == "coffee"
-                    ? "Roast: "
-                    : "Diet Type: "}
-                </span>
-                {product.productTags.nodes[0].name == "coffee" &&
-                  product.coffeeExtraInfo.roast}{" "}
-                {product.productTags.nodes[0].name == "hot chocolate" &&
-                  product.hotChocolateExtraInfo.dietType}{" "}
-                {product.productTags.nodes[0].name == "squirrel sisters" &&
-                  product.chocolateBarsExtraInfo.dietType}
+                {product.productTags.nodes[0].name == "coffee" && (
+                  <>
+                    {product.coffeeExtraInfo.roast && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Roast:</span>{" "}
+                        {product.coffeeExtraInfo.roast}
+                      </span>
+                    )}
+                  </>
+                )}
+                {product.productTags.nodes[0].name == "tea" && (
+                  <>
+                    {product.teaExtraInfo.process && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Process:</span>{" "}
+                        {product.teaExtraInfo.process}
+                      </span>
+                    )}
+                  </>
+                )}
+                {product.productTags.nodes[0].name == "hot chocolate" && (
+                  <span className="font-[400]">
+                    <span className="font-[900] capitalize">Diet Type:</span>{" "}
+                    {capitalizeFirstLetter(
+                      product.chocolateBarsExtraInfo.dietType.toLowerCase()
+                    )}
+                  </span>
+                )}
+                {product.productTags.nodes[0].name == "healthy snacks" && (
+                  <span className="font-[400]">
+                    <span className="font-[900]">Diet Type:</span>{" "}
+                    {capitalizeFirstLetter(
+                      product.chocolateBarsExtraInfo.dietType.toLowerCase()
+                    )}
+                  </span>
+                )}
               </p>
+              <p className="font-circular text-sm lg:text-base text-erniegreen">
+                {product.productTags.nodes[0].name == "healthy snacks" && (
+                  <span className="font-[400]">
+                    <span className="font-[900]">Allergens:</span>{" "}
+                    {product.chocolateBarsExtraInfo.allergens}
+                  </span>
+                )}
+              </p>
+              <p className="font-circular text-sm lg:text-base text-erniegreen">
+                {product.productTags.nodes[0].name == "healthy snacks" && (
+                  <span className="font-[400]">
+                    <span className="font-[900]">Health Claims:</span>{" "}
+                    {product.chocolateBarsExtraInfo.health}
+                  </span>
+                )}
+              </p>
+
+              <p className="font-circular text-sm lg:text-base text-erniegreen">
+                {product.productTags.nodes[0].name == "tea" && (
+                  <>
+                    {product.teaExtraInfo.flavours && (
+                      <span className="font-[400]">
+                        <span className="font-[900]">Flavours:</span>{" "}
+                        {product.teaExtraInfo.flavours}
+                      </span>
+                    )}
+                  </>
+                )}
+              </p>
+              {product.teaExtraInfo.packaging && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                  <div className="flex flex-col">
+                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+                      How To Drink
+                    </p>
+                    <div className="w-full h-1 relative">
+                      <Image
+                        src="/divider.png"
+                        fill={true}
+                        className="min-w-[calc(100%-32px)] w-full h-1.5"
+                      ></Image>
+                    </div>
+                    <div className="flex flex-col font-circular font-[500] text-sm text-erniegreen pt-1 lg:text-base lg:pt-4 lg:pb-5">
+                      {howToDrink(product).map((item, index) => (
+                        <div key={index}>
+                          <p>{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col">
+                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
+                      Packaging
+                    </p>
+                    <div className="w-full h-1 relative">
+                      <Image
+                        src="/divider.png"
+                        fill={true}
+                        className="min-w-[calc(100%-32px)] w-full h-1.5"
+                      ></Image>
+                    </div>
+                    <div className="flex flex-col font-circular font-[500] text-sm text-erniegreen pt-1 lg:text-base lg:pt-4 lg:pb-5">
+                      {product.teaExtraInfo.packaging}
+                    </div>
+                  </div>
+                </div>
+              )}
               <p
                 className={`font-circular text-sm text-erniegreen ${
                   product.coffeeExtraInfo.varietal != "-" &&
