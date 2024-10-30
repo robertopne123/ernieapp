@@ -2,6 +2,8 @@ import { useMutation } from "@apollo/client";
 import Image from "next/image";
 import CartContext from "../context/cart-context";
 import { useState } from "react";
+import { Info } from "../dashboardComponents/info";
+import { Browser } from "@capacitor/browser";
 
 export default function Preview({
   product,
@@ -103,10 +105,26 @@ export default function Preview({
       .split("<br />");
   };
 
+  const [showingInfo, setShowingInfo] = useState(false);
+
+  const openCapacitorSite = async (link) => {
+    await Browser.open({ url: link });
+  };
+
   return (
     <div
       className={`absolute top-0 flex flex-col gap-6 h-full w-full overflow-auto bg-erniedarkcream pb-16 px-6 lg:px-10 z-10 lg:w-[80%] lg:h-[80%] lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl`}
     >
+      {showingInfo && (
+        <Info
+          name={"Coffee That Connects: Bridging Communities with Groundswell "}
+          description={
+            "Ernie London is proud to partner with Groundswell, a charity creating healthier lives, stronger voices and better futures for anyone with experience of homelessness. We share the belief that everyone deserves to be seen, heard and supported. Our contribution will fuel Groundswell’s person-centered and participatory approach to tackling homelessness, where often the most powerful first step is connecting over a cup of coffee. Together, we’re turning every sip into a step towards solving homelessness, recognising that change often begins with a simple, human gesture. "
+          }
+          close={close}
+          link={"https://groundswell.org.uk/"}
+        />
+      )}
       <div
         className="py-2 lg:pt-10 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer lg:hidden"
         onClick={backAction}
@@ -123,7 +141,7 @@ export default function Preview({
         </p>
       </div>
       <div
-        className="absolute right-0 top-0 bg-ernieteal p-4 rounded-bl-lg hidden lg:flex"
+        className="absolute right-0 top-0 bg-ernieteal hover:bg-erniemint cursor-pointer p-4 rounded-bl-lg hidden lg:flex"
         onClick={backAction}
       >
         <img src="/cross_cream.svg" className="w-5 "></img>
@@ -167,9 +185,23 @@ export default function Preview({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <p className="font-circe font-[900] text-erniegreen uppercase text-2xl">
-            {product.name}
-          </p>
+          <div className="flex flex-row justify-between items-end">
+            <p className="font-circe font-[900] text-erniegreen uppercase text-2xl">
+              {product.name}
+            </p>
+            {product.name == "Grindswell Coffee" && (
+              <div
+                onClick={(e) => {
+                  openCapacitorSite("https://groundswell.org.uk/");
+                }}
+              >
+                <img
+                  src="/Language icon wght200.svg"
+                  className="w-10 h-10"
+                ></img>
+              </div>
+            )}
+          </div>
           <div className="w-full h-1.5 relative">
             <Image
               src="/divider.png"
@@ -191,7 +223,7 @@ export default function Preview({
                 )}
 
                 <p
-                  className="font-circular font-[500] text-base text-erniegreen hover:text-erniegold cursor-pointer"
+                  className="font-circular font-[500] text-base text-erniegreen hover:text-erniegold cursor-pointer mt-2"
                   onClick={(e) => {
                     setShowingFullDesc(!showFullDesc);
                   }}

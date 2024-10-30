@@ -10,7 +10,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { gql, useMutation } from "@apollo/client";
 import { Source } from "@stripe/stripe-js";
-import graphqlClient from "@/apollo-client";
+import graphqlClient from "../../../apollo-client";
 import { useState } from "react";
 import { useStripe } from "@stripe/react-stripe-js";
 import Stripe from "stripe";

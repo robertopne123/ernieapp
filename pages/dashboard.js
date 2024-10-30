@@ -6,22 +6,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useSearchParams } from "next/navigation";
-import Products from "@/components/products";
+import Products from "../components/products";
 
 import { gql } from "@apollo/client";
 import { useQuery, useMutation } from "@apollo/client";
-import createApolloClient from "@/apollo-client";
-import graphqlClient from "@/apollo-client";
-import Impact from "@/components/impact";
-import ErnieImpact from "@/components/homeComponents/ernieimpact";
-import Home from "@/components/home";
-import Accounts from "@/components/accounts";
+import createApolloClient from "../apollo-client";
+import graphqlClient from "../apollo-client";
+import Impact from "../components/impact";
+import ErnieImpact from "../components/homeComponents/ernieimpact";
+import Home from "../components/home";
+import Accounts from "../components/accounts";
 import { motion } from "framer-motion";
-import Alert from "@/components/alert";
+import Alert from "../components/alert";
 import cloneDeep from "lodash.clonedeep";
 import { Capacitor } from "@capacitor/core";
-import { Tutorial } from "@/components/tutorial";
-import { StaticTopBar } from "@/components/dashboardComponents/statictopbar";
+import { Tutorial } from "../components/tutorial";
+import { StaticTopBar } from "../components/dashboardComponents/statictopbar";
+import { Rewards } from "../components/rewards";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -1159,6 +1160,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
     { name: "Impact", index: 2, icon: "/impact.png" },
+    // { name: "Rewards", index: 3, icon: "/impact.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
 
@@ -2871,6 +2873,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setShowingCert={setShowingCert}
                 />
               )}
+              {activeTab == 3 && <Rewards />}
               {activeTab == 4 && (
                 <Accounts
                   userQuantity={getUserTotalOrderQty()}
@@ -2889,7 +2892,7 @@ export default function Dashboard({ data, categories, products, orders }) {
               )}
             </div>
             <div
-              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28
+              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >
               {role == 0 &&

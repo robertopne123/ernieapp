@@ -1,4 +1,4 @@
-import "@/styles/globals.css";
+import "../styles/globals.css";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 import localFont from "next/font/local";
 

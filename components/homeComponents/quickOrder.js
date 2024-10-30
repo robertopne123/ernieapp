@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
-import graphqlClient from "@/apollo-client";
+import graphqlClient from "../../apollo-client";
 import { OrderComplete } from "./orderComplete";
 
 export const QuickOrder = ({

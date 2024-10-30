@@ -5,7 +5,7 @@ import Alert from "./alert";
 import Checkout from "./shopPages/checkout";
 import { ApolloProvider, gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
-import graphqlClient from "@/apollo-client";
+import graphqlClient from "../apollo-client";
 import CartContext from "./context/cart-context";
 import Preview from "./productPages/preview";
 import { BrandInfo } from "./productPages/brandInfo";

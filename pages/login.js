@@ -3,10 +3,10 @@ import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import Link from "next/link";
 import { gql, useMutation } from "@apollo/client";
-import graphqlClient from "@/apollo-client";
+import graphqlClient from "../apollo-client";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Alert from "@/components/alert";
+import Alert from "../components/alert";
 
 const inter = Inter({ subsets: ["latin"] });
 

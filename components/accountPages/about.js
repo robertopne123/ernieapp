@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useState } from "react";
-import graphqlClient from "@/apollo-client";
+import graphqlClient from "../../apollo-client";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import { useEffect } from "react";
