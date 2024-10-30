@@ -1063,14 +1063,14 @@ export default function Login() {
                                     format it as follows, SE17 1BA
                                   </label>
                                 )}
-                                {showPCWarning && (
+                                {/* {showPCWarning && (
                                   <label className="font-circular text-erniegreen text-sm">
                                     We only deliver to London Zone 1 &amp; 2,
                                     and you seem to be outside of our delivery
                                     zone. We may still be able to deliver to
                                     you.
                                   </label>
-                                )}
+                                )} */}
                               </div>
                             ))}
                         </div>
@@ -1445,20 +1445,20 @@ export default function Login() {
                     </div>
                     {showPCRegex ||
                       (showPCWarning && (
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 hidden">
                           {showPCRegex && (
                             <label className="font-circular text-erniegreen text-sm">
                               Your postcode isn&apos;t valid. Please format it
                               as follows, SE17 1BA
                             </label>
                           )}
-                          {showPCWarning && (
+                          {/* {showPCWarning && (
                             <label className="font-circular text-erniegreen text-sm">
                               We only deliver to London Zone 1 &amp; 2, and you
                               seem to be outside of our delivery zone. We may
                               still be able to deliver to you.
                             </label>
-                          )}
+                          )} */}
                         </div>
                       ))}
                     <div className="flex flex-col gap-2">
