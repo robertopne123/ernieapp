@@ -44,7 +44,7 @@ export const Basket = ({
   orderHistory,
   setOrderHistory,
 }) => {
-  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
+  // const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
   const [showingCheckout, setShowingCheckout] = useState(false);
 
@@ -1296,7 +1296,7 @@ export const Basket = ({
   const pathname = usePathname();
 
   const paymentOptions = [
-    { image: "/Visa_Inc._logo.svg", name: "stripe" },
+    // { image: "/Visa_Inc._logo.svg", name: "stripe" },
     // { image: "/Paypal.svg" },
     // { image: "/Apple_Pay_logo.svg" },
     // { image: "/Google_Pay_Logo.svg" },
@@ -1680,7 +1680,7 @@ export const Basket = ({
                           Card Payment
                         </p>
                         <img src="/divider.png" className=" w-full mt-2"></img>
-                        <Elements
+                        {/* <Elements
                           stripe={stripePromise}
                           options={{
                             mode: managingSubscription
@@ -1736,7 +1736,7 @@ export const Basket = ({
                                   ).toFixed(2)) * 100
                             }
                           />
-                        </Elements>
+                        </Elements> */}
                       </div>
                     </div>
                   ) : (
