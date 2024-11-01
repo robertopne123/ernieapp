@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export const Activity = ({ backAction }) => {
   return (
-    <div className="absolute top-0 left-0 z-10 bg-erniedarkcream h-full flex flex-col overflow-y-auto gap-6 pb-6 w-full px-6">
+    <div className="absolute top-0 left-0 z-10 bg-erniedarkcream h-full flex-grow flex flex-col overflow-y-auto gap-6 pb-6 w-full px-6">
       <div
         className="py-2 lg:pt-10 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer"
         onClick={backAction}

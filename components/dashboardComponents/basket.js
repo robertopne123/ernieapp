@@ -44,10 +44,6 @@ export const Basket = ({
   orderHistory,
   setOrderHistory,
 }) => {
-  if (process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY === undefined) {
-    throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
-  }
-
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
   const [showingCheckout, setShowingCheckout] = useState(false);
@@ -1542,7 +1538,11 @@ export const Basket = ({
           link={"https://groundswell.org.uk/"}
         />
       )}
-      <div className="relative cursor-pointer hover:bg-erniemint rounded-lg p-2 mr-[-8px]">
+      <div
+        className={`relative cursor-pointer ${
+          showingBasket && "bg-erniemint"
+        } rounded-lg p-2 mr-[-8px]`}
+      >
         {console.log(oneOffBasket)}
         <img
           id="indicator"

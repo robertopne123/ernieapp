@@ -25,7 +25,7 @@ export const Rewards = () => {
                   cy="18"
                   r="16"
                   fill="none"
-                  class="stroke-current text-erniegreen dark:text-neutral-700"
+                  class="stroke-current text-erniegreen"
                   stroke-width="2.5"
                 ></circle>
                 <circle
@@ -33,7 +33,7 @@ export const Rewards = () => {
                   cy="18"
                   r="16"
                   fill="none"
-                  class="stroke-current text-erniecream dark:text-blue-500"
+                  class="stroke-current text-erniecream"
                   stroke-width="2.5"
                   stroke-dasharray="100"
                   stroke-dashoffset={`${100 - (490 / 750) * 100}`}
@@ -43,11 +43,14 @@ export const Rewards = () => {
             </div>
           </div>
           <div className="flex flex-col justify-center">
-            <p className="font-circe text-5xl text-erniecream leading-[30px] mt-3">
-              490<span className="text-3xl leading-[30px]">pts</span>
+            <p className="font-circe text-5xl text-erniecream leading-[34px] mt-4">
+              490
+              <span className="text-xl leading-[30px] uppercase ml-1">
+                points{" "}
+              </span>
             </p>
-            <p className="font-circular font-[500] text-erniecream opacity-60 leading-[20px]">
-              {750 - 490} more points to unlock more rewards
+            <p className="font-circular font-[500] text-erniecream opacity-60 leading-[28px]">
+              Earn 10 points for every £1 spent.
             </p>
           </div>
         </div>
@@ -67,6 +70,9 @@ export const Rewards = () => {
           Redeem for 750 points
         </p>
         <img src="/divider.png" className=" w-full mt-2"></img>
+        <p className="font-circular font-[500] text-erniegreen leading-[20px] text-sm my-4">
+          {750 - 490} more points to unlock more rewards
+        </p>
         <div className="flex flex-row gap-4 mt-4 opacity-50">
           <img
             src="/BIKE-WHEEL_COLOURED-2.png"
@@ -95,6 +101,9 @@ export const Rewards = () => {
           Redeem for 1500 points
         </p>
         <img src="/divider.png" className=" w-full mt-2"></img>
+        <p className="font-circular font-[500] text-erniegreen leading-[20px] text-sm my-4">
+          {1500 - 490} more points to unlock more rewards
+        </p>
         <div className="flex flex-row gap-4 mt-4 opacity-50">
           <img
             src="/REFIL-TUB_COLOURED-7.png"

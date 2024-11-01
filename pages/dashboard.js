@@ -1160,7 +1160,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
     { name: "Impact", index: 2, icon: "/impact.png" },
-    // { name: "Rewards", index: 3, icon: "/impact.png" },
+    { name: "Rewards", index: 3, icon: "/impact.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
 
@@ -2892,7 +2892,7 @@ export default function Dashboard({ data, categories, products, orders }) {
               )}
             </div>
             <div
-              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
+              className={`bg-ernieteal w-screen grid grid-cols-5 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >
               {role == 0 &&
