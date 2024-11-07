@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+export const runtime = "edge";
 
-export async function POST(NextRequest) {
+export default async function POST(request: NextRequest) {
   try {
     const { amount } = await request.json();
 
@@ -16,7 +17,7 @@ export async function POST(NextRequest) {
     console.error("Internal Error:", error);
 
     return NextResponse.json(
-      { error: `Internal Server Error: ${error}` },
+      { error: `Internal Server Error: ${error.message}` },
       { status: 500 }
     );
   }
