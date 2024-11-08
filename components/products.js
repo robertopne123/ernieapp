@@ -60,10 +60,16 @@ export default function Products({
 
     console.log(filteredTags);
 
-    const tags = Object.groupBy(
-      products,
-      (product) => product.productTags?.nodes[0].name
-    );
+    const tags = products.reduce((acc, product) => {
+      const tagName = product.productTags?.nodes[0].name;
+      if (tagName) {
+        if (!acc[tagName]) {
+          acc[tagName] = [];
+        }
+        acc[tagName].push(product);
+      }
+      return acc;
+    }, {});
 
     console.log(tags);
     console.log(products);
@@ -87,10 +93,16 @@ export default function Products({
     for (const [key, value] of Object.entries(tags)) {
       tagsWithBrands.push({
         category: key,
-        brands: Object.groupBy(
-          value,
-          (product) => product.product.brands?.nodes[0]?.name
-        ),
+        brands: value.reduce((acc, product) => {
+          const brandName = product.product.brands?.nodes[0]?.name;
+          if (brandName) {
+            if (!acc[brandName]) {
+              acc[brandName] = [];
+            }
+            acc[brandName].push(product);
+          }
+          return acc;
+        }, {}),
       });
     }
 
