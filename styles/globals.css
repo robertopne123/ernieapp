@@ -198,3 +198,7 @@ body {
 .fadeout {
   animation: fadeOut 5s;
 }
+
+.p-FieldLabel {
+  font-family: "Circular Std" !important;
+}

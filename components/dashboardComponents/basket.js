@@ -575,6 +575,8 @@ export const Basket = ({
 
   const [url, setUrl] = useState("");
 
+  const [paymentIntentId, setPaymentIntentId] = useState(-1);
+
   function handleSubmit() {
     setProcessingOrder(true);
 
@@ -647,8 +649,6 @@ export const Basket = ({
     } else {
       setContactNumberError(false);
     }
-
-    event.preventDefault();
 
     let lineItems = [];
 
@@ -751,7 +751,7 @@ export const Basket = ({
         checkout({
           variables: {
             input: {
-              paymentMethod: "bacs",
+              paymentMethod: paymentOptions[selectedPayment].name,
               lineItems: lineItems,
               customerId: parseInt(customerId),
               customerNote: "Ernie App Order",
@@ -775,6 +775,15 @@ export const Basket = ({
                   total: total,
                 },
               ],
+              metaData:
+                paymentOptions[selectedPayment].name == "stripe"
+                  ? [
+                      {
+                        key: "_stripe_intent_id",
+                        value: paymentIntentId,
+                      },
+                    ]
+                  : [],
             },
           },
         })
@@ -902,7 +911,8 @@ export const Basket = ({
               checkout({
                 variables: {
                   input: {
-                    paymentMethod: "bacs",
+                    paymentMethod: paymentOptions[selectedPayment].name,
+
                     lineItems: lineItems,
                     customerId: parseInt(customerId),
                     customerNote: "Ernie App Order",
@@ -926,6 +936,15 @@ export const Basket = ({
                         total: total,
                       },
                     ],
+                    metaData:
+                      paymentOptions[selectedPayment].name == "stripe"
+                        ? [
+                            {
+                              key: "_stripe_intent_id",
+                              value: paymentIntentId,
+                            },
+                          ]
+                        : [],
                   },
                 },
               }).then((data) => {
@@ -1044,7 +1063,7 @@ export const Basket = ({
         addSubscription({
           variables: {
             input: {
-              paymentMethod: "bacs",
+              paymentMethod: paymentOptions[selectedPayment].name,
               lineItems: lineItems,
               customerId: parseInt(customerId),
               customerNote: "Ernie App Order",
@@ -1069,6 +1088,15 @@ export const Basket = ({
               ],
               billingInterval: interval + "",
               billingPeriod: period,
+              metaData:
+                paymentOptions[selectedPayment].name == "stripe"
+                  ? [
+                      {
+                        key: "_stripe_intent_id",
+                        value: paymentIntentId,
+                      },
+                    ]
+                  : [],
             },
           },
         })
@@ -1175,7 +1203,7 @@ export const Basket = ({
               addSubscription({
                 variables: {
                   input: {
-                    paymentMethod: "bacs",
+                    paymentMethod: paymentOptions[selectedPayment].name,
                     lineItems: lineItems,
                     customerId: parseInt(customerId),
                     customerNote: "Ernie App Order",
@@ -1200,6 +1228,15 @@ export const Basket = ({
                     ],
                     billingInterval: interval + "",
                     billingPeriod: period,
+                    metaData:
+                      paymentOptions[selectedPayment].name == "stripe"
+                        ? [
+                            {
+                              key: "_stripe_intent_id",
+                              value: paymentIntentId,
+                            },
+                          ]
+                        : [],
                   },
                 },
               }).then((data) => {
@@ -1293,15 +1330,88 @@ export const Basket = ({
     setVoucherApplied(false);
   };
 
+  const appearance = {
+    rules: {
+      ".Input": {
+        backgroundColor: "#FFFFEC",
+        border: "1px solid #01513C",
+        borderRadius: "8px",
+        padding: "10px 16px",
+        fontFamily: "Circular Std",
+        fontWeight: "500",
+        color: "#01513C",
+      },
+      ".Input--empty": {
+        backgroundColor: "#FFFFEC",
+        border: "1px solid #01513C",
+        borderRadius: "8px",
+        padding: "10px 16px",
+        fontFamily: "Circular Std",
+        fontWeight: "500",
+        color: "#01513C",
+      },
+      ".Input::placeholder": {
+        backgroundColor: "#FFFFEC",
+
+        fontFamily: "Circular Std",
+        fontWeight: "500",
+        color: "#01513C",
+      },
+      ".Label": {
+        fontFamily: "Circular Std",
+        fontWeight: "500",
+        color: "#01513C",
+        marginBottom: "8px",
+      },
+    },
+  };
+
   const pathname = usePathname();
 
   const paymentOptions = [
-    // { image: "/Visa_Inc._logo.svg", name: "stripe" },
+    { image: "/Visa_Inc._logo.svg", name: "stripe" },
     // { image: "/Paypal.svg" },
     // { image: "/Apple_Pay_logo.svg" },
     // { image: "/Google_Pay_Logo.svg" },
     { image: "/erniesmall.svg", name: "bacs" },
   ];
+
+  const nextSteps = () => {
+    if (managingSubscription) {
+      console.log(donationAmount);
+      console.log(addDonation);
+
+      console.log(products);
+
+      let donationProduct = {};
+
+      for (let i = 0; i < products.length; i++) {
+        if (products[i].databaseId == 3723) {
+          donationProduct = products[i];
+        }
+      }
+
+      if (addDonation) {
+        subAdjBasket.push({
+          product: { node: donationProduct },
+          quantity: donationAmount,
+        });
+      }
+
+      console.log(subAdjBasket);
+
+      updatePlan(subAdjBasket);
+      // updatePlanFrequency({
+      //   id: subscriptions.data.subscription.subscription
+      //     .databaseId,
+      //   billingInterval: interval + "",
+      //   billingPeriod: period,
+      // });
+      setProcessingOrder(true);
+    } else {
+      handleSubmit();
+    }
+  };
 
   const [selectedPayment, setSelectedPayment] = useState(0);
 
@@ -1657,7 +1767,7 @@ export const Basket = ({
               ) : (
                 <>
                   {collectingCardDetails ? (
-                    <div className="absolute right-0 top-20 h-auto w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
+                    <div className="absolute right-0 top-20 h-full w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
                       <div
                         className="pb-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mb-6"
                         onClick={() => {
@@ -1686,6 +1796,7 @@ export const Basket = ({
                             mode: managingSubscription
                               ? "subscription"
                               : "payment",
+                            appearance: appearance,
                             amount:
                               (managingSubscription
                                 ? (
@@ -1710,6 +1821,7 @@ export const Basket = ({
                                   ).toFixed(2)) * 100,
                             currency: "gbp",
                           }}
+                          className="relative"
                         >
                           <CardCheckout
                             amount={
@@ -1735,6 +1847,8 @@ export const Basket = ({
                                     parseFloat(voucherAmount.toFixed(2))
                                   ).toFixed(2)) * 100
                             }
+                            setPaymentIntentId={setPaymentIntentId}
+                            nextSteps={nextSteps}
                           />
                         </Elements>
                       </div>
@@ -2773,7 +2887,7 @@ export const Basket = ({
                             >
                               {managingSubscription
                                 ? "Update Subscription"
-                                : selectedPayment == 1
+                                : selectedPayment == 0
                                 ? "Pay by Card"
                                 : "Pay By Invoice"}
                             </p>

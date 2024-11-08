@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
-export const CardCheckout = ({ amount }) => {
+export const CardCheckout = ({ amount, setPaymentIntentId, nextSteps }) => {
   const stripe = useStripe();
   const elements = useElements();
   const pathname = usePathname();
@@ -28,12 +28,15 @@ export const CardCheckout = ({ amount }) => {
       .then((data) => {
         console.log(data);
         setClientSecret(data.clientSecret);
+        setPaymentIntentId(data.id);
       });
   }, [amount]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
+
+    nextSteps();
 
     if (!stripe || !elements) {
       return;
@@ -84,14 +87,14 @@ export const CardCheckout = ({ amount }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-2 rounded-md">
-      {clientSecret && <PaymentElement />}
+    <form onSubmit={handleSubmit} className="bg-erniecream mt-4 font-circular">
+      {clientSecret && <PaymentElement className="font-circular" />}
 
       {errorMessage && <div>{errorMessage}</div>}
 
       <button
         disabled={!stripe || loading}
-        className="text-white w-full p-5 bg-black mt-2 rounded-md font-bold disabled:opacity-50 disabled:animate-pulse"
+        className="text-erniegreen w-full px-4 py-2 bg-erniegold mt-4 rounded-lg font-circe font-[900] disabled:opacity-50 disabled:animate-pulse"
       >
         {!loading ? `Pay £${amount / 100}` : "Processing..."}
       </button>
