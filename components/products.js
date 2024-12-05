@@ -494,10 +494,10 @@ export default function Products({
               let tempBrands = [];
 
               tempBrands.push({
-                name: productsCopy[i].brands.nodes[0].name,
-                description: productsCopy[i].brands.nodes[0].description,
+                name: productsCopy[i].brands.nodes[0]?.name,
+                description: productsCopy[i].brands.nodes[0]?.description,
                 image:
-                  productsCopy[i].brands.nodes[0].brandingImage?.image
+                  productsCopy[i].brands.nodes[0]?.brandingImage?.image
                     ?.sourceUrl,
                 products: tempProducts,
               });
@@ -525,7 +525,7 @@ export default function Products({
               name: productsCopy[i].brands.nodes[0]?.name,
               description: productsCopy[i].brands.nodes[0]?.description,
               image:
-                productsCopy[i].brands.nodes[0].brandingImage.image?.sourceUrl,
+                productsCopy[i].brands.nodes[0]?.brandingImage.image?.sourceUrl,
               products: tempProducts,
             });
 
