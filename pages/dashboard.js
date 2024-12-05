@@ -25,6 +25,7 @@ import { StaticTopBar } from "../components/dashboardComponents/statictopbar";
 import { Rewards } from "../components/rewards";
 
 const inter = Inter({ subsets: ["latin"] });
+let hi = "hi";
 
 const circularstd = localFont({
   src: [

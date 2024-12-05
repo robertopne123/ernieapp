@@ -12,7 +12,10 @@ export default async function POST(request: NextRequest) {
       automatic_payment_methods: { enabled: true },
     });
 
-    return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+    return NextResponse.json({
+      id: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret,
+    });
   } catch (error) {
     console.error("Internal Error:", error);
 
