@@ -113,8 +113,6 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [coffeeFromHome, setCoffeeFromHome] = useState(false);
 
-  console.log(localStorage.getItem("cfh"));
-
   const client = graphqlClient;
 
   useEffect(() => {
@@ -131,7 +129,9 @@ export default function Dashboard({ data, categories, products, orders }) {
   `;
 
   useEffect(() => {
-    setCoffeeFromHome(localStorage?.getItem("cfh") === "true");
+    if (typeof window !== "undefined") {
+      setCoffeeFromHome(localStorage?.getItem("cfh") === "true");
+    }
   }, []);
 
   const [refreshToken, { refreshData, refreshLoading, refreshError }] =
