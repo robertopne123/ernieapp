@@ -111,9 +111,7 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [updatedPlan, setUpdatedPlan] = useState(false);
 
-  const [coffeeFromHome, setCoffeeFromHome] = useState(
-    localStorage?.getItem("cfh") === "true"
-  );
+  const [coffeeFromHome, setCoffeeFromHome] = useState(false);
 
   console.log(localStorage.getItem("cfh"));
 
@@ -131,6 +129,10 @@ export default function Dashboard({ data, categories, products, orders }) {
       }
     }
   `;
+
+  useEffect(() => {
+    setCoffeeFromHome(localStorage?.getItem("cfh") === "true");
+  }, []);
 
   const [refreshToken, { refreshData, refreshLoading, refreshError }] =
     useMutation(REFRESH, {
