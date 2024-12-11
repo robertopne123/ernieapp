@@ -112,7 +112,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [updatedPlan, setUpdatedPlan] = useState(false);
 
   const [coffeeFromHome, setCoffeeFromHome] = useState(
-    localStorage.getItem("cfh") === "true"
+    localStorage?.getItem("cfh") === "true"
   );
 
   console.log(localStorage.getItem("cfh"));
