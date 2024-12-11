@@ -18,6 +18,7 @@ export default function Accounts({
   saveChanges,
   subsidyChanging,
   role,
+  cfh,
 }) {
   const [selectedPage, setSelectedPage] = useState(-1);
 
@@ -28,49 +29,55 @@ export default function Accounts({
   };
 
   return (
-    <div className={`w-full h-full bg-erniemint pb-[80px] lg:pb-0`}>
+    <div className={`w-full h-full bg-erniemint lg:pb-0`}>
       {selectedPage == -1 && (
         <div
-          className={`grid grid-rows-4 lg:grid-cols-2 lg:grid-rows-2 lg:h-full gap-4 lg:gap-10 p-6 lg:p-10 bg-erniemint overflow-auto cursor-pointer ${
+          className={`grid ${
+            cfh ? "grid-rows-2" : "grid-rows-4"
+          } lg:grid-cols-2 lg:grid-rows-2 lg:h-full gap-4 lg:gap-10 p-6 lg:p-10 bg-erniemint overflow-auto cursor-pointer ${
             role == 0 ? "h-full" : "h-1/2"
           } w-full`}
         >
-          <div
-            className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
-            onClick={() => {
-              setSelectedPage(4);
-            }}
-          >
-            <Image
-              width={100}
-              height={100}
-              src="/PENCIL TICKING_COLOURED.png"
-              className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
-              priority
-            ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
-              Account
-              <br className="xlmb:hidden" /> Details
-            </p>
-          </div>
-          <div
-            className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
-            onClick={() => {
-              setSelectedPage(1);
-            }}
-          >
-            <Image
-              width={100}
-              height={100}
-              src="/orderhistory.png"
-              className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
-              priority
-            ></Image>
-            <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
-              Order
-              <br className="xlmb:hidden" /> Summary
-            </p>
-          </div>
+          {!cfh && (
+            <div
+              className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
+              onClick={() => {
+                setSelectedPage(4);
+              }}
+            >
+              <Image
+                width={100}
+                height={100}
+                src="/PENCIL TICKING_COLOURED.png"
+                className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
+                priority
+              ></Image>
+              <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
+                Account
+                <br className="xlmb:hidden" /> Details
+              </p>
+            </div>
+          )}
+          {!cfh && (
+            <div
+              className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
+              onClick={() => {
+                setSelectedPage(1);
+              }}
+            >
+              <Image
+                width={100}
+                height={100}
+                src="/orderhistory.png"
+                className="w-24 h-24 lg:w-32 lg:h-32 object-contain"
+                priority
+              ></Image>
+              <p className="font-circe font-[900] text-erniegreen uppercase mdmb:text-2xl text-xl">
+                Order
+                <br className="xlmb:hidden" /> Summary
+              </p>
+            </div>
+          )}
           <div
             className="bg-erniecream rounded-xl p-6 lg:p-10 flex flex-row gap-4 items-center"
             onClick={() => {

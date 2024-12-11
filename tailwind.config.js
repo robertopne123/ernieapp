@@ -38,7 +38,7 @@ module.exports = {
         bodyxl: "2.5rem",
       },
       maxHeight: {
-        ios: "calc(88vh - 34px - 59px)",
+        ios: "calc(88vh - 34px - 59px - 80px)",
         pdf: "calc(88vh - 34px - 59px - 72px)",
         pdfinner: "calc(88vh - 80px - 37px - 24px - 48px - 24px - 36px - 24px)",
       },

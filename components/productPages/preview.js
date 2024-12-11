@@ -148,7 +148,7 @@ export default function Preview({
       </div>
       <div
         className={`flex flex-col lg:flex-row gap-6 bg-erniecream rounded-xl p-6 lg:p-10 h-auto lg:gap-10 ${
-          pType != 0 && pType != 1 ? "mb-10" : "mb-0"
+          pType != 0 && pType != 1 ? "mb-0" : "mb-0"
         }`}
       >
         <div className="w-full lg:w-1/2 lg:min-w-[40%] bg-cover h-[300px] lg:h-[400px] relative">
@@ -157,7 +157,7 @@ export default function Preview({
               <div className="h-full mx-auto relative z-10">
                 <Image
                   src={product.image.sourceUrl}
-                  className="h-full mx-auto mr-4"
+                  className="h-full mx-auto mr-0"
                   fill={true}
                   priority
                   style={{ objectFit: "contain" }}
@@ -232,11 +232,22 @@ export default function Preview({
                 </p>
               </div>
             ) : (
-              <p className="font-circular font-[500] text-sm text-erniegreen pt-1 pb-3 border-b-[1px] border-erniegreen lg:text-base lg:pt-4 lg:pb-5 lg:">
+              <p className="font-circular font-[500] text-sm text-erniegreen pt-1 pb-3 lg:text-base lg:pt-4 lg:pb-2">
                 {product.description}
               </p>
             )}
           </div>
+          {product.name == "Spill Tea - 320 Bags (Case 4x80)" && (
+            <div className="bg-ernieteal py-3 px-3 rounded-lg mb-2 flex lg:flex-row flex-col self-start lg:items-end lg:gap-4 gap-0">
+              <p className="font-circe text-erniecream font-[900] uppercase text-2xl">
+                Free Tin Included<span className="font-circular">*</span>
+              </p>
+              <p className="mb-1 font-circular text-erniecream text-[500] text-sm">
+                *with your first order
+              </p>
+            </div>
+          )}
+          <div className="w-full h-[1px] bg-erniegreen"></div>
           {product.productTags.nodes[0].name == "containers" ||
           product.productTags.nodes[0].name == "machines" ||
           product.productTags.nodes[0].name == "cups/bottles" ? (
@@ -374,7 +385,7 @@ export default function Preview({
                   </>
                 )}
               </p>
-              {product.teaExtraInfo.packaging && (
+              {product.teaExtraInfo?.packaging && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
                   <div className="flex flex-col">
                     <p className="font-circe font-[900] text-erniegreen uppercase text-xl">
@@ -425,9 +436,193 @@ export default function Preview({
               </p>
             </div>
           )}
+          {product.productDisplayStyle.allowOrdering == true && (
+            <div className="bg-erniedarkcream p-6 rounded-lg lg:flex hidden">
+              {pType == 0 && (
+                <div className="hidden lg:flex w-full flex-grow">
+                  <div className="rounded-xl mt-0 w-full">
+                    <div className="flex flex-col gap-4 order-b-[1px] border-erniegreen">
+                      <div className="w-full flex flex-row gap-6">
+                        <div
+                          className="bg-erniegreen p-1 rounded-lg flex-grow"
+                          onClick={() => {
+                            if (oneOffQuantity > 1) {
+                              setOneOffQuantity(oneOffQuantity - 1);
+                            }
+                          }}
+                        >
+                          <p className="font-circular text-center text-erniecream text-xl">
+                            -
+                          </p>
+                        </div>
+                        <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center lg:text-lg">
+                          {oneOffQuantity +
+                            " " +
+                            (product.productDisplayStyle.priceSuffix
+                              ? product.productDisplayStyle.priceSuffix
+                              : "")}
+                        </p>
+                        <div
+                          className="bg-erniegreen p-1 rounded-lg flex-grow"
+                          onClick={() => {
+                            setOneOffQuantity(oneOffQuantity + 1);
+                          }}
+                        >
+                          <p className="font-circular text-center text-erniecream text-xl">
+                            +
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-row justify-between gap-8">
+                        <p className="font-circe font-[900] text-erniegreen text-2xl lg:text-3xl">
+                          {product.price == null ? "£0.00" : product.price}
+                        </p>
+                        <div
+                          className="bg-erniegold rounded-xl w-full lg:w-auto p-2 lg:py-2 lg:px-4 flex flex-row justify-center items-center cursor-pointer"
+                          onClick={() => {
+                            setAddingToOBasket(true);
+
+                            addToOneOffBasket({
+                              product: product,
+                              quantity: oneOffQuantity,
+                            });
+
+                            console.log(addingToOBasket);
+                          }}
+                        >
+                          {addingToOBasket && (
+                            <svg
+                              className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                          )}
+                          <p className="font-circe font-[900] text-erniegreen text-center lg:text-lg">
+                            Add to basket
+                          </p>
+                        </div>
+                      </div>
+                      <p className="font-circular text-erniegreen italic text-xs lg:text-sm">
+                        You save 50p per kg when you subscribe!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {pType == 1 && (
+                <div className="hidden lg:flex">
+                  <div className="rounded-xl">
+                    <div className="flex flex-col gap-4 py-4">
+                      <div className="w-full flex flex-row gap-6">
+                        <div
+                          className="bg-erniegreen p-1 rounded-lg flex-grow"
+                          onClick={() => {
+                            if (subQuantity > 1) {
+                              setSubQuantity(subQuantity - 1);
+                            }
+                          }}
+                        >
+                          <p className="font-circular text-center text-erniecream text-xl">
+                            -
+                          </p>
+                        </div>
+                        <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
+                          {subQuantity +
+                            " " +
+                            (product.productDisplayStyle.priceSuffix
+                              ? product.productDisplayStyle.priceSuffix
+                              : "")}
+                        </p>
+                        <div
+                          className="bg-erniegreen p-1 rounded-lg flex-grow"
+                          onClick={() => {
+                            setSubQuantity(subQuantity + 1);
+                          }}
+                        >
+                          <p className="font-circular text-center text-erniecream text-xl">
+                            +
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-row justify-between gap-8">
+                        <p className="font-circe font-[900] text-erniegreen text-2xl">
+                          {product.price == null ? "£0.00" : product.price}
+                        </p>
+                        <div
+                          className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
+                          onClick={() => {
+                            setAddingToSBasket(true);
+
+                            addToSubBasket({
+                              product: product,
+                              quantity: subQuantity,
+                            });
+                          }}
+                        >
+                          {addingToSBasket && (
+                            <svg
+                              className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                          )}
+                          <p className="font-circe font-[900] text-erniegreen text-center">
+                            Add to basket
+                          </p>
+                        </div>
+                      </div>
+                      <p className="font-circular text-erniegreen italic text-xs">
+                        You save 50p per kg when you subscribe!
+                      </p>
+                      <p className="font-circular text-erniegreen italic text-xs font-[500]">
+                        You will be able to choose your subscription frequency
+                        at checkout. If you already have a subscription with us,
+                        this will automatically be added onto your next order.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+      {console.log(product.productDisplayStyle.allowOrdering)}
+      {product.productDisplayStyle.allowOrdering == true && (
+        <div>
           {pType == 0 && (
-            <div className="hidden lg:flex w-full flex-grow">
-              <div className="bg-erniecream rounded-xl mt-6 w-full">
+            <div className="flex w-full lg:hidden">
+              <div className="bg-erniecream rounded-xl p-6 mb-0 w-full">
                 <div className="flex flex-col gap-4 order-b-[1px] border-erniegreen">
                   <div className="w-full flex flex-row gap-6">
                     <div
@@ -442,7 +637,7 @@ export default function Preview({
                         -
                       </p>
                     </div>
-                    <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center lg:text-lg">
+                    <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
                       {oneOffQuantity +
                         " " +
                         (product.productDisplayStyle.priceSuffix
@@ -461,11 +656,11 @@ export default function Preview({
                     </div>
                   </div>
                   <div className="flex flex-row justify-between gap-8">
-                    <p className="font-circe font-[900] text-erniegreen text-2xl lg:text-3xl">
+                    <p className="font-circe font-[900] text-erniegreen text-2xl">
                       {product.price == null ? "£0.00" : product.price}
                     </p>
                     <div
-                      className="bg-erniegold rounded-xl w-full lg:w-auto p-2 lg:py-2 lg:px-4 flex flex-row justify-center items-center cursor-pointer"
+                      className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
                       onClick={() => {
                         setAddingToOBasket(true);
 
@@ -499,12 +694,12 @@ export default function Preview({
                           ></path>
                         </svg>
                       )}
-                      <p className="font-circe font-[900] text-erniegreen text-center lg:text-lg">
+                      <p className="font-circe font-[900] text-erniegreen text-center">
                         Add to basket
                       </p>
                     </div>
                   </div>
-                  <p className="font-circular text-erniegreen italic text-xs lg:text-sm">
+                  <p className="font-circular text-erniegreen italic text-xs">
                     You save 50p per kg when you subscribe!
                   </p>
                 </div>
@@ -512,8 +707,8 @@ export default function Preview({
             </div>
           )}
           {pType == 1 && (
-            <div className="hidden lg:flex">
-              <div className="bg-erniecream rounded-xl">
+            <div className="flex w-full lg:hidden">
+              <div className="bg-erniecream rounded-xl p-6 mb-0 w-full">
                 <div className="flex flex-col gap-4 py-4">
                   <div className="w-full flex flex-row gap-6">
                     <div
@@ -600,181 +795,6 @@ export default function Preview({
               </div>
             </div>
           )}
-        </div>
-      </div>
-      {pType == 0 && (
-        <div className="flex w-full lg:hidden">
-          <div className="bg-erniecream rounded-xl p-6 mb-10 w-full">
-            <div className="flex flex-col gap-4 order-b-[1px] border-erniegreen">
-              <div className="w-full flex flex-row gap-6">
-                <div
-                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                  onClick={() => {
-                    if (oneOffQuantity > 1) {
-                      setOneOffQuantity(oneOffQuantity - 1);
-                    }
-                  }}
-                >
-                  <p className="font-circular text-center text-erniegreen text-xl">
-                    -
-                  </p>
-                </div>
-                <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
-                  {oneOffQuantity +
-                    " " +
-                    (product.productDisplayStyle.priceSuffix
-                      ? product.productDisplayStyle.priceSuffix
-                      : "")}
-                </p>
-                <div
-                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                  onClick={() => {
-                    setOneOffQuantity(oneOffQuantity + 1);
-                  }}
-                >
-                  <p className="font-circular text-center text-erniegreen text-xl">
-                    +
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-row justify-between gap-8">
-                <p className="font-circe font-[900] text-erniegreen text-2xl">
-                  {product.price == null ? "£0.00" : product.price}
-                </p>
-                <div
-                  className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
-                  onClick={() => {
-                    setAddingToOBasket(true);
-
-                    addToOneOffBasket({
-                      product: product,
-                      quantity: oneOffQuantity,
-                    });
-
-                    console.log(addingToOBasket);
-                  }}
-                >
-                  {addingToOBasket && (
-                    <svg
-                      className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  )}
-                  <p className="font-circe font-[900] text-erniegreen text-center">
-                    Add to basket
-                  </p>
-                </div>
-              </div>
-              <p className="font-circular text-erniegreen italic text-xs">
-                You save 50p per kg when you subscribe!
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-      {pType == 1 && (
-        <div className="flex w-full lg:hidden">
-          <div className="bg-erniecream rounded-xl p-6 mb-10 w-full">
-            <div className="flex flex-col gap-4 py-4">
-              <div className="w-full flex flex-row gap-6">
-                <div
-                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                  onClick={() => {
-                    if (subQuantity > 1) {
-                      setSubQuantity(subQuantity - 1);
-                    }
-                  }}
-                >
-                  <p className="font-circular text-center text-erniegreen text-xl">
-                    -
-                  </p>
-                </div>
-                <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center">
-                  {subQuantity +
-                    " " +
-                    (product.productDisplayStyle.priceSuffix
-                      ? product.productDisplayStyle.priceSuffix
-                      : "")}
-                </p>
-                <div
-                  className="bg-erniedarkcream p-1 rounded-lg flex-grow"
-                  onClick={() => {
-                    setSubQuantity(subQuantity + 1);
-                  }}
-                >
-                  <p className="font-circular text-center text-erniegreen text-xl">
-                    +
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-row justify-between gap-8">
-                <p className="font-circe font-[900] text-erniegreen text-2xl">
-                  {product.price == null ? "£0.00" : product.price}
-                </p>
-                <div
-                  className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
-                  onClick={() => {
-                    setAddingToSBasket(true);
-
-                    addToSubBasket({
-                      product: product,
-                      quantity: subQuantity,
-                    });
-                  }}
-                >
-                  {addingToSBasket && (
-                    <svg
-                      className={`animate-spin -ml-1 mr-3 h-5 w-5 text-erniegreen `}
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  )}
-                  <p className="font-circe font-[900] text-erniegreen text-center">
-                    Add to basket
-                  </p>
-                </div>
-              </div>
-              <p className="font-circular text-erniegreen italic text-xs">
-                You save 50p per kg when you subscribe!
-              </p>
-              <p className="font-circular text-erniegreen italic text-xs font-[500]">
-                You will be able to choose your subscription frequency at
-                checkout. If you already have a subscription with us, this will
-                automatically be added onto your next order.
-              </p>
-            </div>
-          </div>
         </div>
       )}
     </div>

@@ -6,6 +6,7 @@ export const Purchasing = ({
   setPurchaseType,
   setPurchasing,
   setNewPurchase,
+  cfh,
 }) => {
   const [loading, setLoading] = useState(false);
 
@@ -24,22 +25,25 @@ export const Purchasing = ({
               : "Continue Subscription Setup"}
           </p>
         </div>
-        <div
-          className="bg-erniegold rounded-lg py-2"
-          onClick={() => {
-            setNewPurchase(true);
 
-            if (purchaseType == 0) {
-              setPurchaseType(1);
-            } else {
-              setPurchaseType(0);
-            }
-          }}
-        >
-          <p className="font-circe text-erniegreen text-xl text-center">
-            {purchaseType == 0 ? "Start Subscription" : "New One-off Order"}
-          </p>
-        </div>
+        {!cfh && (
+          <div
+            className="bg-erniegold rounded-lg py-2"
+            onClick={() => {
+              setNewPurchase(true);
+
+              if (purchaseType == 0) {
+                setPurchaseType(1);
+              } else {
+                setPurchaseType(0);
+              }
+            }}
+          >
+            <p className="font-circe text-erniegreen text-xl text-center">
+              {purchaseType == 0 ? "Start Subscription" : "New One-off Order"}
+            </p>
+          </div>
+        )}
         <div
           className="bg-erniegold rounded-lg py-2"
           onClick={() => {

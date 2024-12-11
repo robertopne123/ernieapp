@@ -42,6 +42,7 @@ export default function Home({
   setManagingSubscription,
   setCurrentTab,
   setShowingCert,
+  cfh,
 }) {
   const updateOrderFromSummary = (orderDetails) => {
     updateOrder(orderDetails);
@@ -223,8 +224,168 @@ export default function Home({
       )}
       {homeTab == -1 && (
         <div className="flex flex-col">
-          <WelcomeMsg name={firstName} />
-          {subscriptionAttempt ? (
+          <WelcomeMsg name={firstName} cfh={cfh} />
+          {console.log(cfh)}
+          {cfh ? (
+            <div className="flex flex-col lg:grid lg:grid-cols-3 lg:auto-rows-fr lg:h-[400px] gap-6 p-6 lg:p-10">
+              <div className="bg-erniegold p-6  rounded-xl">
+                <div className="flex flex-col gap-2">
+                  <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-2xl">
+                    Coffee From Home
+                  </p>
+                  <img src="/divider.png" className="w-full w-[300px]"></img>
+                </div>
+                <p className="font-circular text-erniegreen font-[500] mt-2 lg:mb-4">
+                  Order your favourite coffee and beverages to your home, by
+                  starting a quick order below.
+                </p>
+                <div className="grid grid-cols-1  w-full gap-0 lg:gap-4">
+                  <div
+                    className="bg-ernielightgold rounded-xl p-2 mt-4 lg:mt-0 cursor-pointer"
+                    onClick={() => {
+                      setPurchaseType(0);
+
+                      setPurchasing(true);
+                      setNewPurchase(true);
+                    }}
+                  >
+                    <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                      Quick Order
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {cfh && (
+                <div
+                  className="rounded-xl p-6 bg-[url('/groundswell.webp')] bg-cover bg-[150%] col-span-2 lg:flex flex-col justify-end relative cursor-pointer group hidden"
+                  onClick={(e) => {
+                    setPurchaseType(0);
+
+                    setPurchasing(true);
+                    setNewPurchase(true);
+                  }}
+                >
+                  <div className="h-full w-full absolute left-0 top-0 bg-gradient-to-b from-transparent via-transparent to-[#000000] group-hover:to-erniegreen rounded-xl flex flex-col gap-2 justify-end p-6">
+                    <p className="font-circe uppercase text-erniecream font-[900] text-3xl">
+                      Get Involved and Make a Difference
+                    </p>
+                    <p className="font-circular text-erniecream font-[500] text-sm">
+                      You can make an impact by purchasing Grindswell directly
+                      from the Ernie London app. Whether you’re buying it for
+                      your office, your team, or for yourself, every bag sold
+                      contributes to Groundswell’s ongoing work. Together, we
+                      can help create a future where everyone with experience of
+                      homelessness has a voice, a community, and a healthier
+                      life.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {!cfh && (
+                <div className="w-full p-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex ">
+                  <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                    Order Summary
+                  </p>
+                  <img src="/divider.png" className="w-full"></img>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <p className="font-circular font-[500] text-sm text-erniegreen">
+                      Orders Placed
+                    </p>
+
+                    <p className="font-circular font-[500] text-sm text-erniegreen">
+                      Carbon Saved
+                    </p>
+                  </div>
+                  <div className="bg-erniegreen h-[1px] w-full"></div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-row gap-2">
+                      <p className="font-circe text-4xl font-[900] text-erniegreen mt-6">
+                        {orders.length}
+                      </p>
+                    </div>
+                    <div className="flex flex-row gap-2">
+                      <p className="font-circe text-6xl text-erniegreen">
+                        <p className="font-circe xl:text-4xl text-2xl font-[900] text-erniegreen mt-6">
+                          {client.impactFigures?.carbon != null
+                            ? client.impactFigures?.carbon
+                            : 0}
+                          <span className="text-2xl">kg</span>
+                        </p>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:mt-2">
+                    <div
+                      className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                      onClick={() => {
+                        setCurrentTab(2);
+                      }}
+                    >
+                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                        View Impact
+                      </p>
+                    </div>
+                    <div
+                      className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                      onClick={() => {
+                        setCurrentTab(2);
+                      }}
+                    >
+                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                        Impact Certificate
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!cfh && (
+                <div className="w-full px-6 pt-6 lg:pt-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex h-auto">
+                  <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                    Order History
+                  </p>
+                  <img src="/divider.png" className="w-full"></img>
+                  <div className="flex flex-col gap-2 mt-4 overflow-auto h-[calc(100%-72px)] lg:h-full lg:pb-6 overflow-y-scroll">
+                    {orders.length == 0 && (
+                      <div className="h-full flex-grow w-full flex flex-col justify-center">
+                        <p className="font-circular text-erniegreen font-[500] text-center">
+                          You currently have no orders.
+                        </p>
+                      </div>
+                    )}
+                    {orders.map((order, index) => (
+                      <div className="flex flex-col relative" key={index}>
+                        <div className="flex flex-row gap-2">
+                          <div className="flex flex-row justify-between flex-grow">
+                            <p className="font-circular text-erniegreen font-[900] text-sm">
+                              {getDate(order.date)}
+                            </p>
+                            <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                              {itemCount(order) == 1
+                                ? `${itemCount(order)} item`
+                                : `${itemCount(order)} items`}
+                            </p>
+                          </div>
+                          <img
+                            src="/info.svg"
+                            className="w-8 h-8 mb-1"
+                            onClick={() => {
+                              setOrderShowing(0);
+                              setCurrentOrder(order);
+                            }}
+                          ></img>
+                        </div>
+                        <div className="flex flex-row absolute bottom-0">
+                          <p className="font-circular text-erniegreen italic text-xs">
+                            Order {order.orderNumber}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : subscriptionAttempt ? (
             hasSubscription ? (
               <div className="flex flex-col lg:grid lg:grid-cols-3 lg:auto-rows-fr lg:h-[400px] gap-6 p-6 lg:p-10">
                 <MySubscription
@@ -338,145 +499,286 @@ export default function Home({
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col lg:grid lg:grid-cols-3 lg:auto-rows-fr lg:h-[400px] gap-6 p-6 lg:p-10">
-                <div className="bg-erniegold p-6  rounded-xl">
-                  <div className="flex flex-col gap-2">
-                    <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-2xl">
-                      My Subscription
-                    </p>
-                    <img src="/divider.png" className="w-full w-[300px]"></img>
-                  </div>
-                  <p className="font-circular text-erniegreen font-[500] mt-2">
-                    You currently don&apos;t have an active subscription
-                  </p>
-                  <div className="grid grid-cols-1  w-full gap-0 lg:gap-4">
-                    <div
-                      className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
-                      onClick={() => {
-                        setPurchaseType(1);
-                        setPurchasing(true);
-                        setNewPurchase(true);
-                      }}
-                    >
-                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-                        Start Subscription
-                      </p>
-                    </div>
-                    <div
-                      className="bg-ernielightgold rounded-xl p-2 mt-4 lg:mt-0 cursor-pointer"
-                      onClick={() => {
-                        setPurchaseType(0);
-
-                        setPurchasing(true);
-                        setNewPurchase(true);
-                      }}
-                    >
-                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-                        Quick Order
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full p-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex ">
-                  <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
-                    Order Summary
-                  </p>
-                  <img src="/divider.png" className="w-full"></img>
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <p className="font-circular font-[500] text-sm text-erniegreen">
-                      Orders Placed
-                    </p>
-
-                    <p className="font-circular font-[500] text-sm text-erniegreen">
-                      Carbon Saved
-                    </p>
-                  </div>
-                  <div className="bg-erniegreen h-[1px] w-full"></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-row gap-2">
-                      <p className="font-circe text-4xl font-[900] text-erniegreen mt-6">
-                        {orders.length}
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-2">
-                      <p className="font-circe text-6xl text-erniegreen">
-                        <p className="font-circe xl:text-4xl text-2xl font-[900] text-erniegreen mt-6">
-                          {client.impactFigures.carbon != null
-                            ? client.impactFigures.carbon
-                            : 0}
-                          <span className="text-2xl">kg</span>
+              <div>
+                {console.log(cfh)}
+                {cfh ? (
+                  <div className="flex flex-col lg:grid lg:grid-cols-3 lg:auto-rows-fr lg:h-[400px] gap-6 p-6 lg:p-10">
+                    <div className="bg-erniegold p-6  rounded-xl">
+                      <div className="flex flex-col gap-2">
+                        <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-2xl">
+                          Coffee From Home
                         </p>
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:mt-2">
-                    <div
-                      className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
-                      onClick={() => {
-                        setCurrentTab(2);
-                      }}
-                    >
-                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-                        View Impact
-                      </p>
-                    </div>
-                    <div
-                      className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
-                      onClick={() => {
-                        setCurrentTab(2);
-                      }}
-                    >
-                      <p className="font-circular font-[500] text-sm text-erniegreen text-center">
-                        Impact Certificate
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="w-full px-6 pt-6 lg:pt-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex h-auto">
-                  <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
-                    Order History
-                  </p>
-                  <img src="/divider.png" className="w-full"></img>
-                  <div className="flex flex-col gap-2 mt-4 overflow-auto h-[calc(100%-72px)] lg:h-full lg:pb-6 overflow-y-scroll">
-                    {orders.length == 0 && (
-                      <div className="h-full flex-grow w-full flex flex-col justify-center">
-                        <p className="font-circular text-erniegreen font-[500] text-center">
-                          You currently have no orders.
-                        </p>
+                        <img
+                          src="/divider.png"
+                          className="w-full w-[300px]"
+                        ></img>
                       </div>
-                    )}
-                    {orders.map((order, index) => (
-                      <div className="flex flex-col relative" key={index}>
-                        <div className="flex flex-row gap-2">
-                          <div className="flex flex-row justify-between flex-grow">
-                            <p className="font-circular text-erniegreen font-[900] text-sm">
-                              {getDate(order.date)}
-                            </p>
-                            <p className="font-circular text-erniegreen italic font-[900] text-xs">
-                              {itemCount(order) == 1
-                                ? `${itemCount(order)} item`
-                                : `${itemCount(order)} items`}
-                            </p>
-                          </div>
-                          <img
-                            src="/info.svg"
-                            className="w-8 h-8 mb-1"
-                            onClick={() => {
-                              setOrderShowing(0);
-                              setCurrentOrder(order);
-                            }}
-                          ></img>
-                        </div>
-                        <div className="flex flex-row absolute bottom-0">
-                          <p className="font-circular text-erniegreen italic text-xs">
-                            Order {order.orderNumber}
+                      <p className="font-circular text-erniegreen font-[500] mt-2">
+                        Order your favourite coffee and beverages to your home,
+                        by starting a quick order below.
+                      </p>
+                      <div className="grid grid-cols-1  w-full gap-0 lg:gap-4">
+                        <div
+                          className="bg-ernielightgold rounded-xl p-2 mt-4 lg:mt-0 cursor-pointer"
+                          onClick={() => {
+                            setPurchaseType(0);
+
+                            setPurchasing(true);
+                            setNewPurchase(true);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            Quick Order
                           </p>
                         </div>
                       </div>
-                    ))}
+                    </div>
+                    <div className="w-full p-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex ">
+                      <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                        Order Summary
+                      </p>
+                      <img src="/divider.png" className="w-full"></img>
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <p className="font-circular font-[500] text-sm text-erniegreen">
+                          Orders Placed
+                        </p>
+
+                        <p className="font-circular font-[500] text-sm text-erniegreen">
+                          Carbon Saved
+                        </p>
+                      </div>
+                      <div className="bg-erniegreen h-[1px] w-full"></div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-row gap-2">
+                          <p className="font-circe text-4xl font-[900] text-erniegreen mt-6">
+                            {orders.length}
+                          </p>
+                        </div>
+                        <div className="flex flex-row gap-2">
+                          <p className="font-circe text-6xl text-erniegreen">
+                            <p className="font-circe xl:text-4xl text-2xl font-[900] text-erniegreen mt-6">
+                              {client.impactFigures?.carbon != null
+                                ? client.impactFigures?.carbon
+                                : 0}
+                              <span className="text-2xl">kg</span>
+                            </p>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:mt-2">
+                        <div
+                          className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                          onClick={() => {
+                            setCurrentTab(2);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            View Impact
+                          </p>
+                        </div>
+                        <div
+                          className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                          onClick={() => {
+                            setCurrentTab(2);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            Impact Certificate
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full px-6 pt-6 lg:pt-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex h-auto">
+                      <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                        Order History
+                      </p>
+                      <img src="/divider.png" className="w-full"></img>
+                      <div className="flex flex-col gap-2 mt-4 overflow-auto h-[calc(100%-72px)] lg:h-full lg:pb-6 overflow-y-scroll">
+                        {orders.length == 0 && (
+                          <div className="h-full flex-grow w-full flex flex-col justify-center">
+                            <p className="font-circular text-erniegreen font-[500] text-center">
+                              You currently have no orders.
+                            </p>
+                          </div>
+                        )}
+                        {orders.map((order, index) => (
+                          <div className="flex flex-col relative" key={index}>
+                            <div className="flex flex-row gap-2">
+                              <div className="flex flex-row justify-between flex-grow">
+                                <p className="font-circular text-erniegreen font-[900] text-sm">
+                                  {getDate(order.date)}
+                                </p>
+                                <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                                  {itemCount(order) == 1
+                                    ? `${itemCount(order)} item`
+                                    : `${itemCount(order)} items`}
+                                </p>
+                              </div>
+                              <img
+                                src="/info.svg"
+                                className="w-8 h-8 mb-1"
+                                onClick={() => {
+                                  setOrderShowing(0);
+                                  setCurrentOrder(order);
+                                }}
+                              ></img>
+                            </div>
+                            <div className="flex flex-row absolute bottom-0">
+                              <p className="font-circular text-erniegreen italic text-xs">
+                                Order {order.orderNumber}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex flex-col lg:grid lg:grid-cols-3 lg:auto-rows-fr lg:h-[400px] gap-6 p-6 lg:p-10">
+                    <div className="bg-erniegold p-6  rounded-xl">
+                      <div className="flex flex-col gap-2">
+                        <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-2xl">
+                          My Subscription
+                        </p>
+                        <img
+                          src="/divider.png"
+                          className="w-full w-[300px]"
+                        ></img>
+                      </div>
+                      <p className="font-circular text-erniegreen font-[500] mt-2">
+                        You currently don&apos;t have an active subscription
+                      </p>
+                      <div className="grid grid-cols-1  w-full gap-0 lg:gap-4">
+                        <div
+                          className="bg-ernielightgold rounded-xl p-2 mt-4 cursor-pointer"
+                          onClick={() => {
+                            setPurchaseType(1);
+                            setPurchasing(true);
+                            setNewPurchase(true);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            Start Subscription
+                          </p>
+                        </div>
+                        <div
+                          className="bg-ernielightgold rounded-xl p-2 mt-4 lg:mt-0 cursor-pointer"
+                          onClick={() => {
+                            setPurchaseType(0);
+
+                            setPurchasing(true);
+                            setNewPurchase(true);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            Quick Order
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="w-full p-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex ">
+                      <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                        Order Summary
+                      </p>
+                      <img src="/divider.png" className="w-full"></img>
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <p className="font-circular font-[500] text-sm text-erniegreen">
+                          Orders Placed
+                        </p>
+
+                        <p className="font-circular font-[500] text-sm text-erniegreen">
+                          Carbon Saved
+                        </p>
+                      </div>
+                      <div className="bg-erniegreen h-[1px] w-full"></div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex flex-row gap-2">
+                          <p className="font-circe text-4xl font-[900] text-erniegreen mt-6">
+                            {orders.length}
+                          </p>
+                        </div>
+                        <div className="flex flex-row gap-2">
+                          <p className="font-circe text-6xl text-erniegreen">
+                            <p className="font-circe xl:text-4xl text-2xl font-[900] text-erniegreen mt-6">
+                              {client.impactFigures?.carbon != null
+                                ? client.impactFigures?.carbon
+                                : 0}
+                              <span className="text-2xl">kg</span>
+                            </p>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 lg:grid-cols-1 gap-4 lg:mt-2">
+                        <div
+                          className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                          onClick={() => {
+                            setCurrentTab(2);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            View Impact
+                          </p>
+                        </div>
+                        <div
+                          className="bg-erniegold rounded-lg flex flex-col justify-center py-2 cursor-pointer"
+                          onClick={() => {
+                            setCurrentTab(2);
+                          }}
+                        >
+                          <p className="font-circular font-[500] text-sm text-erniegreen text-center">
+                            Impact Certificate
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="w-full px-6 pt-6 lg:pt-6 bg-erniedarkcream flex-col gap-2 rounded-lg hidden lg:flex h-auto">
+                      <p className="font-circe font-[900] text-xl text-erniegreen uppercase">
+                        Order History
+                      </p>
+                      <img src="/divider.png" className="w-full"></img>
+                      <div className="flex flex-col gap-2 mt-4 overflow-auto h-[calc(100%-72px)] lg:h-full lg:pb-6 overflow-y-scroll">
+                        {orders.length == 0 && (
+                          <div className="h-full flex-grow w-full flex flex-col justify-center">
+                            <p className="font-circular text-erniegreen font-[500] text-center">
+                              You currently have no orders.
+                            </p>
+                          </div>
+                        )}
+                        {orders.map((order, index) => (
+                          <div className="flex flex-col relative" key={index}>
+                            <div className="flex flex-row gap-2">
+                              <div className="flex flex-row justify-between flex-grow">
+                                <p className="font-circular text-erniegreen font-[900] text-sm">
+                                  {getDate(order.date)}
+                                </p>
+                                <p className="font-circular text-erniegreen italic font-[900] text-xs">
+                                  {itemCount(order) == 1
+                                    ? `${itemCount(order)} item`
+                                    : `${itemCount(order)} items`}
+                                </p>
+                              </div>
+                              <img
+                                src="/info.svg"
+                                className="w-8 h-8 mb-1"
+                                onClick={() => {
+                                  setOrderShowing(0);
+                                  setCurrentOrder(order);
+                                }}
+                              ></img>
+                            </div>
+                            <div className="flex flex-row absolute bottom-0">
+                              <p className="font-circular text-erniegreen italic text-xs">
+                                Order {order.orderNumber}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           ) : (

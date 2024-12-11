@@ -43,6 +43,7 @@ export const Basket = ({
   products,
   orderHistory,
   setOrderHistory,
+  cfh,
 }) => {
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
@@ -53,14 +54,22 @@ export const Basket = ({
   }, [orderComplete]);
 
   const [businessName, setBusinessName] = useState(
-    localStorage.getItem("companyname")
+    cfh ? "" : localStorage.getItem("companyname")
   );
-  const [sAddress, setSAddress] = useState(localStorage.getItem("address"));
-  const [bAddress, setBAddress] = useState(localStorage.getItem("address"));
-  const [sPostcode, setSPostcode] = useState(localStorage.getItem("postcode"));
-  const [bPostcode, setBPostcode] = useState(localStorage.getItem("postcode"));
+  const [sAddress, setSAddress] = useState(
+    cfh ? "" : localStorage.getItem("address")
+  );
+  const [bAddress, setBAddress] = useState(
+    cfh ? "" : localStorage.getItem("address")
+  );
+  const [sPostcode, setSPostcode] = useState(
+    cfh ? "" : localStorage.getItem("postcode")
+  );
+  const [bPostcode, setBPostcode] = useState(
+    cfh ? "" : localStorage.getItem("postcode")
+  );
   const [contactNumber, setContactNumber] = useState(
-    localStorage.getItem("number")
+    cfh ? "" : localStorage.getItem("number")
   );
 
   const [businessNameError, setBusinessNameError] = useState(false);
@@ -1368,13 +1377,20 @@ export const Basket = ({
 
   const pathname = usePathname();
 
-  const paymentOptions = [
-    { image: "/Visa_Inc._logo.svg", name: "stripe" },
-    // { image: "/Paypal.svg" },
-    // { image: "/Apple_Pay_logo.svg" },
-    // { image: "/Google_Pay_Logo.svg" },
-    { image: "/erniesmall.svg", name: "bacs" },
-  ];
+  const paymentOptions = cfh
+    ? [
+        { image: "/Visa_Inc._logo.svg", name: "stripe" },
+        // { image: "/Paypal.svg" },
+        // { image: "/Apple_Pay_logo.svg" },
+        // { image: "/Google_Pay_Logo.svg" },
+      ]
+    : [
+        { image: "/Visa_Inc._logo.svg", name: "stripe" },
+        // { image: "/Paypal.svg" },
+        // { image: "/Apple_Pay_logo.svg" },
+        // { image: "/Google_Pay_Logo.svg" },
+        { image: "/erniesmall.svg", name: "bacs" },
+      ];
 
   const nextSteps = () => {
     if (managingSubscription) {
@@ -1854,7 +1870,7 @@ export const Basket = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="absolute right-0 top-20 h-auto w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
+                    <div className="absolute right-0 top-20 h-full w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
                       <div
                         className="pb-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mb-6"
                         onClick={() => {

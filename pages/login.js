@@ -401,7 +401,7 @@ export default function Login() {
 
             setRegisterComplete(true);
 
-            loginUser(email, password, true);
+            loginUser(email, password, true, false);
 
             if (!loginLoading) {
               setLoginLoading(false);
@@ -454,7 +454,7 @@ export default function Login() {
 
   const [incorrectPassword, setIncorrectPassword] = useState(false);
 
-  const loginUser = (un, pw, jr) => {
+  const loginUser = (un, pw, jr, cfh) => {
     if (localStorage.getItem("authtoken") != null) {
       localStorage.removeItem("authtoken");
     }
@@ -472,40 +472,46 @@ export default function Login() {
         console.log("Login");
         console.log(data);
 
+        localStorage.setItem("cfh", cfh);
+
         localStorage.setItem("authtoken", data?.data?.login?.authToken);
         localStorage.setItem("refreshtoken", data?.data?.login?.refreshToken);
-        localStorage.setItem(
-          "role",
-          data?.data?.login?.user.roles.nodes[0].name
-        );
+
         console.log(data?.data?.login?.user.roles.nodes[0].name);
 
-        localStorage.setItem(
-          "customer",
-          JSON.stringify(data?.data?.login?.customer)
-        );
-        localStorage.setItem(
-          "woo-session",
-          data?.data?.login?.customer?.sessionToken
-        );
-        localStorage.setItem(
-          "employeruser",
-          data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
-        );
-        localStorage.setItem(
-          "first-time-user",
-          data?.data?.login?.user.userCompanyField.usedApp == null
-            ? true
-            : false
-        );
-        localStorage.setItem("employeremail", data?.data?.login?.user?.email);
+        if (!cfh) {
+          localStorage.setItem(
+            "role",
+            data?.data?.login?.user.roles.nodes[0].name
+          );
 
-        localStorage.setItem(
-          "companyname",
-          data?.data?.login?.user.userCompanyField.company
-        );
+          localStorage.setItem("firstName", data?.data?.login?.user?.firstName);
 
-        localStorage.setItem("firstName", data?.data?.login?.user?.firstName);
+          localStorage.setItem(
+            "customer",
+            JSON.stringify(data?.data?.login?.customer)
+          );
+          localStorage.setItem(
+            "woo-session",
+            data?.data?.login?.customer?.sessionToken
+          );
+          localStorage.setItem(
+            "employeruser",
+            data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
+          );
+          localStorage.setItem(
+            "first-time-user",
+            data?.data?.login?.user.userCompanyField.usedApp == null
+              ? true
+              : false
+          );
+          localStorage.setItem("employeremail", data?.data?.login?.user?.email);
+
+          localStorage.setItem(
+            "companyname",
+            data?.data?.login?.user.userCompanyField.company
+          );
+        }
 
         localStorage.setItem("avatar", data?.data?.login?.user.avatar.url);
 
@@ -525,8 +531,10 @@ export default function Login() {
         //     createQueryString("email", data?.login?.user?.email)
         // );
 
-        localStorage.setItem("prevUser", un);
-        localStorage.setItem("prevPass", pw);
+        if (!cfh) {
+          localStorage.setItem("prevUser", un);
+          localStorage.setItem("prevPass", pw);
+        }
 
         safePush(
           "/dashboard" +
@@ -937,6 +945,20 @@ export default function Login() {
                       Login
                     </p>
                   </div>
+                  <div
+                    className="bg-transparent px-2 pb-2  [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      loginUser("coffeefromhome", "CFHErnie123!", false, true);
+                    }}
+                  >
+                    <p className="font-circe text-erniecream font-[900] text-lg text-center uppercase">
+                      Coffee From Home
+                    </p>
+                    <p className="font-circe text-erniecream font-[900] uppercase text-xl">
+                      {">"}
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="flex-grow lg:w-1/2 lg:order-1">
@@ -967,6 +989,20 @@ export default function Login() {
                 >
                   <p className="font-circe text-erniegreen font-[900] text-xl uppercase text-center">
                     Login
+                  </p>
+                </div>
+                <div
+                  className="bg-erniedarkcream px-2 pb-2 pt-3 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    loginUser("coffeefromhome", "CFHErnie123!", false, true);
+                  }}
+                >
+                  <p className="font-circe text-erniegreen font-[900] text-lg text-center uppercase">
+                    Coffee From Home
+                  </p>
+                  <p className="font-circe text-erniegreen font-[900] uppercase text-xl">
+                    {">"}
                   </p>
                 </div>
               </div>
@@ -1796,12 +1832,12 @@ export default function Login() {
                       e.preventDefault();
 
                       if (prevUser == null) {
-                        loginUser(username, password, false);
+                        loginUser(username, password, false, false);
                       } else {
                         let pUser = prevUser.u;
                         let pPass = prevUser.p;
 
-                        loginUser(pUser, pPass, false);
+                        loginUser(pUser, pPass, false, false);
 
                         localStorage.setItem("prevUser", pUser);
                         localStorage.setItem("prevPass", pPass);
@@ -1936,12 +1972,12 @@ export default function Login() {
                     e.preventDefault();
 
                     if (prevUser == null) {
-                      loginUser(username, password, false);
+                      loginUser(username, password, false, false);
                     } else {
                       let pUser = prevUser.u;
                       let pPass = prevUser.p;
 
-                      loginUser(pUser, pPass, false);
+                      loginUser(pUser, pPass, false, false);
 
                       localStorage.setItem("prevUser", pUser);
                       localStorage.setItem("prevPass", pPass);

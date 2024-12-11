@@ -111,6 +111,12 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [updatedPlan, setUpdatedPlan] = useState(false);
 
+  const [coffeeFromHome, setCoffeeFromHome] = useState(
+    localStorage.getItem("cfh") === "true"
+  );
+
+  console.log(localStorage.getItem("cfh"));
+
   const client = graphqlClient;
 
   useEffect(() => {
@@ -258,6 +264,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                     titleStyle
                     priceSuffix
                     shortDescription
+                    allowOrdering
+                    forHome
                   }
                   productTags {
                     nodes {
@@ -673,6 +681,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                           titleStyle
                           priceSuffix
+                          allowOrdering
+                          forHome
                         }
                         productTags {
                           nodes {
@@ -815,9 +825,13 @@ export default function Dashboard({ data, categories, products, orders }) {
               console.log(data);
               tempDataObject = data;
 
-              setCompanyID(data.data.clients.nodes[0].databaseId);
+              let cfh = localStorage.getItem("cfh");
 
-              console.log(data.data.clients.nodes[0].databaseId);
+              if (!cfh) {
+                setCompanyID(data.data.clients.nodes[0].databaseId);
+
+                console.log(data.data.clients.nodes[0].databaseId);
+              }
 
               setOrders(data.data.orders.nodes);
 
@@ -946,27 +960,29 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setSubAttempt(true);
                 });
 
-              client
-                .mutate({
-                  mutation: gql`
-                    mutation GetPDF($dataset: ID!, $templateId: ID!) {
-                      getPDF(
-                        input: { dataset: $dataset, templateId: $templateId }
-                      ) {
-                        url
+              if (!cfh) {
+                client
+                  .mutate({
+                    mutation: gql`
+                      mutation GetPDF($dataset: ID!, $templateId: ID!) {
+                        getPDF(
+                          input: { dataset: $dataset, templateId: $templateId }
+                        ) {
+                          url
+                        }
                       }
-                    }
-                  `,
-                  variables: {
-                    dataset: data.data.clients.nodes[0].databaseId,
-                    templateId: 2,
-                  },
-                })
-                .then((data) => {
-                  console.log(data);
+                    `,
+                    variables: {
+                      dataset: data.data.clients.nodes[0].databaseId,
+                      templateId: 2,
+                    },
+                  })
+                  .then((data) => {
+                    console.log(data);
 
-                  setImpactCertificateURL(data.data.getPDF.url);
-                });
+                    setImpactCertificateURL(data.data.getPDF.url);
+                  });
+              }
             });
         });
       });
@@ -1161,6 +1177,14 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
     { name: "Impact", index: 2, icon: "/impact.png" },
+    // { name: "Rewards", index: 3, icon: "/impact.png" },
+    { name: "Account", index: 4, icon: "/account.png" },
+  ];
+
+  const cfhtabs = [
+    { name: "Home", index: 0, icon: "/home.png" },
+    { name: "Products", index: 1, icon: "/tea.png" },
+    // { name: "Impact", index: 2, icon: "/impact.png" },
     // { name: "Rewards", index: 3, icon: "/impact.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
@@ -2786,10 +2810,11 @@ export default function Dashboard({ data, categories, products, orders }) {
               products={dataObject.data.products.nodes}
               orderHistory={orderHistory}
               setOrderHistory={setOrderHistory}
+              cfh={coffeeFromHome}
             />
             <div
               className={`${
-                testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
+                testPlatform == "ios" ? "max-h-ios" : "max-h-[calc(100vh-80px)]"
               } h-auto flex-grow w-full lg:ml-28 lg:w-[calc(100vw-112px)] lg:max-h-[calc(100vh-80px)] lg:h-[calc(100vh-80px)]`}
             >
               {activeTab == 0 && (
@@ -2823,6 +2848,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setManagingSubscription={setManagingSubscription}
                   setCurrentTab={setCurrentTab}
                   setShowingCert={setShowingCert}
+                  cfh={coffeeFromHome}
                 />
               )}
               {activeTab == 1 && (
@@ -2859,6 +2885,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   addingToOBasket={addingToOBasket}
                   setAddingToSBasket={setAddingToSBasket}
                   setAddingToOBasket={setAddingToOBasket}
+                  cfh={coffeeFromHome}
                 />
               )}
               {activeTab == 2 && (
@@ -2889,36 +2916,62 @@ export default function Dashboard({ data, categories, products, orders }) {
                   saveChanges={saveChanges}
                   subsidyChanging={subsidyChanging}
                   role={role}
+                  cfh={coffeeFromHome}
                 />
               )}
             </div>
             <div
-              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
+              className={`bg-ernieteal w-screen grid ${
+                coffeeFromHome ? "grid-cols-3" : "grid-cols-4"
+              } justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >
               {role == 0 &&
-                tabs.map((tab, index) => (
-                  <div
-                    key={index}
-                    className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
-                      tab.index == activeTab ? "bg-erniemint" : ""
-                    } `}
-                    onClick={(e) => {
-                      setTab(tab.index);
-                      setNewPurchase(false);
-                      console.log(tab.index, activeTab);
-                      setShowingBasket(false);
-                      setManagingSubscription(false);
-                    }}
-                  >
-                    <div className="w-8 h-8 mx-auto relative">
-                      <Image src={tab.icon} fill={true}></Image>
-                    </div>
-                    <p className="text-erniecream text-sm font-circular text-center">
-                      {tab.name}
-                    </p>
-                  </div>
-                ))}
+                (coffeeFromHome
+                  ? cfhtabs.map((tab, index) => (
+                      <div
+                        key={index}
+                        className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
+                          tab.index == activeTab ? "bg-erniemint" : ""
+                        } `}
+                        onClick={(e) => {
+                          setTab(tab.index);
+                          setNewPurchase(false);
+                          console.log(tab.index, activeTab);
+                          setShowingBasket(false);
+                          setManagingSubscription(false);
+                        }}
+                      >
+                        <div className="w-8 h-8 mx-auto relative">
+                          <Image src={tab.icon} fill={true}></Image>
+                        </div>
+                        <p className="text-erniecream text-sm font-circular text-center">
+                          {tab.name}
+                        </p>
+                      </div>
+                    ))
+                  : tabs.map((tab, index) => (
+                      <div
+                        key={index}
+                        className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
+                          tab.index == activeTab ? "bg-erniemint" : ""
+                        } `}
+                        onClick={(e) => {
+                          setTab(tab.index);
+                          setNewPurchase(false);
+                          console.log(tab.index, activeTab);
+                          setShowingBasket(false);
+                          setManagingSubscription(false);
+                        }}
+                      >
+                        <div className="w-8 h-8 mx-auto relative">
+                          <Image src={tab.icon} fill={true}></Image>
+                        </div>
+                        <p className="text-erniecream text-sm font-circular text-center">
+                          {tab.name}
+                        </p>
+                      </div>
+                    )))}
               {role == 1 &&
                 restrictedtabs.map((tab, index) => (
                   <div

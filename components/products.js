@@ -42,7 +42,121 @@ export default function Products({
   addingToOBasket,
   setAddingToSBasket,
   setAddingToOBasket,
+  cfh,
 }) {
+  // function filteredCategories() {
+  //   let filtered = [];
+
+  //   console.log(productCategories);
+
+  //   let productTags = [...productCategories];
+
+  //   let filteredTags = [];
+
+  //   for (let i = 0; i < productTags.length; i++) {
+  //     if (productTags[i].tagOrder.tagOrder != null) {
+  //       filteredTags.push(productTags[i]);
+  //     }
+  //   }
+
+  //   console.log(filteredTags);
+
+  //   const tags = products.reduce((acc, product) => {
+  //     const tagName = product.productTags?.nodes[0].name;
+  //     if (tagName) {
+  //       if (!acc[tagName]) {
+  //         acc[tagName] = [];
+  //       }
+  //       acc[tagName].push(product);
+  //     }
+  //     return acc;
+  //   }, {});
+
+  //   console.log(tags);
+  //   console.log(products);
+
+  //   for (const [key, value] of Object.entries(tags)) {
+  //     for (let j = 0; j < tags[key].length; j++) {
+  //       for (let k = 0; k < products.length; k++) {
+  //         if (tags[key][j].databaseId == products[k].databaseId) {
+  //           let temp = { arrIndex: k, product: products[k] };
+
+  //           tags[key][j] = temp;
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   console.log(tags);
+
+  //   let tagsWithBrands = [];
+
+  //   for (const [key, value] of Object.entries(tags)) {
+  //     tagsWithBrands.push({
+  //       category: key,
+  //       brands: value.reduce((acc, product) => {
+  //         const brandName = product.product.brands?.nodes[0]?.name;
+  //         if (brandName) {
+  //           if (!acc[brandName]) {
+  //             acc[brandName] = [];
+  //           }
+  //           acc[brandName].push(product);
+  //         }
+  //         return acc;
+  //       }, {}),
+  //     });
+  //   }
+
+  //   for (let i = 0; i < tagsWithBrands.length; i++) {
+  //     for (let j = 0; j < filteredTags.length; j++) {
+  //       if (tagsWithBrands[i].category == filteredTags[j].name) {
+  //         tagsWithBrands[i].order = filteredTags[j].tagOrder;
+  //       }
+  //     }
+
+  //     console.log(tagsWithBrands[i].brands);
+
+  //     let brandObjects = [];
+
+  //     for (const [key, value] of Object.entries(tagsWithBrands[i].brands)) {
+  //       tagsWithBrands[i].brands[key] = {};
+  //       tagsWithBrands[i].brands[key].name = key;
+  //       tagsWithBrands[i].brands[key].products = value;
+  //       tagsWithBrands[i].brands[key].description =
+  //         tagsWithBrands[i].brands[
+  //           key
+  //         ].products[0].product.brands?.nodes[0]?.description;
+  //       tagsWithBrands[i].brands[key].image =
+  //         tagsWithBrands[i].brands[
+  //           key
+  //         ].products[0].product.brands?.nodes[0]?.brandingImage.image?.sourceUrl;
+  //       tagsWithBrands[i].brands[key].order =
+  //         tagsWithBrands[i].brands[
+  //           key
+  //         ].products[0].product.brands?.nodes[0]?.brandOrder?.brandOrder;
+  //       brandObjects.push(tagsWithBrands[i].brands[key]);
+  //     }
+
+  //     tagsWithBrands[i].brands = brandObjects;
+
+  //     console.log(tagsWithBrands);
+  //   }
+
+  //   for (let i = 0; i < tagsWithBrands.length; i++) {
+  //     if (tagsWithBrands[i].order != null) {
+  //       filtered.push(tagsWithBrands[i]);
+  //     }
+  //   }
+
+  //   console.log(filtered);
+
+  //   filtered.sort(function (a, b) {
+  //     return a.order.tagOrder - b.order.tagOrder;
+  //   });
+
+  //   return filtered;
+  // }
+
   function filteredCategories() {
     let filtered = [];
 
@@ -61,14 +175,28 @@ export default function Products({
     console.log(filteredTags);
 
     const tags = products.reduce((acc, product) => {
-      const tagName = product.productTags?.nodes[0].name;
-      if (tagName) {
-        if (!acc[tagName]) {
-          acc[tagName] = [];
+      // Apply the forHome check only if cfh is true
+      if (cfh) {
+        if (product?.productDisplayStyle?.forHome) {
+          const tagName = product.productTags?.nodes[0].name;
+          if (tagName) {
+            if (!acc[tagName]) {
+              acc[tagName] = [];
+            }
+            acc[tagName].push(product);
+          }
         }
-        acc[tagName].push(product);
+        return acc;
+      } else {
+        const tagName = product.productTags?.nodes[0].name;
+        if (tagName) {
+          if (!acc[tagName]) {
+            acc[tagName] = [];
+          }
+          acc[tagName].push(product);
+        }
+        return acc;
       }
-      return acc;
     }, {});
 
     console.log(tags);
@@ -617,6 +745,7 @@ export default function Products({
             setPurchaseType={setPType}
             setPurchasing={setP}
             setNewPurchase={setNewP}
+            cfh={cfh}
           />
         )}
         <div className="flex lg:hidden">
@@ -643,7 +772,7 @@ export default function Products({
               setAddingToOBasket={setAddingToOBasketFromProductPage}
             />
           ) : (
-            <div className="flex flex-col gap-0 h-auto pb-16 w-full">
+            <div className="flex flex-col gap-0 h-auto pb-0 w-full">
               {purchaseType == 0 && (
                 <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                   <div className="flex flex-row justify-between">
@@ -693,7 +822,7 @@ export default function Products({
                   })
                   .map((tab, index) => (
                     <div
-                      className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
+                      className={`py-2 px-3 rounded-lg text-nowrap w-auto lg:w-auto ${
                         selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
                       }`}
                       key={index}
@@ -749,8 +878,8 @@ export default function Products({
                         {brand.products
                           .sort(function (a, b) {
                             return (
-                              a.product.productOrdering.productOrder -
-                              b.product.productOrdering.productOrder
+                              a.product.productOrdering?.productOrder -
+                              b.product.productOrdering?.productOrder
                             );
                           })
                           .map((product, productIndex) => (
@@ -784,31 +913,44 @@ export default function Products({
                                 </p>
                                 <div className="line-clamp-3">
                                   <p
-                                    className={`font-circular text-erniegreen font-[400] text-xs mb-2 mt-2 ${
+                                    className={`font-circular text-erniegreen font-[400] text-xs mt-2 ${
                                       product.product.description
                                         ? "block"
                                         : "hidden"
+                                    } ${
+                                      product?.product?.productDisplayStyle
+                                        ?.allowOrdering
+                                        ? "mb-2"
+                                        : "mb-4"
                                     }`}
                                   >
                                     {product.product.description}
                                   </p>
                                 </div>
-                                <div className="flex flex-row gap-1 items-end mt-2">
-                                  <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
-                                    from
-                                  </p>
-                                  <p
-                                    className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
-                                      product.product.description
-                                        ? "mt-0"
-                                        : "mt-2"
-                                    }`}
-                                  >
-                                    {product.product.price}
-                                  </p>
-                                </div>
+                                {product?.product.productDisplayStyle
+                                  ?.allowOrdering && (
+                                  <div className="flex flex-row gap-1 items-end mt-2">
+                                    <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
+                                      from
+                                    </p>
+                                    <p
+                                      className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
+                                        product.product.description
+                                          ? "mt-0"
+                                          : "mt-2"
+                                      }`}
+                                    >
+                                      {product.product.price}
+                                    </p>
+                                  </div>
+                                )}
                                 <div
-                                  className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer"
+                                  className={`bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer  ${
+                                    product.product?.productDisplayStyle
+                                      .allowOrdering
+                                      ? "mt-2"
+                                      : "mt-4"
+                                  }`}
                                   onClick={() => {
                                     setSelectedBrands(index);
                                     setSelectedProduct(product.arrIndex);
@@ -855,7 +997,7 @@ export default function Products({
               setAddingToOBasket={setAddingToOBasketFromProductPage}
             />
           )}
-          <div className="flex flex-col gap-0 h-auto pb-16">
+          <div className="flex flex-col gap-0 h-auto">
             {purchaseType == 0 && (
               <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                 <div className="flex flex-row justify-between">
@@ -961,8 +1103,8 @@ export default function Products({
                       {brand.products
                         .sort(function (a, b) {
                           return (
-                            a.product.productOrdering.productOrder -
-                            b.product.productOrdering.productOrder
+                            a.product.productOrdering?.productOrder -
+                            b.product.productOrdering?.productOrder
                           );
                         })
                         .map((product, productIndex) => (
@@ -996,32 +1138,46 @@ export default function Products({
                               </p>
                               <div className="line-clamp-3">
                                 <p
-                                  className={`font-circular text-erniegreen font-[400] text-xs mb-2 mt-2 ${
+                                  className={`font-circular text-erniegreen font-[400] text-xs mt-2 ${
                                     product.product.description
                                       ? "block"
                                       : "hidden"
+                                  } ${
+                                    product?.product?.productDisplayStyle
+                                      ?.allowOrdering
+                                      ? "mb-2"
+                                      : "mb-4"
                                   }`}
                                 >
                                   {product.product.description}
                                 </p>
                               </div>
-                              <div className="flex flex-row gap-1 items-end mt-2">
-                                <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
-                                  from
-                                </p>
+                              {console.log(product)}
+                              {product?.product.productDisplayStyle
+                                ?.allowOrdering && (
+                                <div className="flex flex-row gap-1 items-end mt-2">
+                                  <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
+                                    from
+                                  </p>
 
-                                <p
-                                  className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
-                                    product.product.description
-                                      ? "mt-0"
-                                      : "mt-2"
-                                  }`}
-                                >
-                                  {product.product.price}
-                                </p>
-                              </div>
+                                  <p
+                                    className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
+                                      product.product.description
+                                        ? "mt-0"
+                                        : "mt-2"
+                                    }`}
+                                  >
+                                    {product.product.price}
+                                  </p>
+                                </div>
+                              )}
                               <div
-                                className="bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer"
+                                className={`bg-erniegold py-2 px-4 rounded-xl inline self-start ${
+                                  product.product?.productDisplayStyle
+                                    .allowOrdering
+                                    ? "mt-2"
+                                    : "mt-4"
+                                } cursor-pointer`}
                                 onClick={() => {
                                   setSelectedBrands(index);
                                   setSelectedProduct(product.arrIndex);
