@@ -741,16 +741,22 @@ export const Basket = ({
     let total =
       purchaseType == 0
         ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
-          ? "8.95"
+          ? cfh == "5.25"
+            ? "8.95"
+            : "0.0"
           : "0.0"
         : managingSubscription
         ? parseFloat(getCurSubSubTotal().toFixed(2)) +
             parseFloat(getSubSubtotal().toFixed(2)) <
           80.0
-          ? "8.95"
+          ? cfh == "5.25"
+            ? "8.95"
+            : "0.0"
+          : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+          ? cfh == "5.25"
+            ? "8.95"
+            : "0.0"
           : "0.0"
-        : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
-        ? "8.95"
         : "0.0";
 
     if (purchaseType == 0) {
@@ -1529,7 +1535,11 @@ export const Basket = ({
             parseFloat(getSubSubtotal().toFixed(2)) <
           80.0
         ) {
-          setDeliveryAmount(8.95);
+          if (cfh) {
+            setDeliveryAmount(5.25);
+          } else {
+            setDeliveryAmount(8.95);
+          }
           setVoucherAmount(0.0);
         } else {
           setDeliveryAmount(0.0);
@@ -1552,7 +1562,11 @@ export const Basket = ({
           if (currentVoucher.freeShipping) {
             setDeliveryAmount(0.0);
           } else {
-            setDeliveryAmount(8.95);
+            if (cfh) {
+              setDeliveryAmount(5.25);
+            } else {
+              setDeliveryAmount(8.95);
+            }
           }
 
           for (let i = 0; i < oneOffBasket.length; i++) {
@@ -1569,7 +1583,12 @@ export const Basket = ({
           );
         } else {
           if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
-            setDeliveryAmount(8.95);
+            if (cfh) {
+              setDeliveryAmount(5.25);
+            } else {
+              setDeliveryAmount(8.95);
+            }
+
             setVoucherAmount(0.0);
           } else {
             setDeliveryAmount(0.0);
@@ -1594,7 +1613,12 @@ export const Basket = ({
           );
         } else {
           if (parseFloat(getSubSubtotal().toFixed(2)) < 80.0) {
-            setDeliveryAmount(8.95);
+            if (cfh) {
+              setDeliveryAmount(5.25);
+            } else {
+              setDeliveryAmount(8.95);
+            }
+
             setVoucherAmount(0.0);
           } else {
             setDeliveryAmount(0.0);
