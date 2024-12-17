@@ -953,7 +953,7 @@ export default function Login() {
                     }}
                   >
                     <p className="font-circe text-erniecream font-[900] text-lg text-center uppercase">
-                      Coffee From Home
+                      Coffee For Home
                     </p>
                     <p className="font-circe text-erniecream font-[900] uppercase text-xl">
                       {">"}
@@ -999,7 +999,7 @@ export default function Login() {
                   }}
                 >
                   <p className="font-circe text-erniegreen font-[900] text-lg text-center uppercase">
-                    Coffee From Home
+                    Coffee For Home
                   </p>
                   <p className="font-circe text-erniegreen font-[900] uppercase text-xl">
                     {">"}

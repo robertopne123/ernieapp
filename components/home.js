@@ -231,7 +231,7 @@ export default function Home({
               <div className="bg-erniegold p-6  rounded-xl">
                 <div className="flex flex-col gap-2">
                   <p className="font-circe font-[900] text-erniegreen uppercase text-xl lg:text-2xl">
-                    Coffee From Home
+                    Coffee For Home
                   </p>
                   <img src="/divider.png" className="w-full w-[300px]"></img>
                 </div>
