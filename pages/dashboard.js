@@ -219,6 +219,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                 }
                 description(format: RAW)
                 name
+                type
                 ... on SimpleProduct {
                   id
                   name
@@ -296,6 +297,107 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productOrdering {
                     productOrder
+                  }
+                  attributes {
+                    nodes {
+                      name
+                      options
+                      variation
+                    }
+                  }
+                }
+                ... on VariableProduct {
+                  id
+                  name
+                  price
+                  variations {
+                    nodes {
+                      databaseId
+                      name
+                      price
+                    }
+                  }
+                  chocolateBarsExtraInfo {
+                    calories
+                    dietType
+                    ingredients
+                    type
+                    allergens
+                    health
+                  }
+                  coffeeExtraInfo {
+                    flavours
+                    origin
+                    roast
+                    type
+                    varietal
+                    appearance
+                  }
+                  hotChocolateExtraInfo {
+                    dietType
+                    ingredients
+                    origin
+                    type
+                  }
+                  teaExtraInfo {
+                    elavation
+                    origin
+                    howToDrink
+                    flavours
+                    packaging
+                    process
+                  }
+                  productDisplayStyle {
+                    badgeImage {
+                      sourceUrl
+                    }
+                    bgImage {
+                      sourceUrl
+                    }
+                    secondaryImage {
+                      sourceUrl
+                    }
+                    titleStyle
+                    shortDescription
+                    allowOrdering
+                    forHome
+                    priceSuffix
+                  }
+                  title
+                  productTags {
+                    nodes {
+                      name
+                      tagCategoryImages {
+                        displayOrder
+                        tagImage {
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
+                  brands {
+                    nodes {
+                      name
+                      description
+                      brandingImage {
+                        image {
+                          sourceUrl
+                        }
+                      }
+                      brandOrder {
+                        brandOrder
+                      }
+                    }
+                  }
+                  productOrdering {
+                    productOrder
+                  }
+                  attributes {
+                    nodes {
+                      name
+                      options
+                      variation
+                    }
                   }
                 }
               }
@@ -542,11 +644,26 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 sourceUrl
                               }
                             }
+                            type
                             ... on SimpleProduct {
                               id
                               name
                               price
                             }
+                            ... on VariableProduct {
+                              id
+                              name
+                              price
+                              databaseId
+                              productId
+                            }
+                          }
+                        }
+                        variation {
+                          node {
+                            name
+                            databaseId
+                            price
                           }
                         }
                       }
@@ -657,6 +774,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                           dietType
                           ingredients
                           type
+                          allergens
+                          health
                         }
                         coffeeExtraInfo {
                           flavours
@@ -664,12 +783,21 @@ export default function Dashboard({ data, categories, products, orders }) {
                           roast
                           type
                           varietal
+                          appearance
                         }
                         hotChocolateExtraInfo {
                           dietType
                           ingredients
                           origin
                           type
+                        }
+                        teaExtraInfo {
+                          origin
+                          elavation
+                          flavours
+                          process
+                          howToDrink
+                          packaging
                         }
                         productDisplayStyle {
                           badgeImage {
@@ -683,6 +811,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                           titleStyle
                           priceSuffix
+                          shortDescription
                           allowOrdering
                           forHome
                         }
@@ -706,9 +835,103 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 sourceUrl
                               }
                             }
+                            brandOrder {
+                              brandOrder
+                            }
                           }
                         }
+                        productOrdering {
+                          productOrder
+                        }
                       }
+                      ... on VariableProduct {
+                        id
+                        name
+                        price
+                        variations {
+                          nodes {
+                            databaseId
+                            name
+                            price
+                          }
+                        }
+                        chocolateBarsExtraInfo {
+                          calories
+                          dietType
+                          ingredients
+                          type
+                          allergens
+                          health
+                        }
+                        coffeeExtraInfo {
+                          flavours
+                          origin
+                          roast
+                          type
+                          varietal
+                          appearance
+                        }
+                        hotChocolateExtraInfo {
+                          dietType
+                          ingredients
+                          origin
+                          type
+                        }
+                        teaExtraInfo {
+                          elavation
+                          origin
+                          howToDrink
+                          flavours
+                          packaging
+                          process
+                        }
+                        productDisplayStyle {
+                          badgeImage {
+                            sourceUrl
+                          }
+                          bgImage {
+                            sourceUrl
+                          }
+                          secondaryImage {
+                            sourceUrl
+                          }
+                          titleStyle
+                          shortDescription
+                          allowOrdering
+                          forHome
+                          priceSuffix
+                        }
+                        title
+                        productTags {
+                          nodes {
+                            name
+                            tagCategoryImages {
+                              displayOrder
+                              tagImage {
+                                sourceUrl
+                              }
+                            }
+                          }
+                        }
+                        brands {
+                          nodes {
+                            name
+                            description
+                            brandingImage {
+                              image {
+                                sourceUrl
+                              }
+                            }
+                            brandOrder {
+                              brandOrder
+                            }
+                          }
+                        }
+                        productOrdering {
+                          productOrder
+                        }
+                      }
+                      type
                     }
                   }
                   clients(where: { title: $company }, first: 100) {
@@ -2227,7 +2450,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                   ? subscriptions?.subscriptions.data.subscription.subscription
                       .databaseId
                   : subscriptions?.data.subscription.subscription.databaseId,
-                productId: planDetailsTemp[i].product.node.databaseId + "",
+                productId:
+                  planDetailsTemp[i].product.node.type == "SIMPLE"
+                    ? planDetailsTemp[i].product.node.databaseId + ""
+                    : planDetailsTemp[i].variation.node.databaseId + "",
                 productQuantity:
                   planDetailsTemp[i].quantity != null
                     ? planDetailsTemp[i].quantity
@@ -2235,6 +2461,8 @@ export default function Dashboard({ data, categories, products, orders }) {
               },
             })
             .then((data) => {
+              console.log(planDetailsTemp[i]);
+
               console.log(data);
               if (i == planDetailsTemp.length - 1) {
                 console.log(data);
@@ -2322,7 +2550,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                         : subscriptions?.data.subscription.subscription
                             .databaseId,
                       productId:
-                        planDetailsTemp[i].product.node.databaseId + "",
+                        planDetailsTemp[i].product.node.type == "SIMPLE"
+                          ? planDetailsTemp[i].product.node.databaseId + ""
+                          : planDetailsTemp[i].variation.node.databaseId + "",
                       productQuantity:
                         planDetailsTemp[i].quantity != null
                           ? planDetailsTemp[i].quantity
@@ -2853,6 +3083,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   cfh={coffeeFromHome}
                 />
               )}
+              {console.log(dataObject)}
               {activeTab == 1 && (
                 <Products
                   productCategories={dataObject.data.productTags.nodes}

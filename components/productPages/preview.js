@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import Image from "next/image";
 import CartContext from "../context/cart-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Info } from "../dashboardComponents/info";
 import { Browser } from "@capacitor/browser";
 
@@ -66,6 +66,29 @@ export default function Preview({
     return -1;
   };
 
+  const getCheapestVariant = (variants) => {
+    let lowestPrice = 0.0;
+    let lowestPriceLoc = 0;
+
+    for (let i = 0; i < variants?.length; i++) {
+      let price = parseFloat(variants[i]?.price.replace("£", ""));
+
+      console.log(price);
+
+      if (lowestPrice == 0.0) {
+        lowestPrice = price;
+        lowestPriceLoc = i;
+      } else {
+        if (lowestPrice > price) {
+          lowestPrice = price;
+          lowestPriceLoc = i;
+        }
+      }
+    }
+
+    return lowestPriceLoc;
+  };
+
   const [subQuantity, setSubQuantity] = useState(
     purchaseType == 1 && isInSubscription()
       ? subscriptions.data.subscription.subscription.lineItems.nodes[
@@ -111,9 +134,64 @@ export default function Preview({
     await Browser.open({ url: link });
   };
 
+  const getDefaultVariants = () => {
+    let temp = {};
+
+    for (let i = 0; i < product.attributes?.nodes?.length; i++) {
+      temp[product.attributes.nodes[i]?.name.toLowerCase()] =
+        product.variations.nodes[
+          getCheapestVariant(product.variations.nodes)
+        ].name
+          .split("-")[1]
+          .split(", ")
+          [i].replace(" ", "");
+    }
+
+    console.log(temp);
+
+    return temp;
+  };
+
+  const [selectedVariants, setSelectedVariants] = useState(
+    getDefaultVariants()
+  );
+
+  useEffect(() => {
+    console.log(selectedVariants);
+  }, [selectedVariants]);
+
+  const findVariant = (variants, sVariants) => {
+    for (let i = 0; i < variants.length; i++) {
+      let variantName = variants[i].name.split("-")[1].replace(" ", "");
+
+      let sVariantsStr = "";
+
+      for (let j = 0; j < sVariants.length; j++) {
+        if (sVariantsStr != "") {
+          sVariantsStr += ", ";
+          sVariantsStr += sVariants[j];
+        } else {
+          sVariantsStr += sVariants[j];
+        }
+      }
+
+      if (variantName == sVariantsStr) {
+        return i;
+      }
+    }
+
+    return -1;
+  };
+
+  console.log(getCheapestVariant(product.variations?.nodes));
+
+  const [selectedVariant, setSelectedVariant] = useState(
+    product.variations?.nodes[getCheapestVariant(product.variations.nodes)]
+  );
+
   return (
     <div
-      className={`absolute top-0 flex flex-col gap-6 h-full w-full overflow-auto bg-erniedarkcream pb-16 px-6 lg:px-10 z-10 lg:w-[80%] lg:h-[80%] lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl`}
+      className={`fixed top-0 flex flex-col gap-6 h-full w-full overflow-auto bg-erniedarkcream pb-16 px-6 lg:px-10 z-10 lg:w-[70%] lg:h-[70%] lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl`}
     >
       {showingInfo && (
         <Info
@@ -211,7 +289,7 @@ export default function Preview({
           </div>
           <div className="">
             {product.productDisplayStyle.shortDescription ? (
-              <div className="flex flex-col gap-0 border-b-[1px] border-erniegreen pb-3">
+              <div className="flex flex-col gap-0  border-erniegreen pb-3">
                 {showFullDesc ? (
                   <p className="font-circular font-[500] text-sm text-erniegreen pt-1 lg:text-base lg:pt-4 lg:pb-5 lg:">
                     {product.description}
@@ -253,7 +331,7 @@ export default function Preview({
           product.productTags.nodes[0].name == "cups/bottles" ? (
             <div></div>
           ) : (
-            <div className="flex flex-col lg:mt-2">
+            <div className="flex flex-col lg:mt-2 mb-2">
               <p
                 className={`font-circular text-sm lg:text-base text-erniegreen`}
               >
@@ -436,8 +514,73 @@ export default function Preview({
               </p>
             </div>
           )}
+          {console.log(selectedVariants)}
+          {product.type == "VARIABLE" && pType != -1 && (
+            <div className="flex flex-col gap-4 mb-4">
+              {product.attributes.nodes.map((attribute, index) => (
+                <div className="flex flex-col gap-2" key={index}>
+                  <label
+                    htmlFor={attribute.name.toLowerCase()}
+                    className="font-circular text-erniegreen text-sm"
+                  >
+                    {attribute.name}
+                  </label>
+                  <select
+                    id={attribute.name.toLowerCase()}
+                    name={attribute.name.toLowerCase()}
+                    className="bg-erniedarkcream rounded-lg p-2 font-circular text-erniegreen outline-none"
+                    onChange={(e) => {
+                      let temp = selectedVariants;
+
+                      temp[attribute.name.toLowerCase()] =
+                        e.currentTarget.value;
+
+                      setSelectedVariants(temp);
+
+                      console.log(temp);
+
+                      console.log(
+                        findVariant(
+                          product.variations.nodes,
+                          Array.from(Object.values(temp))
+                        )
+                      );
+
+                      console.log(
+                        product.variations.nodes[
+                          findVariant(
+                            product.variations.nodes,
+                            Array.from(Object.values(temp))
+                          )
+                        ]
+                      );
+
+                      setSelectedVariant(
+                        product.variations.nodes[
+                          findVariant(
+                            product.variations.nodes,
+                            Array.from(Object.values(temp))
+                          )
+                        ]
+                      );
+                    }}
+                  >
+                    {attribute.options.map((option, oIndex) => (
+                      <option key={oIndex} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
           {product.productDisplayStyle.allowOrdering == true && (
-            <div className="bg-erniedarkcream p-6 rounded-lg lg:flex hidden">
+            <div
+              className={`bg-erniedarkcream p-6 rounded-lg ${
+                pType == -1 ? "hidden" : "lg:flex hidden "
+              }`}
+            >
               {pType == 0 && (
                 <div className="hidden lg:flex w-full flex-grow">
                   <div className="rounded-xl mt-0 w-full">
@@ -456,11 +599,7 @@ export default function Preview({
                           </p>
                         </div>
                         <p className="font-circe font-erniegreen font-[900] self-center w-10 text-center lg:text-lg">
-                          {oneOffQuantity +
-                            " " +
-                            (product.productDisplayStyle.priceSuffix
-                              ? product.productDisplayStyle.priceSuffix
-                              : "")}
+                          {oneOffQuantity}
                         </p>
                         <div
                           className="bg-erniegreen p-1 rounded-lg flex-grow"
@@ -475,7 +614,14 @@ export default function Preview({
                       </div>
                       <div className="flex flex-row justify-between gap-8">
                         <p className="font-circe font-[900] text-erniegreen text-2xl lg:text-3xl">
-                          {product.price == null ? "£0.00" : product.price}
+                          {console.log(
+                            product.variations.nodes[selectedVariant]
+                          )}
+                          {product.type == "SIMPLE"
+                            ? product.price == null
+                              ? "£0.00"
+                              : product.price
+                            : selectedVariant?.price}
                         </p>
                         <div
                           className="bg-erniegold rounded-xl w-full lg:w-auto p-2 lg:py-2 lg:px-4 flex flex-row justify-center items-center cursor-pointer"
@@ -485,6 +631,7 @@ export default function Preview({
                             addToOneOffBasket({
                               product: product,
                               quantity: oneOffQuantity,
+                              selectedVariant: selectedVariant,
                             });
 
                             console.log(addingToOBasket);
@@ -561,7 +708,11 @@ export default function Preview({
                       </div>
                       <div className="flex flex-row justify-between gap-8">
                         <p className="font-circe font-[900] text-erniegreen text-2xl">
-                          {product.price == null ? "£0.00" : product.price}
+                          {product.type == "SIMPLE"
+                            ? product.price == null
+                              ? "£0.00"
+                              : product.price
+                            : selectedVariant?.price}
                         </p>
                         <div
                           className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
@@ -571,6 +722,7 @@ export default function Preview({
                             addToSubBasket({
                               product: product,
                               quantity: subQuantity,
+                              selectedVariant: selectedVariant,
                             });
                           }}
                         >
@@ -667,6 +819,7 @@ export default function Preview({
                         addToOneOffBasket({
                           product: product,
                           quantity: oneOffQuantity,
+                          variation: selectedVariant,
                         });
 
                         console.log(addingToOBasket);
@@ -743,7 +896,11 @@ export default function Preview({
                   </div>
                   <div className="flex flex-row justify-between gap-8">
                     <p className="font-circe font-[900] text-erniegreen text-2xl">
-                      {product.price == null ? "£0.00" : product.price}
+                      {product.type == "SIMPLE"
+                        ? product.price == null
+                          ? "£0.00"
+                          : product.price
+                        : selectedVariant?.price}
                     </p>
                     <div
                       className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
@@ -753,6 +910,7 @@ export default function Preview({
                         addToSubBasket({
                           product: product,
                           quantity: subQuantity,
+                          selectedVariant: selectedVariant,
                         });
                       }}
                     >

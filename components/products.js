@@ -157,6 +157,8 @@ export default function Products({
   //   return filtered;
   // }
 
+  console.log(products);
+
   function filteredCategories() {
     let filtered = [];
 
@@ -172,7 +174,7 @@ export default function Products({
       }
     }
 
-    console.log(filteredTags);
+    console.log(products);
 
     const tags = products.reduce((acc, product) => {
       // Apply the forHome check only if cfh is true
@@ -222,6 +224,7 @@ export default function Products({
       tagsWithBrands.push({
         category: key,
         brands: value.reduce((acc, product) => {
+          console.log(value);
           const brandName = product.product.brands?.nodes[0]?.name;
           if (brandName) {
             if (!acc[brandName]) {
@@ -233,6 +236,8 @@ export default function Products({
         }, {}),
       });
     }
+
+    console.log(tagsWithBrands);
 
     for (let i = 0; i < tagsWithBrands.length; i++) {
       for (let j = 0; j < filteredTags.length; j++) {
@@ -727,6 +732,29 @@ export default function Products({
     setNewPurchase(val);
   };
 
+  const getCheapestVariant = (variants) => {
+    let lowestPrice = 0.0;
+    let lowestPriceLoc = 0;
+
+    for (let i = 0; i < variants?.length; i++) {
+      let price = parseFloat(variants[i]?.price.replace("£", ""));
+
+      console.log(price);
+
+      if (lowestPrice == 0.0) {
+        lowestPrice = price;
+        lowestPriceLoc = i;
+      } else {
+        if (lowestPrice > price) {
+          lowestPrice = price;
+          lowestPriceLoc = i;
+        }
+      }
+    }
+
+    return variants[lowestPriceLoc]?.price;
+  };
+
   return (
     <ApolloProvider client={graphqlClient}>
       <div className="h-full lg:w-[calc(100vw-112px)] relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
@@ -940,7 +968,12 @@ export default function Products({
                                           : "mt-2"
                                       }`}
                                     >
-                                      {product.product.price}
+                                      {console.log(product.product.type)}
+                                      {product.product.type == "SIMPLE"
+                                        ? product.product.price
+                                        : getCheapestVariant(
+                                            product.product.variations?.nodes
+                                          )}
                                     </p>
                                   </div>
                                 )}
@@ -1167,7 +1200,11 @@ export default function Products({
                                         : "mt-2"
                                     }`}
                                   >
-                                    {product.product.price}
+                                    {product.product.type == "SIMPLE"
+                                      ? product.product.price
+                                      : getCheapestVariant(
+                                          product.product.variations?.nodes
+                                        )}
                                   </p>
                                 </div>
                               )}
