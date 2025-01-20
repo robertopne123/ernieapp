@@ -167,7 +167,7 @@ export const Basket = ({
           parseFloat(
             arr[i].product?.node.type == "SIMPLE"
               ? arr[i].product?.node.price.replace("£", "")
-              : arr[i].variant?.node.price.replace("£", "")
+              : arr[i].variation?.node.price.replace("£", "")
           ) *
             arr[i].quantity;
       }
