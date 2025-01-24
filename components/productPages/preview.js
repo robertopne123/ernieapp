@@ -89,6 +89,37 @@ export default function Preview({
     return lowestPriceLoc;
   };
 
+  const getDefaultSelectedVariants = () => {
+    for (let i = 0; i < product.variations.nodes?.length; i++) {
+      console.log(product.variations.nodes[i]);
+
+      let titleParts = product.variations.nodes[i].name.split(" - ");
+
+      console.log(titleParts);
+
+      if (titleParts.length == 2) {
+        let variantParts = titleParts[1].split(", ");
+
+        console.log(variantParts);
+
+        if (variantParts.length == 1) {
+          if (titleParts[1] == selectedType) {
+            return i;
+          }
+        } else {
+          if (
+            variantParts[0] == selectedSize &&
+            variantParts[1] == selectedType
+          ) {
+            return i;
+          }
+        }
+      }
+    }
+
+    return null;
+  };
+
   const [subQuantity, setSubQuantity] = useState(
     purchaseType == 1 && isInSubscription()
       ? subscriptions.data.subscription.subscription.lineItems.nodes[
@@ -137,13 +168,19 @@ export default function Preview({
   const getDefaultVariants = () => {
     let temp = {};
 
+    console.log(product.attributes.nodes);
+    console.log(
+      product.variations.nodes[getCheapestVariant(product.variations.nodes)]
+    );
+
     for (let i = 0; i < product.attributes?.nodes?.length; i++) {
+      let cheapestVariant =
+        product.variations.nodes[getCheapestVariant(product.variations.nodes)];
+
       temp[product.attributes.nodes[i]?.name.toLowerCase()] =
-        product.variations.nodes[
-          getCheapestVariant(product.variations.nodes)
-        ].name
-          .split("-")[1]
-          .split(", ")
+        cheapestVariant.name
+          .split("-")
+          [cheapestVariant.name.split("-").length - 1].split(", ")
           [i].replace(" ", "");
     }
 
@@ -185,14 +222,28 @@ export default function Preview({
 
   console.log(getCheapestVariant(product.variations?.nodes));
 
+  console.log(product);
+
+  const [selectedSize, setSelectedSize] = useState("1kg Tub");
+  const [selectedType, setSelectedType] = useState("Beans");
+
   const [selectedVariant, setSelectedVariant] = useState(
-    product.variations?.nodes[getCheapestVariant(product.variations.nodes)]
+    product.variations?.nodes[getDefaultSelectedVariants()]
   );
+
+  useEffect(() => {
+    console.log(selectedSize);
+  }, [selectedSize]);
+
+  useEffect(() => {
+    console.log(selectedType);
+  }, [selectedType]);
 
   return (
     <div
-      className={`fixed top-0 flex flex-col gap-6 h-full w-full overflow-auto bg-erniedarkcream pb-16 px-6 lg:px-10 z-10 lg:w-[70%] lg:h-[70%] lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl`}
+      className={`absolute flex flex-col gap-6 h-full w-full overflow-auto bg-erniedarkcream pb-16 px-6 lg:px-10 z-10 lg:w-[70%] lg:h-[70%] lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl`}
     >
+      {console.log(selectedVariant)}
       {showingInfo && (
         <Info
           name={"Coffee That Connects: Bridging Communities with Groundswell "}
@@ -528,6 +579,11 @@ export default function Preview({
                   <select
                     id={attribute.name.toLowerCase()}
                     name={attribute.name.toLowerCase()}
+                    defaultValue={
+                      attribute.name.toLowerCase() == "size"
+                        ? selectedSize
+                        : selectedType
+                    }
                     className="bg-erniedarkcream rounded-lg p-2 font-circular text-erniegreen outline-none"
                     onChange={(e) => {
                       let temp = selectedVariants;
@@ -536,6 +592,16 @@ export default function Preview({
                         e.currentTarget.value;
 
                       setSelectedVariants(temp);
+
+                      if (attribute.name.toLowerCase() == "size") {
+                        setSelectedSize(
+                          e.currentTarget.value == 0 ? "1kg Tub" : "4kg Bucket"
+                        );
+                      } else {
+                        setSelectedType(
+                          e.currentTarget.value == 0 ? "Beans" : "Ground"
+                        );
+                      }
 
                       console.log(temp);
 
@@ -614,9 +680,7 @@ export default function Preview({
                       </div>
                       <div className="flex flex-row justify-between gap-8">
                         <p className="font-circe font-[900] text-erniegreen text-2xl lg:text-3xl">
-                          {console.log(
-                            product.variations.nodes[selectedVariant]
-                          )}
+                          {console.log(selectedVariant)}
                           {product.type == "SIMPLE"
                             ? product.price == null
                               ? "£0.00"
@@ -708,6 +772,7 @@ export default function Preview({
                       </div>
                       <div className="flex flex-row justify-between gap-8">
                         <p className="font-circe font-[900] text-erniegreen text-2xl">
+                          Hi
                           {product.type == "SIMPLE"
                             ? product.price == null
                               ? "£0.00"
@@ -809,7 +874,12 @@ export default function Preview({
                   </div>
                   <div className="flex flex-row justify-between gap-8">
                     <p className="font-circe font-[900] text-erniegreen text-2xl">
-                      {product.price == null ? "£0.00" : product.price}
+                      {console.log(selectedVariant)}
+                      {product.type == "SIMPLE"
+                        ? product.price == null
+                          ? "£0.00"
+                          : product.price
+                        : selectedVariant?.price}
                     </p>
                     <div
                       className="bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer"
@@ -819,7 +889,7 @@ export default function Preview({
                         addToOneOffBasket({
                           product: product,
                           quantity: oneOffQuantity,
-                          variation: selectedVariant,
+                          selectedVariant: selectedVariant,
                         });
 
                         console.log(addingToOBasket);

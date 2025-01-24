@@ -757,7 +757,7 @@ export default function Products({
 
   return (
     <ApolloProvider client={graphqlClient}>
-      <div className="h-full lg:w-[calc(100vw-112px)] relative flex flex-col bg-erniedarkcream pt-8 lg:pt-10 pb-8 lg:pb-10 overflow-auto">
+      <div className="h-full lg:w-[calc(100vw-112px)] relative flex flex-col bg-erniedarkcream overflow-auto">
         {showingInfo && (
           <BrandInfo
             close={close}
@@ -776,7 +776,7 @@ export default function Products({
             cfh={cfh}
           />
         )}
-        <div className="flex lg:hidden">
+        <div className="h-full flex lg:hidden relative">
           {previewing ? (
             <Preview
               product={products[selectedProduct]}
@@ -800,7 +800,7 @@ export default function Products({
               setAddingToOBasket={setAddingToOBasketFromProductPage}
             />
           ) : (
-            <div className="flex flex-col gap-0 h-auto pb-0 w-full">
+            <div className="flex flex-col gap-0 h-auto pb-0 w-full pt-8 lg:pt-10 pb-8 lg:pb-10">
               {purchaseType == 0 && (
                 <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                   <div className="flex flex-row justify-between">
@@ -843,7 +843,7 @@ export default function Products({
                   </div>
                 ))}
 
-              <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer">
+              <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer flex-none">
                 {filteredCategories()
                   .sort(function (a, b) {
                     return a.order - b.order;
@@ -1006,7 +1006,7 @@ export default function Products({
           )}
         </div>
 
-        <div className="hidden lg:flex">
+        <div className="hidden lg:flex w-full">
           {previewing && (
             <Preview
               product={products[selectedProduct]}

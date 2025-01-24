@@ -185,8 +185,11 @@ export const Basket = ({
         (oneOffBasket[i].product.type == "SIMPLE"
           ? parseFloat(oneOffBasket[i].product.price.replace("£", "")) *
             oneOffBasket[i].quantity
-          : parseFloat(oneOffBasket[i].selectedVariant.price.replace("£", "")) *
-            oneOffBasket[i].quantity);
+          : parseFloat(
+              oneOffBasket[i].selectedVariant
+                ? oneOffBasket[i].selectedVariant?.price.replace("£", "")
+                : oneOffBasket[i].variation?.price.replace("£", "")
+            ) * oneOffBasket[i].quantity);
     }
 
     return subtotal;
@@ -706,20 +709,31 @@ export const Basket = ({
                   productId: basket[i].product.databaseId,
                   quantity: basket[i].quantity,
                   variationId: basket[i].selectedVariant?.databaseId,
-                  metaData: [
-                    {
-                      key: "size",
-                      value: basket[i].selectedVariant?.name
-                        .split(" - ")[1]
-                        .split(",")[0],
-                    },
-                    {
-                      key: "type",
-                      value: basket[i].selectedVariant?.name
-                        .split(" - ")[1]
-                        .split(",")[1],
-                    },
-                  ],
+                  metaData:
+                    basket[i].selectedVariant?.name.split(" - ")[1].split(",")
+                      .length == 1
+                      ? [
+                          {
+                            key: "type",
+                            value: basket[i].selectedVariant?.name
+                              .split(" - ")[1]
+                              .split(",")[0],
+                          },
+                        ]
+                      : [
+                          {
+                            key: "size",
+                            value: basket[i].selectedVariant?.name
+                              .split(" - ")[1]
+                              .split(",")[0],
+                          },
+                          {
+                            key: "type",
+                            value: basket[i].selectedVariant?.name
+                              .split(" - ")[1]
+                              .split(",")[1],
+                          },
+                        ],
                 });
               }
             }
@@ -739,20 +753,31 @@ export const Basket = ({
           productId: basket[i].product.databaseId,
           quantity: basket[i].quantity,
           variationId: basket[i].selectedVariant?.databaseId,
-          metaData: [
-            {
-              key: "size",
-              value: basket[i].selectedVariant?.name
-                .split(" - ")[1]
-                .split(",")[0],
-            },
-            {
-              key: "type",
-              value: basket[i].selectedVariant?.name
-                .split(" - ")[1]
-                .split(",")[1],
-            },
-          ],
+          metaData:
+            basket[i].selectedVariant?.name.split(" - ")[1].split(",").length ==
+            1
+              ? [
+                  {
+                    key: "type",
+                    value: basket[i].selectedVariant?.name
+                      .split(" - ")[1]
+                      .split(",")[0],
+                  },
+                ]
+              : [
+                  {
+                    key: "size",
+                    value: basket[i].selectedVariant?.name
+                      .split(" - ")[1]
+                      .split(",")[0],
+                  },
+                  {
+                    key: "type",
+                    value: basket[i].selectedVariant?.name
+                      .split(" - ")[1]
+                      .split(",")[1],
+                  },
+                ],
         });
       }
     }
@@ -1775,7 +1800,7 @@ export const Basket = ({
           {showingCheckout ? (
             <div>
               {orderComplete ? (
-                <div className="absolute right-0 top-20 h-full w-full lg:h-[80%] lg:w-[80%]  lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
+                <div className="absolute right-0 top-20 h-auto w-full lg:h-[80%] lg:w-[80%]  lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
                   <div className="flex flex-col gap-4">
                     <p className="font-circe font-[900] text-center text-2xl lg:text-3xl text-erniegreen uppercase">
                       Thank you for <br />
