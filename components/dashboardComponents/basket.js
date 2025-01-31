@@ -1659,14 +1659,21 @@ export const Basket = ({
             console.log(oneOffBasket[i]);
           }
 
-          setVoucherAmount(
-            parseFloat(
-              oneOffBasket[oneOffBasket.length - 1]?.product.price.replace(
-                "£",
-                ""
-              )
-            ) * -1
-          );
+          if (currentVoucher.code === "groundswellstaff") {
+            // Apply 20% discount to the basket
+            const subtotal = parseFloat(getOneOffSubtotal().toFixed(2));
+            const discount = subtotal * 0.2;
+            setVoucherAmount(-discount);
+          } else {
+            setVoucherAmount(
+              parseFloat(
+                oneOffBasket[oneOffBasket.length - 1]?.product.price.replace(
+                  "£",
+                  ""
+                )
+              ) * -1
+            );
+          }
         } else {
           if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
             if (cfh) {
@@ -2293,6 +2300,8 @@ export const Basket = ({
                                               productsForCode =
                                                 coupons[i].products.nodes;
 
+                                              console.log(productsForCode);
+
                                               let matchingProducts = [];
 
                                               for (
@@ -2338,15 +2347,29 @@ export const Basket = ({
                                                 console.log(matchingProducts);
                                                 setMProducts(matchingProducts);
                                               } else {
-                                                console.log("sub");
-                                                console.log(purchaseType);
-                                                setVoucherApplied(false);
-                                                setVoucherFound(true);
-                                                vFound = true;
-                                                setVoucherInvalid(true);
-                                                setVoucherInvalidMsg(
-                                                  "You have no valid items in your basket"
-                                                );
+                                                console.log("no products");
+                                                if (
+                                                  productsForCode.length == 0
+                                                ) {
+                                                  console.log(purchaseType);
+                                                  setVoucherApplied(true);
+                                                  setVoucherFound(true);
+                                                  vFound = true;
+                                                  setVoucherInvalid(false);
+                                                  setAppliedVoucher(voucher);
+                                                  console.log(matchingProducts);
+                                                  setMProducts(oneOffBasket);
+                                                } else {
+                                                  console.log("sub");
+                                                  console.log(purchaseType);
+                                                  setVoucherApplied(false);
+                                                  setVoucherFound(true);
+                                                  vFound = true;
+                                                  setVoucherInvalid(true);
+                                                  setVoucherInvalidMsg(
+                                                    "You have no valid items in your basket"
+                                                  );
+                                                }
                                               }
                                             } else {
                                               console.log("sub");
@@ -2859,8 +2882,16 @@ export const Basket = ({
                                   </p>
                                   <p className="font-circular text-erniegreen text-sm">
                                     -
-                                    {purchaseType == 0 &&
-                                      mProducts[matchedProduct]?.product.price}
+                                    {appliedVoucher == "groundswellstaff"
+                                      ? "£" +
+                                        (
+                                          (purchaseType == 0
+                                            ? getOneOffSubtotal()
+                                            : getSubSubtotal()) * 0.2
+                                        ).toFixed(2)
+                                      : purchaseType == 0 &&
+                                        mProducts[matchedProduct]?.product
+                                          .price}
                                   </p>
                                   {console.log(matchedProduct)}
                                 </div>
