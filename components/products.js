@@ -870,6 +870,7 @@ export default function Products({
                     </div>
                   ))}
               </div>
+              {console.log(products)}
               <div className="flex flex-col-reverse">
                 {console.log(filteredCategories()[selectedTab])}
 

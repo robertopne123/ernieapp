@@ -310,11 +310,24 @@ export default function Dashboard({ data, categories, products, orders }) {
                   id
                   name
                   price
+                  attributes(first: 100) {
+                    nodes {
+                      name
+                      options
+                      variation
+                    }
+                  }
                   variations {
                     nodes {
                       databaseId
                       name
                       price
+                      attributes {
+                        nodes {
+                          name
+                          value
+                        }
+                      }
                     }
                   }
                   chocolateBarsExtraInfo {
@@ -391,13 +404,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productOrdering {
                     productOrder
-                  }
-                  attributes {
-                    nodes {
-                      name
-                      options
-                      variation
-                    }
                   }
                 }
               }
@@ -765,6 +771,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                       }
                       description(format: RAW)
                       name
+                      type
                       ... on SimpleProduct {
                         id
                         name
@@ -843,6 +850,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                         productOrdering {
                           productOrder
                         }
+                        attributes {
+                          nodes {
+                            name
+                            options
+                            variation
+                          }
+                        }
                       }
                       ... on VariableProduct {
                         id
@@ -853,6 +867,12 @@ export default function Dashboard({ data, categories, products, orders }) {
                             databaseId
                             name
                             price
+                            attributes {
+                              nodes {
+                                name
+                                value
+                              }
+                            }
                           }
                         }
                         chocolateBarsExtraInfo {
@@ -930,8 +950,14 @@ export default function Dashboard({ data, categories, products, orders }) {
                         productOrdering {
                           productOrder
                         }
+                        attributes(first: 100) {
+                          nodes {
+                            name
+                            options
+                            variation
+                          }
+                        }
                       }
-                      type
                     }
                   }
                   clients(where: { title: $company }, first: 100) {
@@ -1024,6 +1050,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       }
                       discountType
                       freeShipping
+                      couponDetails {
+                        maxUsage
+                      }
                     }
                   }
                   employeeLists(where: { name: $email }) {
@@ -1049,6 +1078,8 @@ export default function Dashboard({ data, categories, products, orders }) {
               setData(data);
               console.log(data);
               tempDataObject = data;
+
+              console.log(data.data.products.nodes);
 
               let cfh = localStorage.getItem("cfh");
 

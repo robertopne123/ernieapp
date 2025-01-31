@@ -168,7 +168,7 @@ export default function Preview({
   const getDefaultVariants = () => {
     let temp = {};
 
-    console.log(product.attributes.nodes);
+    console.log(product.attributes?.nodes);
     console.log(
       product.variations.nodes[getCheapestVariant(product.variations.nodes)]
     );
@@ -565,10 +565,10 @@ export default function Preview({
               </p>
             </div>
           )}
-          {console.log(selectedVariants)}
+          {console.log(product)}
           {product.type == "VARIABLE" && pType != -1 && (
             <div className="flex flex-col gap-4 mb-4">
-              {product.attributes.nodes.map((attribute, index) => (
+              {product.attributes?.nodes.map((attribute, index) => (
                 <div className="flex flex-col gap-2" key={index}>
                   <label
                     htmlFor={attribute.name.toLowerCase()}
