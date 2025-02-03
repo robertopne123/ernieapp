@@ -1987,7 +1987,7 @@ export const Basket = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="absolute right-0 top-20 h-auto w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
+                    <div className="absolute right-0 top-20 h-auto lg:h-full w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
                       <div
                         className="pb-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mb-6"
                         onClick={() => {
