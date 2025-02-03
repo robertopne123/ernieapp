@@ -2274,6 +2274,8 @@ export const Basket = ({
 
                                   let usage = 0;
 
+                                  console.log(id);
+
                                   checkCoupon({
                                     variables: {
                                       id: id,

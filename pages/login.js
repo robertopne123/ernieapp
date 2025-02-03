@@ -344,6 +344,8 @@ export default function Login() {
         "employeruser",
         data?.data?.login?.user.userCompanyField.parentUser
       );
+
+      console.log(data?.data?.login?.user.userCompanyField.parentUser);
       localStorage.setItem(
         "first-time-user",
         data?.data?.login?.user.userCompanyField.usedApp == null ? true : false
@@ -499,6 +501,7 @@ export default function Login() {
             "employeruser",
             data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
           );
+          console.log(data?.data?.login?.customer?.databaseId);
           localStorage.setItem(
             "first-time-user",
             data?.data?.login?.user.userCompanyField.usedApp == null
@@ -535,6 +538,13 @@ export default function Login() {
           localStorage.setItem("prevUser", un);
           localStorage.setItem("prevPass", pw);
         }
+
+        console.log(data?.data?.login?.customer?.databaseId);
+
+        localStorage.setItem(
+          "employeruser",
+          data?.data?.login?.customer?.databaseId //NEEDS CHANGING IF EMPLOYEES ADDED
+        );
 
         safePush(
           "/dashboard" +
