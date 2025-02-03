@@ -2211,10 +2211,14 @@ export const Basket = ({
                                   name="voucher"
                                   placeholder="Enter code here"
                                   onChange={(e) => {
-                                    setVoucher(e.currentTarget.value);
+                                    setVoucher(
+                                      e.currentTarget.value.replace(/\s/g, "")
+                                    );
                                   }}
                                   onPaste={(e) => {
-                                    setVoucher(e.currentTarget.value);
+                                    setVoucher(
+                                      e.currentTarget.value.replace(/\s/g, "")
+                                    );
                                   }}
                                   className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] rounded-lg outline-erniegold outline-[1px] ${
                                     voucherInvalid
