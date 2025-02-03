@@ -2212,12 +2212,16 @@ export const Basket = ({
                                   placeholder="Enter code here"
                                   onChange={(e) => {
                                     setVoucher(
-                                      e.currentTarget.value.replace(/\s/g, "")
+                                      e.currentTarget.value
+                                        .toLowerCase()
+                                        .replace(/\s/g, "")
                                     );
                                   }}
                                   onPaste={(e) => {
                                     setVoucher(
-                                      e.currentTarget.value.replace(/\s/g, "")
+                                      e.currentTarget.value
+                                        .toLowerCase()
+                                        .replace(/\s/g, "")
                                     );
                                   }}
                                   className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] rounded-lg outline-erniegold outline-[1px] ${
