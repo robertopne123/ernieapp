@@ -170,7 +170,7 @@ export default function Preview({
 
     console.log(product.attributes?.nodes);
     console.log(
-      product.variations.nodes[getCheapestVariant(product.variations.nodes)]
+      product.variations?.nodes[getCheapestVariant(product.variations.nodes)]
     );
 
     for (let i = 0; i < product.attributes?.nodes?.length; i++) {
