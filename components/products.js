@@ -1031,7 +1031,7 @@ export default function Products({
               setAddingToOBasket={setAddingToOBasketFromProductPage}
             />
           )}
-          <div className="flex flex-col gap-0 h-auto">
+          <div className="flex flex-col my-10 gap-0 h-auto">
             {purchaseType == 0 && (
               <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                 <div className="flex flex-row justify-between">
