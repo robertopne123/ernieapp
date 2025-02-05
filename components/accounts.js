@@ -19,6 +19,7 @@ export default function Accounts({
   subsidyChanging,
   role,
   cfh,
+  gs,
 }) {
   const [selectedPage, setSelectedPage] = useState(-1);
 

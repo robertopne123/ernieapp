@@ -34,6 +34,7 @@ export const StaticTopBar = ({
   orderHistory,
   setOrderHistory,
   cfh,
+  gs,
 }) => {
   const addToSubBasketFromBar = (item) => {
     addToSubBasket(item);
@@ -152,6 +153,7 @@ export const StaticTopBar = ({
           orderHistory={orderHistory}
           setOrderHistory={setOrderHistoryFromBar}
           cfh={cfh}
+          gs={gs}
         />
       </div>
     </div>

@@ -43,6 +43,7 @@ export default function Products({
   setAddingToSBasket,
   setAddingToOBasket,
   cfh,
+  gs,
 }) {
   // function filteredCategories() {
   //   let filtered = [];
@@ -179,16 +180,29 @@ export default function Products({
     const tags = products.reduce((acc, product) => {
       // Apply the forHome check only if cfh is true
       if (cfh) {
-        if (product?.productDisplayStyle?.forHome) {
-          const tagName = product.productTags?.nodes[0].name;
-          if (tagName) {
-            if (!acc[tagName]) {
-              acc[tagName] = [];
+        if (gs) {
+          if (product?.productDisplayStyle?.showProductGroundswell) {
+            const tagName = product.productTags?.nodes[0].name;
+            if (tagName) {
+              if (!acc[tagName]) {
+                acc[tagName] = [];
+              }
+              acc[tagName].push(product);
             }
-            acc[tagName].push(product);
           }
+          return acc;
+        } else {
+          if (product?.productDisplayStyle?.forHome) {
+            const tagName = product.productTags?.nodes[0].name;
+            if (tagName) {
+              if (!acc[tagName]) {
+                acc[tagName] = [];
+              }
+              acc[tagName].push(product);
+            }
+          }
+          return acc;
         }
-        return acc;
       } else {
         const tagName = product.productTags?.nodes[0].name;
         if (tagName) {
@@ -774,6 +788,7 @@ export default function Products({
             setPurchasing={setP}
             setNewPurchase={setNewP}
             cfh={cfh}
+            gs={gs}
           />
         )}
         <div className="h-full flex lg:hidden relative">

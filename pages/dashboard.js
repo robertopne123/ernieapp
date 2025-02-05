@@ -112,6 +112,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const [updatedPlan, setUpdatedPlan] = useState(false);
 
   const [coffeeFromHome, setCoffeeFromHome] = useState(false);
+  const [groundswell, setGroundswell] = useState(false);
 
   const client = graphqlClient;
 
@@ -131,6 +132,10 @@ export default function Dashboard({ data, categories, products, orders }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCoffeeFromHome(localStorage?.getItem("cfh") === "true");
+    }
+
+    if (typeof window !== "undefined") {
+      setGroundswell(localStorage?.getItem("groundswell") === "true");
     }
   }, []);
 
@@ -269,6 +274,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     shortDescription
                     allowOrdering
                     forHome
+                    showProductGroundswell
                   }
                   productTags {
                     nodes {
@@ -375,6 +381,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     allowOrdering
                     forHome
                     priceSuffix
+                    showProductGroundswell
                   }
                   title
                   productTags {
@@ -821,6 +828,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           shortDescription
                           allowOrdering
                           forHome
+                          showProductGroundswell
                         }
                         productTags {
                           nodes {
@@ -920,6 +928,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           allowOrdering
                           forHome
                           priceSuffix
+                          showProductGroundswell
                         }
                         title
                         productTags {
@@ -1082,8 +1091,15 @@ export default function Dashboard({ data, categories, products, orders }) {
               console.log(data.data.products.nodes);
 
               let cfh = localStorage.getItem("cfh");
+              let gs = localStorage.getItem("groundswell");
 
               if (!cfh) {
+                setCompanyID(data.data.clients.nodes[0].databaseId);
+
+                console.log(data.data.clients.nodes[0].databaseId);
+              }
+
+              if (!gs) {
                 setCompanyID(data.data.clients.nodes[0].databaseId);
 
                 console.log(data.data.clients.nodes[0].databaseId);
@@ -1217,6 +1233,30 @@ export default function Dashboard({ data, categories, products, orders }) {
                 });
 
               if (!cfh) {
+                client
+                  .mutate({
+                    mutation: gql`
+                      mutation GetPDF($dataset: ID!, $templateId: ID!) {
+                        getPDF(
+                          input: { dataset: $dataset, templateId: $templateId }
+                        ) {
+                          url
+                        }
+                      }
+                    `,
+                    variables: {
+                      dataset: data.data.clients.nodes[0].databaseId,
+                      templateId: 2,
+                    },
+                  })
+                  .then((data) => {
+                    console.log(data);
+
+                    setImpactCertificateURL(data.data.getPDF.url);
+                  });
+              }
+
+              if (!gs) {
                 client
                   .mutate({
                     mutation: gql`
@@ -2096,6 +2136,7 @@ export default function Dashboard({ data, categories, products, orders }) {
               orderHistory={orderHistory}
               setOrderHistory={setOrderHistory}
               cfh={coffeeFromHome}
+              gs={groundswell}
             />
             <div
               className={`${
@@ -2134,6 +2175,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setCurrentTab={setCurrentTab}
                   setShowingCert={setShowingCert}
                   cfh={coffeeFromHome}
+                  gs={groundswell}
                 />
               )}
               {console.log(dataObject)}
@@ -2172,6 +2214,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setAddingToSBasket={setAddingToSBasket}
                   setAddingToOBasket={setAddingToOBasket}
                   cfh={coffeeFromHome}
+                  gs={groundswell}
                 />
               )}
               {activeTab == 2 && (
@@ -2203,17 +2246,43 @@ export default function Dashboard({ data, categories, products, orders }) {
                   subsidyChanging={subsidyChanging}
                   role={role}
                   cfh={coffeeFromHome}
+                  gs={groundswell}
                 />
               )}
             </div>
             <div
               className={`bg-ernieteal w-screen grid ${
                 coffeeFromHome ? "grid-cols-3" : "grid-cols-4"
+              } ${
+                groundswell ? "grid-cols-3" : "grid-cols-4"
               } justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >
               {role == 0 &&
                 (coffeeFromHome
+                  ? cfhtabs.map((tab, index) => (
+                      <div
+                        key={index}
+                        className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
+                          tab.index == activeTab ? "bg-erniemint" : ""
+                        } `}
+                        onClick={(e) => {
+                          setTab(tab.index);
+                          setNewPurchase(false);
+                          console.log(tab.index, activeTab);
+                          setShowingBasket(false);
+                          setManagingSubscription(false);
+                        }}
+                      >
+                        <div className="w-8 h-8 mx-auto relative">
+                          <Image src={tab.icon} fill={true}></Image>
+                        </div>
+                        <p className="text-erniecream text-sm font-circular text-center">
+                          {tab.name}
+                        </p>
+                      </div>
+                    ))
+                  : groundswell
                   ? cfhtabs.map((tab, index) => (
                       <div
                         key={index}

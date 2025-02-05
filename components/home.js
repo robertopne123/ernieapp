@@ -43,6 +43,7 @@ export default function Home({
   setCurrentTab,
   setShowingCert,
   cfh,
+  gs,
 }) {
   const updateOrderFromSummary = (orderDetails) => {
     updateOrder(orderDetails);
