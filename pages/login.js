@@ -1010,13 +1010,13 @@ export default function Login() {
                     }}
                   >
                     <p className="font-circe text-erniecream font-[900] text-lg text-center uppercase">
-                      Coffee For Home
+                      Coffee For Home - Grindswell
                     </p>
                     <p className="font-circe text-erniecream font-[900] uppercase text-xl">
                       {">"}
                     </p>
                   </div>
-                  <div
+                  {/* <div
                     className="bg-transparent px-2 pb-2  [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
                     onClick={(e) => {
                       e.preventDefault();
@@ -1035,7 +1035,7 @@ export default function Login() {
                     <p className="font-circe text-erniecream font-[900] uppercase text-xl">
                       {">"}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="flex-grow lg:w-1/2 lg:order-1">
