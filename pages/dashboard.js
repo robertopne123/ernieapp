@@ -111,6 +111,9 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [updatedPlan, setUpdatedPlan] = useState(false);
 
+  const [coffeeFromHome, setCoffeeFromHome] = useState(false);
+  const [groundswell, setGroundswell] = useState(false);
+
   const client = graphqlClient;
 
   useEffect(() => {
@@ -125,6 +128,16 @@ export default function Dashboard({ data, categories, products, orders }) {
       }
     }
   `;
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCoffeeFromHome(localStorage?.getItem("cfh") === "true");
+    }
+
+    if (typeof window !== "undefined") {
+      setGroundswell(localStorage?.getItem("groundswell") === "true");
+    }
+  }, []);
 
   const [refreshToken, { refreshData, refreshLoading, refreshError }] =
     useMutation(REFRESH, {
@@ -211,6 +224,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                 }
                 description(format: RAW)
                 name
+                type
                 ... on SimpleProduct {
                   id
                   name
@@ -258,7 +272,118 @@ export default function Dashboard({ data, categories, products, orders }) {
                     titleStyle
                     priceSuffix
                     shortDescription
+                    allowOrdering
+                    forHome
+                    showProductGroundswell
                   }
+                  productTags {
+                    nodes {
+                      name
+                      tagCategoryImages {
+                        displayOrder
+                        tagImage {
+                          sourceUrl
+                        }
+                      }
+                    }
+                  }
+                  brands {
+                    nodes {
+                      name
+                      description
+                      brandingImage {
+                        image {
+                          sourceUrl
+                        }
+                      }
+                      brandOrder {
+                        brandOrder
+                      }
+                    }
+                  }
+                  productOrdering {
+                    productOrder
+                  }
+                  attributes {
+                    nodes {
+                      name
+                      options
+                      variation
+                    }
+                  }
+                }
+                ... on VariableProduct {
+                  id
+                  name
+                  price
+                  attributes(first: 100) {
+                    nodes {
+                      name
+                      options
+                      variation
+                    }
+                  }
+                  variations {
+                    nodes {
+                      databaseId
+                      name
+                      price
+                      attributes {
+                        nodes {
+                          name
+                          value
+                        }
+                      }
+                    }
+                  }
+                  chocolateBarsExtraInfo {
+                    calories
+                    dietType
+                    ingredients
+                    type
+                    allergens
+                    health
+                  }
+                  coffeeExtraInfo {
+                    flavours
+                    origin
+                    roast
+                    type
+                    varietal
+                    appearance
+                  }
+                  hotChocolateExtraInfo {
+                    dietType
+                    ingredients
+                    origin
+                    type
+                  }
+                  teaExtraInfo {
+                    elavation
+                    origin
+                    howToDrink
+                    flavours
+                    packaging
+                    process
+                  }
+                  productDisplayStyle {
+                    badgeImage {
+                      sourceUrl
+                    }
+                    bgImage {
+                      sourceUrl
+                    }
+                    secondaryImage {
+                      sourceUrl
+                    }
+                    titleStyle
+                    shortDescription
+                    allowOrdering
+                    forHome
+                    priceSuffix
+                    showProductGroundswell
+                  }
+                  title
                   productTags {
                     nodes {
                       name
@@ -532,11 +657,26 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 sourceUrl
                               }
                             }
+                            type
                             ... on SimpleProduct {
                               id
                               name
                               price
                             }
+                            ... on VariableProduct {
+                              id
+                              name
+                              price
+                              databaseId
+                              productId
+                            }
+                          }
+                        }
+                        variation {
+                          node {
+                            name
+                            databaseId
+                            price
                           }
                         }
                       }
@@ -638,6 +778,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                       }
                       description(format: RAW)
                       name
+                      type
                       ... on SimpleProduct {
                         id
                         name
@@ -647,6 +788,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                           dietType
                           ingredients
                           type
+                          allergens
+                          health
                         }
                         coffeeExtraInfo {
                           flavours
@@ -654,12 +797,21 @@ export default function Dashboard({ data, categories, products, orders }) {
                           roast
                           type
                           varietal
+                          appearance
                         }
                         hotChocolateExtraInfo {
                           dietType
                           ingredients
                           origin
                           type
+                        }
+                        teaExtraInfo {
+                          origin
+                          elavation
+                          flavours
+                          process
+                          howToDrink
+                          packaging
                         }
                         productDisplayStyle {
                           badgeImage {
@@ -673,6 +825,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                           titleStyle
                           priceSuffix
+                          shortDescription
+                          allowOrdering
+                          forHome
+                          showProductGroundswell
                         }
                         productTags {
                           nodes {
@@ -694,6 +850,120 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 sourceUrl
                               }
                             }
+                            brandOrder {
+                              brandOrder
+                            }
+                          }
+                        }
+                        productOrdering {
+                          productOrder
+                        }
+                        attributes {
+                          nodes {
+                            name
+                            options
+                            variation
+                          }
+                        }
+                      }
+                      ... on VariableProduct {
+                        id
+                        name
+                        price
+                        variations {
+                          nodes {
+                            databaseId
+                            name
+                            price
+                            attributes {
+                              nodes {
+                                name
+                                value
+                              }
+                            }
+                          }
+                        }
+                        chocolateBarsExtraInfo {
+                          calories
+                          dietType
+                          ingredients
+                          type
+                          allergens
+                          health
+                        }
+                        coffeeExtraInfo {
+                          flavours
+                          origin
+                          roast
+                          type
+                          varietal
+                          appearance
+                        }
+                        hotChocolateExtraInfo {
+                          dietType
+                          ingredients
+                          origin
+                          type
+                        }
+                        teaExtraInfo {
+                          elavation
+                          origin
+                          howToDrink
+                          flavours
+                          packaging
+                          process
+                        }
+                        productDisplayStyle {
+                          badgeImage {
+                            sourceUrl
+                          }
+                          bgImage {
+                            sourceUrl
+                          }
+                          secondaryImage {
+                            sourceUrl
+                          }
+                          titleStyle
+                          shortDescription
+                          allowOrdering
+                          forHome
+                          priceSuffix
+                          showProductGroundswell
+                        }
+                        title
+                        productTags {
+                          nodes {
+                            name
+                            tagCategoryImages {
+                              displayOrder
+                              tagImage {
+                                sourceUrl
+                              }
+                            }
+                          }
+                        }
+                        brands {
+                          nodes {
+                            name
+                            description
+                            brandingImage {
+                              image {
+                                sourceUrl
+                              }
+                            }
+                            brandOrder {
+                              brandOrder
+                            }
+                          }
+                        }
+                        productOrdering {
+                          productOrder
+                        }
+                        attributes(first: 100) {
+                          nodes {
+                            name
+                            options
+                            variation
                           }
                         }
                       }
@@ -789,6 +1059,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       }
                       discountType
                       freeShipping
+                      couponDetails {
+                        maxUsage
+                      }
                     }
                   }
                   employeeLists(where: { name: $email }) {
@@ -815,9 +1088,22 @@ export default function Dashboard({ data, categories, products, orders }) {
               console.log(data);
               tempDataObject = data;
 
-              setCompanyID(data.data.clients.nodes[0].databaseId);
+              console.log(data.data.products.nodes);
 
-              console.log(data.data.clients.nodes[0].databaseId);
+              let cfh = localStorage.getItem("cfh");
+              let gs = localStorage.getItem("groundswell");
+
+              if (!cfh) {
+                setCompanyID(data.data.clients.nodes[0].databaseId);
+
+                console.log(data.data.clients.nodes[0].databaseId);
+              }
+
+              if (!gs) {
+                setCompanyID(data.data.clients.nodes[0].databaseId);
+
+                console.log(data.data.clients.nodes[0].databaseId);
+              }
 
               setOrders(data.data.orders.nodes);
 
@@ -946,27 +1232,53 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setSubAttempt(true);
                 });
 
-              client
-                .mutate({
-                  mutation: gql`
-                    mutation GetPDF($dataset: ID!, $templateId: ID!) {
-                      getPDF(
-                        input: { dataset: $dataset, templateId: $templateId }
-                      ) {
-                        url
+              if (!cfh) {
+                client
+                  .mutate({
+                    mutation: gql`
+                      mutation GetPDF($dataset: ID!, $templateId: ID!) {
+                        getPDF(
+                          input: { dataset: $dataset, templateId: $templateId }
+                        ) {
+                          url
+                        }
                       }
-                    }
-                  `,
-                  variables: {
-                    dataset: data.data.clients.nodes[0].databaseId,
-                    templateId: 2,
-                  },
-                })
-                .then((data) => {
-                  console.log(data);
+                    `,
+                    variables: {
+                      dataset: data.data.clients.nodes[0].databaseId,
+                      templateId: 2,
+                    },
+                  })
+                  .then((data) => {
+                    console.log(data);
 
-                  setImpactCertificateURL(data.data.getPDF.url);
-                });
+                    setImpactCertificateURL(data.data.getPDF.url);
+                  });
+              }
+
+              if (!gs) {
+                client
+                  .mutate({
+                    mutation: gql`
+                      mutation GetPDF($dataset: ID!, $templateId: ID!) {
+                        getPDF(
+                          input: { dataset: $dataset, templateId: $templateId }
+                        ) {
+                          url
+                        }
+                      }
+                    `,
+                    variables: {
+                      dataset: data.data.clients.nodes[0].databaseId,
+                      templateId: 2,
+                    },
+                  })
+                  .then((data) => {
+                    console.log(data);
+
+                    setImpactCertificateURL(data.data.getPDF.url);
+                  });
+              }
             });
         });
       });
@@ -1161,6 +1473,14 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
     { name: "Impact", index: 2, icon: "/impact.png" },
+    // { name: "Rewards", index: 3, icon: "/impact.png" },
+    { name: "Account", index: 4, icon: "/account.png" },
+  ];
+
+  const cfhtabs = [
+    { name: "Home", index: 0, icon: "/home.png" },
+    { name: "Products", index: 1, icon: "/tea.png" },
+    // { name: "Impact", index: 2, icon: "/impact.png" },
     // { name: "Rewards", index: 3, icon: "/impact.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
@@ -1368,772 +1688,32 @@ export default function Dashboard({ data, categories, products, orders }) {
 
     console.log(planDetailsTemp);
 
-    // for (let i = 0; i < planDetailsTemp.length; i++) {
-    //   console.log(i);
-
-    //   if (newChanges.length > 0) {
-    //     console.log("newChanges");
-
-    //     for (let j = 0; j < newChanges.length; j++) {
-    //       console.log(j);
-
-    //       console.log(
-    //         planDetailsTemp[i].product.node?.name +
-    //           " - " +
-    //           newChanges[j].product.node?.name
-    //       );
-
-    //       if (
-    //         planDetailsTemp[i].product.node?.name ==
-    //         newChanges[j].product.node.name
-    //       ) {
-    //         console.log("product already exists");
-
-    //         console.log(newChanges[j].quantity, planDetailsTemp[i].quantity);
-
-    //         newChanges[j].quantity =
-    //           newChanges[j].quantity + planDetailsTemp[i].quantity;
-
-    //         planDetailsTemp.splice(i, 1);
-
-    //         break;
-    //       } else {
-    //         newChanges.push(planDetailsTemp[i]);
-
-    //         console.log("new - " + planDetailsTemp[i].product.node?.name);
-
-    //         break;
-    //       }
-    //     }
-    //   } else {
-    //     newChanges.push(planDetailsTemp[i]);
-
-    //     console.log("new - " + planDetailsTemp[i].product.node.name);
-    //   }
-    // }
-
-    // console.log(newChanges);
-
-    // console.log(planDetails);
-    // console.log(existingSubscriptionProducts);
-
-    // let finalDetails = [...planDetails];
-
-    // //COMPARISON - FIRST SCAN
-    // let changes = [];
-
-    // let foundProduct = false;
-
-    // for (let i = 0; i < newChanges.length; i++) {
-    //   foundProduct = false;
-    //   for (let j = 0; j < existingSubscriptionProducts.length; j++) {
-    //     if (
-    //       newChanges[i].product.node?.name ==
-    //       existingSubscriptionProducts[j].product.node.name
-    //     ) {
-    //       console.log(
-    //         "Comparing ",
-    //         newChanges[i].product.node?.name,
-    //         " - ",
-    //         existingSubscriptionProducts[j].product.node.name
-    //       );
-
-    //       foundProduct = true;
-    //       console.log(
-    //         newChanges[i].quantity +
-    //           " - " +
-    //           existingSubscriptionProducts[j].quantity
-    //       );
-
-    //       if (
-    //         newChanges[i].quantity != existingSubscriptionProducts[j].quantity
-    //       ) {
-    //         if (
-    //           newChanges[i].quantity > existingSubscriptionProducts[j].quantity
-    //         ) {
-    //           console.log("qty");
-    //           changes.push({
-    //             action: "qty",
-    //             difference: newChanges[i].quantity,
-    //             product: newChanges[i],
-    //           });
-    //           console.log(changes[i]);
-    //         } else if (
-    //           newChanges[i].quantity < existingSubscriptionProducts[j].quantity
-    //         ) {
-    //           changes.push({
-    //             action: "qty",
-    //             difference: newChanges[i].quantity,
-    //             product: newChanges[i],
-    //           });
-    //         }
-    //       } else {
-    //         console.log("qty same");
-    //       }
-    //     }
-    //   }
-
-    //   if (!foundProduct) {
-    //     changes.push({
-    //       action: "add",
-    //       product: newChanges[i],
-    //       difference: newChanges[i].quantity,
-    //     });
-    //   }
-    // }
-
-    // console.log(existingSubscriptionProducts);
-
-    // for (let i = 0; i < existingSubscriptionProducts.length; i++) {
-    //   foundProduct = false;
-    //   for (let j = 0; j < newChanges.length; j++) {
-    //     if (
-    //       existingSubscriptionProducts[i].product.node.name ==
-    //       newChanges[j].product.node?.name
-    //     ) {
-    //       console.log(
-    //         "Comparing ",
-    //         existingSubscriptionProducts[i].product.node.name,
-    //         " - ",
-    //         newChanges[j].product.node?.name
-    //       );
-    //       foundProduct = true;
-    //     }
-    //   }
-
-    //   if (!foundProduct) {
-    //     changes.push({
-    //       action: "remove",
-    //       product: existingSubscriptionProducts[i],
-    //     });
-    //   }
-    // }
-
-    // console.log(changes);
-
-    // console.log(subscriptions);
-
-    const client = graphqlClient;
-
-    // for (let i = 0; i < changes.length; i++) {
-    //   if (changes[i].action == "add") {
-    //     console.log("add");
-
-    //     client
-    //       .mutate({
-    //         mutation: gql`
-    //           mutation MyMutation2(
-    //             $id: ID!
-    //             $productId: ID!
-    //             $productQuantity: Int!
-    //           ) {
-    //             addProductToSubscription(
-    //               input: {
-    //                 id: $id
-    //                 productId: $productId
-    //                 productQuantity: $productQuantity
-    //               }
-    //             ) {
-    //               subscription {
-    //                 databaseId
-    //                 lineItems {
-    //                   nodes {
-    //                     databaseId
-    //                     quantity
-    //                     product {
-    //                       node {
-    //                         name
-    //                         description(format: RAW)
-    //                         databaseId
-    //                         featuredImage {
-    //                           node {
-    //                             sourceUrl
-    //                           }
-    //                         }
-    //                         ... on SimpleProduct {
-    //                           id
-    //                           name
-    //                           price
-    //                         }
-    //                       }
-    //                     }
-    //                   }
-    //                 }
-    //                 billingPeriod
-    //                 billingInterval
-    //                 nextPaymentDate
-    //               }
-    //             }
-    //           }
-    //         `,
-    //         variables: {
-    //           id: subscriptions.data.subscription.subscription.databaseId,
-    //           productId: changes[i].product.product.node?.databaseId + "",
-    //           productQuantity: changes[i].difference,
-    //         },
-    //       })
-    //       .then((data) => {
-    //         console.log(data);
-
-    //         let updateSubscriptions = {
-    //           subscriptions: {
-    //             data: {
-    //               subscription: data.data.addProductToSubscription,
-    //             },
-    //           },
-    //         };
-
-    //         setSubscriptions(updateSubscriptions);
-
-    //         setOrderComplete(true);
-
-    //         setOrderDetails(updateSubscriptions);
-
-    //         console.log(updateSubscriptions);
-    //       })
-    //       .catch((error) => {
-    //         setUpdateSubError(error);
-
-    //         console.log("error");
-
-    //         console.log(error);
-
-    //         localStorage.setItem("authtoken", "");
-
-    //         refreshToken({
-    //           variables: {
-    //             refreshToken: localStorage.getItem("refreshtoken"),
-    //           },
-    //         }).then((data) => {
-    //           localStorage.setItem(
-    //             "authtoken",
-    //             data.data.refreshToken.authToken
-    //           );
-
-    //           client
-    //             .mutate({
-    //               mutation: gql`
-    //                 mutation MyMutation2(
-    //                   $id: ID!
-    //                   $productId: ID!
-    //                   $productQuantity: Int!
-    //                 ) {
-    //                   addProductToSubscription(
-    //                     input: {
-    //                       id: $id
-    //                       productId: $productId
-    //                       productQuantity: $productQuantity
-    //                     }
-    //                   ) {
-    //                     subscription {
-    //                       databaseId
-    //                       lineItems {
-    //                         nodes {
-    //                           databaseId
-    //                           quantity
-    //                           product {
-    //                             node {
-    //                               name
-    //                               description(format: RAW)
-    //                               databaseId
-    //                               featuredImage {
-    //                                 node {
-    //                                   sourceUrl
-    //                                 }
-    //                               }
-    //                               ... on SimpleProduct {
-    //                                 id
-    //                                 name
-    //                                 price
-    //                               }
-    //                             }
-    //                           }
-    //                         }
-    //                       }
-    //                       billingPeriod
-    //                       billingInterval
-    //                       nextPaymentDate
-    //                     }
-    //                   }
-    //                 }
-    //               `,
-    //               variables: {
-    //                 id: subscriptions.data.subscription.subscription.databaseId,
-    //                 productId: changes[i].product.product.node?.databaseId + "",
-    //                 productQuantity: changes[i].difference,
-    //               },
-    //             })
-    //             .then((data) => {
-    //               console.log(data);
-
-    //               let updateSubscriptions = {
-    //                 subscriptions: {
-    //                   data: {
-    //                     subscription: data.data.addProductToSubscription,
-    //                   },
-    //                 },
-    //               };
-
-    //               setSubscriptions(updateSubscriptions);
-
-    //               setOrderComplete(true);
-
-    //               setOrderDetails(updateSubscriptions);
-
-    //               console.log(updateSubscriptions);
-    //             });
-    //         });
-    //       });
-    //   } else if (changes[i].action == "remove") {
-    //     client
-    //       .mutate({
-    //         mutation: gql`
-    //           mutation MyMutation2($id: ID!, $productId: ID!) {
-    //             removeProductFromSubscription(
-    //               input: { id: $id, productId: $productId }
-    //             ) {
-    //               subscription {
-    //                 databaseId
-    //                 lineItems {
-    //                   nodes {
-    //                     databaseId
-    //                     quantity
-    //                     product {
-    //                       node {
-    //                         name
-    //                         description(format: RAW)
-    //                         databaseId
-    //                         featuredImage {
-    //                           node {
-    //                             sourceUrl
-    //                           }
-    //                         }
-    //                         ... on SimpleProduct {
-    //                           id
-    //                           name
-    //                           price
-    //                         }
-    //                       }
-    //                     }
-    //                   }
-    //                 }
-    //                 billingPeriod
-    //                 billingInterval
-    //                 nextPaymentDate
-    //               }
-    //             }
-    //           }
-    //         `,
-    //         variables: {
-    //           id: subscriptions.data.subscription.subscription.databaseId,
-    //           productId: changes[i].product.product.node.databaseId + "",
-    //         },
-    //       })
-    //       .then((data) => {
-    //         console.log(data);
-
-    //         let updateSubscriptions = {
-    //           subscriptions: {
-    //             data: {
-    //               subscription: data.data.removeProductFromSubscription,
-    //             },
-    //           },
-    //         };
-
-    //         setSubscriptions(updateSubscriptions);
-
-    //         setOrderComplete(true);
-    //       })
-    //       .catch((error) => {
-    //         setUpdateSubError(error);
-
-    //         console.log("remove product error");
-
-    //         localStorage.setItem("authtoken", "");
-
-    //         refreshToken({
-    //           variables: {
-    //             refreshToken: localStorage.getItem("refreshtoken"),
-    //           },
-    //         }).then((data) => {
-    //           localStorage.setItem(
-    //             "authtoken",
-    //             data.data.refreshToken.authToken
-    //           );
-
-    //           client
-    //             .mutate({
-    //               mutation: gql`
-    //                 mutation MyMutation2($id: ID!, $productId: ID!) {
-    //                   removeProductFromSubscription(
-    //                     input: { id: $id, productId: $productId }
-    //                   ) {
-    //                     subscription {
-    //                       databaseId
-    //                       lineItems {
-    //                         nodes {
-    //                           databaseId
-    //                           quantity
-    //                           product {
-    //                             node {
-    //                               name
-    //                               description(format: RAW)
-    //                               databaseId
-    //                               featuredImage {
-    //                                 node {
-    //                                   sourceUrl
-    //                                 }
-    //                               }
-    //                               ... on SimpleProduct {
-    //                                 id
-    //                                 name
-    //                                 price
-    //                               }
-    //                             }
-    //                           }
-    //                         }
-    //                       }
-    //                       billingPeriod
-    //                       billingInterval
-    //                       nextPaymentDate
-    //                     }
-    //                   }
-    //                 }
-    //               `,
-    //               variables: {
-    //                 id: subscriptions.data.subscription.subscription.databaseId,
-    //                 productId: changes[i].product.product.node.databaseId + "",
-    //               },
-    //             })
-    //             .then((data) => {
-    //               console.log(data);
-
-    //               let updateSubscriptions = {
-    //                 subscriptions: {
-    //                   data: {
-    //                     subscription: data.data.removeProductFromSubscription,
-    //                   },
-    //                 },
-    //               };
-
-    //               setSubscriptions(updateSubscriptions);
-
-    //               setOrderComplete(true);
-    //             });
-    //         });
-    //       });
-    //   } else if (changes[i].action == "qty") {
-    //     console.log(changes[i]);
-
-    //     client
-    //       .mutate({
-    //         mutation: gql`
-    //           mutation MyMutation2($id: ID!, $productId: ID!) {
-    //             removeProductFromSubscription(
-    //               input: { id: $id, productId: $productId }
-    //             ) {
-    //               subscription {
-    //                 databaseId
-    //                 lineItems {
-    //                   nodes {
-    //                     databaseId
-    //                     quantity
-    //                     product {
-    //                       node {
-    //                         name
-    //                         description(format: RAW)
-    //                         databaseId
-    //                         featuredImage {
-    //                           node {
-    //                             sourceUrl
-    //                           }
-    //                         }
-    //                         ... on SimpleProduct {
-    //                           id
-    //                           name
-    //                           price
-    //                         }
-    //                       }
-    //                     }
-    //                   }
-    //                 }
-    //                 billingPeriod
-    //                 billingInterval
-    //                 nextPaymentDate
-    //               }
-    //             }
-    //           }
-    //         `,
-    //         variables: {
-    //           id: subscriptions.data.subscription.subscription.databaseId,
-    //           productId: changes[i].product.databaseId,
-    //         },
-    //       })
-    //       .then((data) => {
-    //         console.log("Old QTY Removed");
-
-    //         console.log(data);
-
-    //         console.log(changes[i]);
-
-    //         client
-    //           .mutate({
-    //             mutation: gql`
-    //               mutation MyMutation2(
-    //                 $id: ID!
-    //                 $productId: ID!
-    //                 $productQuantity: Int!
-    //               ) {
-    //                 addProductToSubscription(
-    //                   input: {
-    //                     id: $id
-    //                     productId: $productId
-    //                     productQuantity: $productQuantity
-    //                   }
-    //                 ) {
-    //                   subscription {
-    //                     databaseId
-    //                     lineItems {
-    //                       nodes {
-    //                         databaseId
-    //                         quantity
-    //                         product {
-    //                           node {
-    //                             name
-    //                             description(format: RAW)
-    //                             databaseId
-    //                             featuredImage {
-    //                               node {
-    //                                 sourceUrl
-    //                               }
-    //                             }
-    //                             ... on SimpleProduct {
-    //                               id
-    //                               name
-    //                               price
-    //                             }
-    //                           }
-    //                         }
-    //                       }
-    //                     }
-    //                     billingPeriod
-    //                     billingInterval
-    //                     nextPaymentDate
-    //                   }
-    //                 }
-    //               }
-    //             `,
-    //             variables: {
-    //               id: subscriptions.data.subscription.subscription.databaseId,
-    //               productId: changes[i].product.product.node.databaseId + "",
-    //               productQuantity: changes[i].difference,
-    //             },
-    //           })
-    //           .then((data) => {
-    //             console.log("New QTY Added");
-
-    //             console.log(data);
-
-    //             let updateSubscriptions = {
-    //               subscriptions: {
-    //                 data: {
-    //                   subscription: data.data.addProductToSubscription,
-    //                 },
-    //               },
-    //             };
-
-    //             setSubscriptions(updateSubscriptions);
-
-    //             setOrderComplete(true);
-    //           })
-    //           .catch((error) => {
-    //             console.log("new Qty error");
-    //           });
-    //       })
-    //       .catch((error) => {
-    //         setUpdateSubError(error.message + "");
-
-    //         console.log("error");
-
-    //         localStorage.setItem("authtoken", "");
-
-    //         refreshToken({
-    //           variables: {
-    //             refreshToken: localStorage.getItem("refreshtoken"),
-    //           },
-    //         }).then((data) => {
-    //           localStorage.setItem(
-    //             "authtoken",
-    //             data.data.refreshToken.authToken
-    //           );
-    //           client
-    //             .mutate({
-    //               mutation: gql`
-    //                 mutation MyMutation2($id: ID!, $productId: ID!) {
-    //                   removeProductFromSubscription(
-    //                     input: { id: $id, productId: $productId }
-    //                   ) {
-    //                     subscription {
-    //                       databaseId
-    //                       lineItems {
-    //                         nodes {
-    //                           databaseId
-    //                           quantity
-    //                           product {
-    //                             node {
-    //                               name
-    //                               description(format: RAW)
-    //                               databaseId
-    //                               featuredImage {
-    //                                 node {
-    //                                   sourceUrl
-    //                                 }
-    //                               }
-    //                               ... on SimpleProduct {
-    //                                 id
-    //                                 name
-    //                                 price
-    //                               }
-    //                             }
-    //                           }
-    //                         }
-    //                       }
-    //                       billingPeriod
-    //                       billingInterval
-    //                       nextPaymentDate
-    //                     }
-    //                   }
-    //                 }
-    //               `,
-    //               variables: {
-    //                 id: subscriptions.data.subscription.subscription.databaseId,
-    //                 productId: changes[i].product.product.node.databaseId,
-    //               },
-    //             })
-    //             .then((data) => {
-    //               console.log("Old QTY Removed");
-
-    //               console.log(data);
-
-    //               console.log(changes[i]);
-
-    //               client
-    //                 .mutate({
-    //                   mutation: gql`
-    //                     mutation MyMutation2(
-    //                       $id: ID!
-    //                       $productId: ID!
-    //                       $productQuantity: Int!
-    //                     ) {
-    //                       addProductToSubscription(
-    //                         input: {
-    //                           id: $id
-    //                           productId: $productId
-    //                           productQuantity: $productQuantity
-    //                         }
-    //                       ) {
-    //                         subscription {
-    //                           databaseId
-    //                           lineItems {
-    //                             nodes {
-    //                               databaseId
-    //                               quantity
-    //                               product {
-    //                                 node {
-    //                                   name
-    //                                   description(format: RAW)
-    //                                   databaseId
-    //                                   featuredImage {
-    //                                     node {
-    //                                       sourceUrl
-    //                                     }
-    //                                   }
-    //                                   ... on SimpleProduct {
-    //                                     id
-    //                                     name
-    //                                     price
-    //                                   }
-    //                                 }
-    //                               }
-    //                             }
-    //                           }
-    //                           billingPeriod
-    //                           billingInterval
-    //                           nextPaymentDate
-    //                         }
-    //                       }
-    //                     }
-    //                   `,
-    //                   variables: {
-    //                     id: subscriptions.data.subscription.subscription
-    //                       .databaseId,
-    //                     productId:
-    //                       changes[i].product.product.node.databaseId + "",
-    //                     productQuantity: changes[i].difference,
-    //                   },
-    //                 })
-    //                 .then((data) => {
-    //                   console.log("New QTY Added");
-
-    //                   console.log(data);
-
-    //                   let updateSubscriptions = {
-    //                     subscriptions: {
-    //                       data: {
-    //                         subscription: data.data.addProductToSubscription,
-    //                       },
-    //                     },
-    //                   };
-
-    //                   console.log(updateSubscriptions);
-
-    //                   setSubscriptions(updateSubscriptions);
-
-    //                   setOrderComplete(true);
-    //                   setOrderDetails(updateSubscriptions);
-    //                 })
-    //                 .catch((error) => {
-    //                   console.log("new Qty error");
-    //                 });
-    //             });
-    //         });
-    //       });
-    //   }
-    // }
+    let newLineItems = [];
+
+    for (let i = 0; i < planDetailsTemp.length; i++) {
+      newLineItems.push({
+        productId:
+          planDetailsTemp[i].product.node.type == "SIMPLE"
+            ? planDetailsTemp[i].product.node.databaseId
+            : planDetailsTemp[i].variation?.node.databaseId,
+        quantity: planDetailsTemp[i].quantity,
+        variationId: planDetailsTemp[i].variation?.node.databaseId,
+      });
+    }
 
     client
       .mutate({
         mutation: gql`
-          mutation MyMutation2($id: ID!) {
-            removeProductFromSubscription(input: { id: $id }) {
+          mutation MyMutation2($lineItems: [LineItemInput], $id: ID!) {
+            updateSubscription(input: { id: $id, lineItems: $lineItems }) {
               subscription {
-                databaseId
                 lineItems {
                   nodes {
-                    databaseId
+                    productId
+                    variationId
                     quantity
-                    product {
-                      node {
-                        name
-                        description(format: RAW)
-                        databaseId
-                        featuredImage {
-                          node {
-                            sourceUrl
-                          }
-                        }
-                        ... on SimpleProduct {
-                          id
-                          name
-                          price
-                        }
-                      }
-                    }
                   }
                 }
-                billingPeriod
-                billingInterval
-                nextPaymentDate
               }
             }
           }
@@ -2143,242 +1723,11 @@ export default function Dashboard({ data, categories, products, orders }) {
             ? subscriptions?.subscriptions.data.subscription.subscription
                 .databaseId
             : subscriptions?.data.subscription.subscription.databaseId,
+          lineItems: newLineItems,
         },
       })
       .then((data) => {
-        for (let i = 0; i < planDetailsTemp.length; i++) {
-          console.log(planDetailsTemp[i]);
-
-          client
-            .mutate({
-              mutation: gql`
-                mutation MyMutation2(
-                  $id: ID!
-                  $productId: ID!
-                  $productQuantity: Int!
-                ) {
-                  addProductToSubscription(
-                    input: {
-                      id: $id
-                      productId: $productId
-                      productQuantity: $productQuantity
-                    }
-                  ) {
-                    subscription {
-                      databaseId
-                      lineItems {
-                        nodes {
-                          databaseId
-                          quantity
-                          product {
-                            node {
-                              name
-                              description(format: RAW)
-                              databaseId
-                              featuredImage {
-                                node {
-                                  sourceUrl
-                                }
-                              }
-                              ... on SimpleProduct {
-                                id
-                                name
-                                price
-                              }
-                            }
-                          }
-                        }
-                      }
-                      billingPeriod
-                      billingInterval
-                      nextPaymentDate
-                    }
-                  }
-                }
-              `,
-              variables: {
-                id: subscriptions?.subscriptions
-                  ? subscriptions?.subscriptions.data.subscription.subscription
-                      .databaseId
-                  : subscriptions?.data.subscription.subscription.databaseId,
-                productId: planDetailsTemp[i].product.node.databaseId + "",
-                productQuantity:
-                  planDetailsTemp[i].quantity != null
-                    ? planDetailsTemp[i].quantity
-                    : 1,
-              },
-            })
-            .then((data) => {
-              console.log(data);
-              if (i == planDetailsTemp.length - 1) {
-                console.log(data);
-
-                let updateSubscriptions = {
-                  data: {
-                    subscription: data.data.addProductToSubscription,
-                  },
-                };
-
-                console.log(updateSubscriptions);
-
-                setSubscriptions(updateSubscriptions);
-
-                setOrderDetails(updateSubscriptions);
-                setOrderComplete(true);
-              }
-            })
-            .catch((error) => {
-              localStorage.setItem("authtoken", "");
-
-              refreshToken({
-                variables: {
-                  refreshToken: localStorage.getItem("refreshtoken"),
-                },
-              }).then((data) => {
-                console.log(data);
-
-                localStorage.setItem(
-                  "authtoken",
-                  data.data.refreshToken.authToken
-                );
-
-                client
-                  .mutate({
-                    mutation: gql`
-                      mutation MyMutation2(
-                        $id: ID!
-                        $productId: ID!
-                        $productQuantity: Int!
-                      ) {
-                        addProductToSubscription(
-                          input: {
-                            id: $id
-                            productId: $productId
-                            productQuantity: $productQuantity
-                          }
-                        ) {
-                          subscription {
-                            databaseId
-                            lineItems {
-                              nodes {
-                                databaseId
-                                quantity
-                                product {
-                                  node {
-                                    name
-                                    description(format: RAW)
-                                    databaseId
-                                    featuredImage {
-                                      node {
-                                        sourceUrl
-                                      }
-                                    }
-                                    ... on SimpleProduct {
-                                      id
-                                      name
-                                      price
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                            billingPeriod
-                            billingInterval
-                            nextPaymentDate
-                          }
-                        }
-                      }
-                    `,
-                    variables: {
-                      id: subscriptions?.subscriptions
-                        ? subscriptions?.subscriptions.data.subscription
-                            .subscription.databaseId
-                        : subscriptions?.data.subscription.subscription
-                            .databaseId,
-                      productId:
-                        planDetailsTemp[i].product.node.databaseId + "",
-                      productQuantity:
-                        planDetailsTemp[i].quantity != null
-                          ? planDetailsTemp[i].quantity
-                          : 1,
-                    },
-                  })
-                  .then((data) => {
-                    if (i == planDetailsTemp.length - 1) {
-                      console.log(data);
-
-                      let updateSubscriptions = {
-                        data: {
-                          subscription: data.data.addProductToSubscription,
-                        },
-                      };
-
-                      setSubscriptions(updateSubscriptions);
-
-                      setOrderDetails(updateSubscriptions);
-                      setOrderComplete(true);
-                    }
-                  });
-              });
-            });
-        }
-      })
-      .catch((error) => {
-        localStorage.setItem("authtoken", "");
-
-        refreshToken({
-          variables: {
-            refreshToken: localStorage.getItem("refreshtoken"),
-          },
-        }).then((data) => {
-          console.log(data);
-
-          localStorage.setItem("authtoken", data.data.refreshToken.authToken);
-
-          client.mutate({
-            mutation: gql`
-              mutation MyMutation2($id: ID!) {
-                removeProductFromSubscription(input: { id: $id }) {
-                  subscription {
-                    databaseId
-                    lineItems {
-                      nodes {
-                        databaseId
-                        quantity
-                        product {
-                          node {
-                            name
-                            description(format: RAW)
-                            databaseId
-                            featuredImage {
-                              node {
-                                sourceUrl
-                              }
-                            }
-                            ... on SimpleProduct {
-                              id
-                              name
-                              price
-                            }
-                          }
-                        }
-                      }
-                    }
-                    billingPeriod
-                    billingInterval
-                    nextPaymentDate
-                  }
-                }
-              }
-            `,
-            variables: {
-              id: subscriptions?.subscriptions
-                ? subscriptions?.subscriptions.data.subscription.subscription
-                    .databaseId
-                : subscriptions?.data.subscription.subscription.databaseId,
-            },
-          });
-        });
+        console.log(data);
       });
   };
 
@@ -2786,10 +2135,12 @@ export default function Dashboard({ data, categories, products, orders }) {
               products={dataObject.data.products.nodes}
               orderHistory={orderHistory}
               setOrderHistory={setOrderHistory}
+              cfh={coffeeFromHome}
+              gs={groundswell}
             />
             <div
               className={`${
-                testPlatform == "ios" ? "max-h-ios" : "max-h-[88vh]"
+                testPlatform == "ios" ? "max-h-ios" : "max-h-[calc(100vh-80px)]"
               } h-auto flex-grow w-full lg:ml-28 lg:w-[calc(100vw-112px)] lg:max-h-[calc(100vh-80px)] lg:h-[calc(100vh-80px)]`}
             >
               {activeTab == 0 && (
@@ -2823,8 +2174,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setManagingSubscription={setManagingSubscription}
                   setCurrentTab={setCurrentTab}
                   setShowingCert={setShowingCert}
+                  cfh={coffeeFromHome}
+                  gs={groundswell}
                 />
               )}
+              {console.log(dataObject)}
               {activeTab == 1 && (
                 <Products
                   productCategories={dataObject.data.productTags.nodes}
@@ -2859,6 +2213,8 @@ export default function Dashboard({ data, categories, products, orders }) {
                   addingToOBasket={addingToOBasket}
                   setAddingToSBasket={setAddingToSBasket}
                   setAddingToOBasket={setAddingToOBasket}
+                  cfh={coffeeFromHome}
+                  gs={groundswell}
                 />
               )}
               {activeTab == 2 && (
@@ -2889,36 +2245,88 @@ export default function Dashboard({ data, categories, products, orders }) {
                   saveChanges={saveChanges}
                   subsidyChanging={subsidyChanging}
                   role={role}
+                  cfh={coffeeFromHome}
+                  gs={groundswell}
                 />
               )}
             </div>
             <div
-              className={`bg-ernieteal w-screen grid grid-cols-4 justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
+              className={`bg-ernieteal w-screen grid ${
+                coffeeFromHome ? "grid-cols-3" : "grid-cols-4"
+              } ${
+                groundswell ? "grid-cols-3" : "grid-cols-4"
+              } justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >
               {role == 0 &&
-                tabs.map((tab, index) => (
-                  <div
-                    key={index}
-                    className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
-                      tab.index == activeTab ? "bg-erniemint" : ""
-                    } `}
-                    onClick={(e) => {
-                      setTab(tab.index);
-                      setNewPurchase(false);
-                      console.log(tab.index, activeTab);
-                      setShowingBasket(false);
-                      setManagingSubscription(false);
-                    }}
-                  >
-                    <div className="w-8 h-8 mx-auto relative">
-                      <Image src={tab.icon} fill={true}></Image>
-                    </div>
-                    <p className="text-erniecream text-sm font-circular text-center">
-                      {tab.name}
-                    </p>
-                  </div>
-                ))}
+                (coffeeFromHome
+                  ? cfhtabs.map((tab, index) => (
+                      <div
+                        key={index}
+                        className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
+                          tab.index == activeTab ? "bg-erniemint" : ""
+                        } `}
+                        onClick={(e) => {
+                          setTab(tab.index);
+                          setNewPurchase(false);
+                          console.log(tab.index, activeTab);
+                          setShowingBasket(false);
+                          setManagingSubscription(false);
+                        }}
+                      >
+                        <div className="w-8 h-8 mx-auto relative">
+                          <Image src={tab.icon} fill={true}></Image>
+                        </div>
+                        <p className="text-erniecream text-sm font-circular text-center">
+                          {tab.name}
+                        </p>
+                      </div>
+                    ))
+                  : groundswell
+                  ? cfhtabs.map((tab, index) => (
+                      <div
+                        key={index}
+                        className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
+                          tab.index == activeTab ? "bg-erniemint" : ""
+                        } `}
+                        onClick={(e) => {
+                          setTab(tab.index);
+                          setNewPurchase(false);
+                          console.log(tab.index, activeTab);
+                          setShowingBasket(false);
+                          setManagingSubscription(false);
+                        }}
+                      >
+                        <div className="w-8 h-8 mx-auto relative">
+                          <Image src={tab.icon} fill={true}></Image>
+                        </div>
+                        <p className="text-erniecream text-sm font-circular text-center">
+                          {tab.name}
+                        </p>
+                      </div>
+                    ))
+                  : tabs.map((tab, index) => (
+                      <div
+                        key={index}
+                        className={`flex-grow h-full flex flex-col gap-2 justify-center cursor-pointer hover:bg-erniemint w-full ${
+                          tab.index == activeTab ? "bg-erniemint" : ""
+                        } `}
+                        onClick={(e) => {
+                          setTab(tab.index);
+                          setNewPurchase(false);
+                          console.log(tab.index, activeTab);
+                          setShowingBasket(false);
+                          setManagingSubscription(false);
+                        }}
+                      >
+                        <div className="w-8 h-8 mx-auto relative">
+                          <Image src={tab.icon} fill={true}></Image>
+                        </div>
+                        <p className="text-erniecream text-sm font-circular text-center">
+                          {tab.name}
+                        </p>
+                      </div>
+                    )))}
               {role == 1 &&
                 restrictedtabs.map((tab, index) => (
                   <div

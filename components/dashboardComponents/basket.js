@@ -43,6 +43,7 @@ export const Basket = ({
   products,
   orderHistory,
   setOrderHistory,
+  cfh,
 }) => {
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
@@ -53,14 +54,22 @@ export const Basket = ({
   }, [orderComplete]);
 
   const [businessName, setBusinessName] = useState(
-    localStorage.getItem("companyname")
+    cfh ? "" : localStorage.getItem("companyname")
   );
-  const [sAddress, setSAddress] = useState(localStorage.getItem("address"));
-  const [bAddress, setBAddress] = useState(localStorage.getItem("address"));
-  const [sPostcode, setSPostcode] = useState(localStorage.getItem("postcode"));
-  const [bPostcode, setBPostcode] = useState(localStorage.getItem("postcode"));
+  const [sAddress, setSAddress] = useState(
+    cfh ? "" : localStorage.getItem("address")
+  );
+  const [bAddress, setBAddress] = useState(
+    cfh ? "" : localStorage.getItem("address")
+  );
+  const [sPostcode, setSPostcode] = useState(
+    cfh ? "" : localStorage.getItem("postcode")
+  );
+  const [bPostcode, setBPostcode] = useState(
+    cfh ? "" : localStorage.getItem("postcode")
+  );
   const [contactNumber, setContactNumber] = useState(
-    localStorage.getItem("number")
+    cfh ? "" : localStorage.getItem("number")
   );
 
   const [businessNameError, setBusinessNameError] = useState(false);
@@ -131,7 +140,11 @@ export const Basket = ({
     for (let i = 0; i < subBasket.length; i++) {
       subtotal =
         subtotal +
-        parseFloat(subBasket[i].product.price.replace("£", "")) *
+        parseFloat(
+          subBasket[i].product.type == "SIMPLE"
+            ? subBasket[i].product.price.replace("£", "")
+            : subBasket[i].selectedVariant?.price.replace("£", "")
+        ) *
           subBasket[i].quantity;
     }
 
@@ -145,11 +158,17 @@ export const Basket = ({
 
     arr = subscriptions?.data?.subscription?.subscription?.lineItems?.nodes;
 
+    console.log(arr);
+
     if (arr?.length > 0) {
       for (let i = 0; i < arr.length; i++) {
         subtotal =
           subtotal +
-          parseFloat(arr[i].product.node.price.replace("£", "")) *
+          parseFloat(
+            arr[i].product?.node.type == "SIMPLE"
+              ? arr[i].product?.node.price.replace("£", "")
+              : arr[i].variation?.node.price.replace("£", "")
+          ) *
             arr[i].quantity;
       }
     }
@@ -163,8 +182,14 @@ export const Basket = ({
     for (let i = 0; i < oneOffBasket.length; i++) {
       subtotal =
         subtotal +
-        parseFloat(oneOffBasket[i].product.price.replace("£", "")) *
-          oneOffBasket[i].quantity;
+        (oneOffBasket[i].product.type == "SIMPLE"
+          ? parseFloat(oneOffBasket[i].product.price.replace("£", "")) *
+            oneOffBasket[i].quantity
+          : parseFloat(
+              oneOffBasket[i].selectedVariant
+                ? oneOffBasket[i].selectedVariant?.price.replace("£", "")
+                : oneOffBasket[i].variation?.price.replace("£", "")
+            ) * oneOffBasket[i].quantity);
     }
 
     return subtotal;
@@ -577,6 +602,8 @@ export const Basket = ({
 
   const [paymentIntentId, setPaymentIntentId] = useState(-1);
 
+  console.log(oneOffBasket);
+
   function handleSubmit() {
     setProcessingOrder(true);
 
@@ -670,21 +697,89 @@ export const Basket = ({
         ) {
           if (basket[i].quantity > 1) {
             for (let j = 0; j < basket[i].quantity; j++) {
-              lineItems.push({
-                name: basket[i].product.name,
-                productId: basket[i].product.databaseId,
-                quantity: basket[i].quantity,
-              });
+              if (basket[i].product.type == "SIMPLE") {
+                lineItems.push({
+                  name: basket[i].product.name,
+                  productId: basket[i].product.databaseId,
+                  quantity: basket[i].quantity,
+                });
+              } else {
+                lineItems.push({
+                  name: basket[i].product.name,
+                  productId: basket[i].product.databaseId,
+                  quantity: basket[i].quantity,
+                  variationId: basket[i].selectedVariant?.databaseId,
+                  metaData:
+                    basket[i].selectedVariant?.name.split(" - ")[1].split(",")
+                      .length == 1
+                      ? [
+                          {
+                            key: "type",
+                            value: basket[i].selectedVariant?.name
+                              .split(" - ")[1]
+                              .split(",")[0],
+                          },
+                        ]
+                      : [
+                          {
+                            key: "size",
+                            value: basket[i].selectedVariant?.name
+                              .split(" - ")[1]
+                              .split(",")[0],
+                          },
+                          {
+                            key: "type",
+                            value: basket[i].selectedVariant?.name
+                              .split(" - ")[1]
+                              .split(",")[1],
+                          },
+                        ],
+                });
+              }
             }
           }
         }
       }
 
-      lineItems.push({
-        name: basket[i].product.name,
-        productId: basket[i].product.databaseId,
-        quantity: basket[i].quantity,
-      });
+      if (basket[i].product.type == "SIMPLE") {
+        lineItems.push({
+          name: basket[i].product.name,
+          productId: basket[i].product.databaseId,
+          quantity: basket[i].quantity,
+        });
+      } else {
+        lineItems.push({
+          name: basket[i].product.name,
+          productId: basket[i].product.databaseId,
+          quantity: basket[i].quantity,
+          variationId: basket[i].selectedVariant?.databaseId,
+          metaData:
+            basket[i].selectedVariant?.name.split(" - ")[1].split(",").length ==
+            1
+              ? [
+                  {
+                    key: "type",
+                    value: basket[i].selectedVariant?.name
+                      .split(" - ")[1]
+                      .split(",")[0],
+                  },
+                ]
+              : [
+                  {
+                    key: "size",
+                    value: basket[i].selectedVariant?.name
+                      .split(" - ")[1]
+                      .split(",")[0],
+                  },
+                  {
+                    key: "type",
+                    value: basket[i].selectedVariant?.name
+                      .split(" - ")[1]
+                      .split(",")[1],
+                  },
+                ],
+        });
+      }
     }
 
     if (addDonation) {
@@ -732,16 +827,22 @@ export const Basket = ({
     let total =
       purchaseType == 0
         ? parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0
-          ? "8.95"
+          ? cfh == "5.25"
+            ? "8.95"
+            : "0.0"
           : "0.0"
         : managingSubscription
         ? parseFloat(getCurSubSubTotal().toFixed(2)) +
             parseFloat(getSubSubtotal().toFixed(2)) <
           80.0
-          ? "8.95"
+          ? cfh == "5.25"
+            ? "8.95"
+            : "0.0"
+          : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
+          ? cfh == "5.25"
+            ? "8.95"
+            : "0.0"
           : "0.0"
-        : parseFloat(getSubSubtotal().toFixed(2)) < 80.0
-        ? "8.95"
         : "0.0";
 
     if (purchaseType == 0) {
@@ -1368,13 +1469,20 @@ export const Basket = ({
 
   const pathname = usePathname();
 
-  const paymentOptions = [
-    { image: "/Visa_Inc._logo.svg", name: "stripe" },
-    // { image: "/Paypal.svg" },
-    // { image: "/Apple_Pay_logo.svg" },
-    // { image: "/Google_Pay_Logo.svg" },
-    { image: "/erniesmall.svg", name: "bacs" },
-  ];
+  const paymentOptions = cfh
+    ? [
+        { image: "/Visa_Inc._logo.svg", name: "stripe" },
+        // { image: "/Paypal.svg" },
+        // { image: "/Apple_Pay_logo.svg" },
+        // { image: "/Google_Pay_Logo.svg" },
+      ]
+    : [
+        { image: "/Visa_Inc._logo.svg", name: "stripe" },
+        // { image: "/Paypal.svg" },
+        // { image: "/Apple_Pay_logo.svg" },
+        // { image: "/Google_Pay_Logo.svg" },
+        { image: "/erniesmall.svg", name: "bacs" },
+      ];
 
   const nextSteps = () => {
     if (managingSubscription) {
@@ -1513,7 +1621,11 @@ export const Basket = ({
             parseFloat(getSubSubtotal().toFixed(2)) <
           80.0
         ) {
-          setDeliveryAmount(8.95);
+          if (cfh) {
+            setDeliveryAmount(5.25);
+          } else {
+            setDeliveryAmount(8.95);
+          }
           setVoucherAmount(0.0);
         } else {
           setDeliveryAmount(0.0);
@@ -1536,24 +1648,40 @@ export const Basket = ({
           if (currentVoucher.freeShipping) {
             setDeliveryAmount(0.0);
           } else {
-            setDeliveryAmount(8.95);
+            if (cfh) {
+              setDeliveryAmount(5.25);
+            } else {
+              setDeliveryAmount(8.95);
+            }
           }
 
           for (let i = 0; i < oneOffBasket.length; i++) {
             console.log(oneOffBasket[i]);
           }
 
-          setVoucherAmount(
-            parseFloat(
-              oneOffBasket[oneOffBasket.length - 1]?.product.price.replace(
-                "£",
-                ""
-              )
-            ) * -1
-          );
+          if (currentVoucher.code === "groundswellstaff") {
+            // Apply 20% discount to the basket
+            const subtotal = parseFloat(getOneOffSubtotal().toFixed(2));
+            const discount = subtotal * 0.2;
+            setVoucherAmount(-discount);
+          } else {
+            setVoucherAmount(
+              parseFloat(
+                oneOffBasket[oneOffBasket.length - 1]?.product.price.replace(
+                  "£",
+                  ""
+                )
+              ) * -1
+            );
+          }
         } else {
           if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
-            setDeliveryAmount(8.95);
+            if (cfh) {
+              setDeliveryAmount(5.25);
+            } else {
+              setDeliveryAmount(8.95);
+            }
+
             setVoucherAmount(0.0);
           } else {
             setDeliveryAmount(0.0);
@@ -1578,7 +1706,12 @@ export const Basket = ({
           );
         } else {
           if (parseFloat(getSubSubtotal().toFixed(2)) < 80.0) {
-            setDeliveryAmount(8.95);
+            if (cfh) {
+              setDeliveryAmount(5.25);
+            } else {
+              setDeliveryAmount(8.95);
+            }
+
             setVoucherAmount(0.0);
           } else {
             setDeliveryAmount(0.0);
@@ -1674,7 +1807,7 @@ export const Basket = ({
           {showingCheckout ? (
             <div>
               {orderComplete ? (
-                <div className="absolute right-0 top-20 h-full w-full lg:h-[80%] lg:w-[80%]  lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
+                <div className="absolute right-0 top-20 h-auto w-full lg:h-[80%] lg:w-[80%]  lg:left-1/2 lg:top-1/2 lg:translate-x-[-50%] lg:translate-y-[-50%] lg:border-[1px] lg:border-erniegreen lg:rounded-xl lg:p-10 lg:shadow-xl bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
                   <div className="flex flex-col gap-4">
                     <p className="font-circe font-[900] text-center text-2xl lg:text-3xl text-erniegreen uppercase">
                       Thank you for <br />
@@ -1854,7 +1987,7 @@ export const Basket = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="absolute right-0 top-20 h-auto w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
+                    <div className="absolute right-0 top-20 h-auto lg:h-full w-full bg-erniedarkcream p-6 lg:p-10 z-[990] flex flex-col gap-4">
                       <div
                         className="pb-2 flex flex-row items-center gap-1 border-b-[1px] border-erniegreen cursor-pointer mb-6"
                         onClick={() => {
@@ -2078,10 +2211,18 @@ export const Basket = ({
                                   name="voucher"
                                   placeholder="Enter code here"
                                   onChange={(e) => {
-                                    setVoucher(e.currentTarget.value);
+                                    setVoucher(
+                                      e.currentTarget.value
+                                        .toLowerCase()
+                                        .replace(/\s/g, "")
+                                    );
                                   }}
                                   onPaste={(e) => {
-                                    setVoucher(e.currentTarget.value);
+                                    setVoucher(
+                                      e.currentTarget.value
+                                        .toLowerCase()
+                                        .replace(/\s/g, "")
+                                    );
                                   }}
                                   className={`bg-erniecream h-10 font-circular font-[500] px-4 text-erniegreen border-[1px] rounded-lg outline-erniegold outline-[1px] ${
                                     voucherInvalid
@@ -2133,6 +2274,8 @@ export const Basket = ({
 
                                   let usage = 0;
 
+                                  console.log(id);
+
                                   checkCoupon({
                                     variables: {
                                       id: id,
@@ -2166,6 +2309,8 @@ export const Basket = ({
                                             if (purchaseType == 0) {
                                               productsForCode =
                                                 coupons[i].products.nodes;
+
+                                              console.log(productsForCode);
 
                                               let matchingProducts = [];
 
@@ -2212,15 +2357,29 @@ export const Basket = ({
                                                 console.log(matchingProducts);
                                                 setMProducts(matchingProducts);
                                               } else {
-                                                console.log("sub");
-                                                console.log(purchaseType);
-                                                setVoucherApplied(false);
-                                                setVoucherFound(true);
-                                                vFound = true;
-                                                setVoucherInvalid(true);
-                                                setVoucherInvalidMsg(
-                                                  "You have no valid items in your basket"
-                                                );
+                                                console.log("no products");
+                                                if (
+                                                  productsForCode.length == 0
+                                                ) {
+                                                  console.log(purchaseType);
+                                                  setVoucherApplied(true);
+                                                  setVoucherFound(true);
+                                                  vFound = true;
+                                                  setVoucherInvalid(false);
+                                                  setAppliedVoucher(voucher);
+                                                  console.log(matchingProducts);
+                                                  setMProducts(oneOffBasket);
+                                                } else {
+                                                  console.log("sub");
+                                                  console.log(purchaseType);
+                                                  setVoucherApplied(false);
+                                                  setVoucherFound(true);
+                                                  vFound = true;
+                                                  setVoucherInvalid(true);
+                                                  setVoucherInvalidMsg(
+                                                    "You have no valid items in your basket"
+                                                  );
+                                                }
                                               }
                                             } else {
                                               console.log("sub");
@@ -2653,13 +2812,20 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.name}
+                                    {item.product.type == "SIMPLE"
+                                      ? item.product.name
+                                      : item.selectedVariant?.name}
                                   </p>
                                   <p className="font-circular text-erniegreen text-sm">
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.price.replace("£", "")
+                                        item.product.type == "SIMPLE"
+                                          ? item.product.price.replace("£", "")
+                                          : item.selectedVariant?.price.replace(
+                                              "£",
+                                              ""
+                                            )
                                       ) * item.quantity
                                     ).toFixed(2)}
                                   </p>
@@ -2676,13 +2842,20 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.name}
+                                    {item.product.type == "SIMPLE"
+                                      ? item.product.name
+                                      : item.selectedVariant?.name}
                                   </p>
                                   <p className="font-circular text-erniegreen text-sm">
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.price.replace("£", "")
+                                        item.product.type == "SIMPLE"
+                                          ? item.product.price.replace("£", "")
+                                          : item.selectedVariant?.price.replace(
+                                              "£",
+                                              ""
+                                            )
                                       ) * item.quantity
                                     ).toFixed(2)}
                                   </p>
@@ -2719,8 +2892,16 @@ export const Basket = ({
                                   </p>
                                   <p className="font-circular text-erniegreen text-sm">
                                     -
-                                    {purchaseType == 0 &&
-                                      mProducts[matchedProduct]?.product.price}
+                                    {appliedVoucher == "groundswellstaff"
+                                      ? "£" +
+                                        (
+                                          (purchaseType == 0
+                                            ? getOneOffSubtotal()
+                                            : getSubSubtotal()) * 0.2
+                                        ).toFixed(2)
+                                      : purchaseType == 0 &&
+                                        mProducts[matchedProduct]?.product
+                                          .price}
                                   </p>
                                   {console.log(matchedProduct)}
                                 </div>
@@ -2816,45 +2997,43 @@ export const Basket = ({
                           <div
                             className={`bg-erniegold rounded-xl w-full p-2 flex flex-row justify-center items-center cursor-pointer`}
                             onClick={(e) => {
-                              if (selectedPayment == 1) {
-                                if (managingSubscription) {
-                                  console.log(donationAmount);
-                                  console.log(addDonation);
+                              if (managingSubscription) {
+                                console.log(donationAmount);
+                                console.log(addDonation);
 
-                                  console.log(products);
+                                console.log(products);
 
-                                  let donationProduct = {};
+                                let donationProduct = {};
 
-                                  for (let i = 0; i < products.length; i++) {
-                                    if (products[i].databaseId == 3723) {
-                                      donationProduct = products[i];
-                                    }
+                                for (let i = 0; i < products.length; i++) {
+                                  if (products[i].databaseId == 3723) {
+                                    donationProduct = products[i];
                                   }
-
-                                  if (addDonation) {
-                                    subAdjBasket.push({
-                                      product: { node: donationProduct },
-                                      quantity: donationAmount,
-                                    });
-                                  }
-
-                                  console.log(subAdjBasket);
-
-                                  updatePlan(subAdjBasket);
-                                  // updatePlanFrequency({
-                                  //   id: subscriptions.data.subscription.subscription
-                                  //     .databaseId,
-                                  //   billingInterval: interval + "",
-                                  //   billingPeriod: period,
-                                  // });
-                                  setProcessingOrder(true);
-                                } else {
-                                  handleSubmit();
                                 }
-                              }
 
-                              if (selectedPayment == 0) {
-                                setCollectingCardDetails(true);
+                                if (addDonation) {
+                                  subAdjBasket.push({
+                                    product: { node: donationProduct },
+                                    quantity: donationAmount,
+                                  });
+                                }
+
+                                console.log(subAdjBasket);
+
+                                updatePlan(subAdjBasket);
+                                // updatePlanFrequency({
+                                //   id: subscriptions.data.subscription.subscription
+                                //     .databaseId,
+                                //   billingInterval: interval + "",
+                                //   billingPeriod: period,
+                                // });
+                                setProcessingOrder(true);
+                              } else {
+                                if (selectedPayment == 1) {
+                                  handleSubmit();
+                                } else if (selectedPayment == 0) {
+                                  setCollectingCardDetails(true);
+                                }
                               }
                             }}
                           >
@@ -2929,6 +3108,10 @@ export const Basket = ({
                                 className="w-fill mt-2"
                               ></img>
                               <div className="flex flex-col gap-1 mt-4">
+                                {console.log(
+                                  subscriptions.data.subscription.subscription
+                                    .lineItems.nodes
+                                )}
                                 {subscriptions?.subscriptions
                                   ? subscriptions.subscriptions.data.subscription.subscription.lineItems.nodes.map(
                                       (item, index) => (
@@ -2937,10 +3120,14 @@ export const Basket = ({
                                           key={index}
                                         >
                                           <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                            {item.product.node.name}
+                                            {item.product.node.type == "SIMPLE"
+                                              ? item.product.node.name
+                                              : item.variation.node.name}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                            {item.product.node.price}
+                                            {item.product.node.type == "SIMPLE"
+                                              ? item.product.node.price
+                                              : item.variation.node.price}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm text-right">
                                             {item.quantity}
@@ -2955,10 +3142,14 @@ export const Basket = ({
                                           key={index}
                                         >
                                           <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                            {item.product.node.name}
+                                            {item.product.node.type == "SIMPLE"
+                                              ? item.product.node.name
+                                              : item.variation.node.name}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                            {item.product.node.price}
+                                            {item.product.node.type == "SIMPLE"
+                                              ? item.product.node.price
+                                              : item.variation.node.price}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm text-right">
                                             {item.quantity}
@@ -2986,13 +3177,20 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.name}
+                                    {item.product.type == "SIMPLE"
+                                      ? item.product.name
+                                      : item.selectedVariant.name}
                                   </p>
                                   <p className="font-circular text-erniegreen text-sm">
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.price.replace("£", "")
+                                        item.product.type == "SIMPLE"
+                                          ? item.product.price.replace("£", "")
+                                          : item.selectedVariant.price.replace(
+                                              "£",
+                                              ""
+                                            )
                                       ) * item.quantity
                                     ).toFixed(2)}
                                   </p>
@@ -3138,15 +3336,25 @@ export const Basket = ({
                               key={index}
                             >
                               <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                {item.product.name}
+                                {console.log(item)}
+                                {item.product.type == "SIMPLE"
+                                  ? item.product.name
+                                  : item.selectedVariant?.name}
                               </p>
                               <p className="font-circular text-erniegreen text-sm">
-                                £
-                                {(
+                                {item.product.type == "SIMPLE"
+                                  ? `£
+                                ${(
                                   parseFloat(
                                     item.product.price.replace("£", "")
                                   ) * item.quantity
-                                ).toFixed(2)}
+                                ).toFixed(2)}`
+                                  : `£
+                                ${(
+                                  parseFloat(
+                                    item.selectedVariant?.price.replace("£", "")
+                                  ) * item.quantity
+                                ).toFixed(2)}`}
                               </p>
                               <div className="flex flex-row gap-2 items-center justify-end">
                                 <div

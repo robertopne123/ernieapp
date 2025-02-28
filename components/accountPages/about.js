@@ -151,8 +151,11 @@ export default function About({ backAction }) {
               </div>
             </div>
             <div className="flex flex-col gap-6">
-              <div className="rounded-xl bg-erniecream p-6 flex flex-col gap-3">
-                <img src="/dolcearch.svg" className="w-8"></img>
+              <div className="rounded-xl bg-erniecream p-6 flex flex-row gap-6">
+                <img
+                  src="/dolcelogo.png"
+                  className="w-16 h-16 flex-grow rounded-lg aspect-square"
+                ></img>
                 <p className="font-circular text-erniegreen font-[500] text-sm">
                   The Ernie App is powered by 100% renewable energy, from sun,
                   wind and water power. Designed, developed and maintained by{" "}
