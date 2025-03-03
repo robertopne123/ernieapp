@@ -1,16 +1,35 @@
 import { Activity } from "./rewardPages/activity";
 import { useState } from "react";
 
-export const Rewards = () => {
+export const Rewards = ({ orders }) => {
   const [showingActivity, setShowingActivity] = useState(false);
 
   const back = () => {
     setShowingActivity(false);
   };
 
+  const getTotal = () => {
+    let total = 0.0;
+
+    for (let i = 0; i < orders.length; i++) {
+      for (let j = 0; j < orders[i].lineItems.nodes.length; j++) {
+        let priceFloat = parseFloat(orders[i].lineItems.nodes[j].subtotal);
+
+        if (orders[i].lineItems.nodes[j].subtotal == null) {
+          total += 0.0;
+        } else {
+          total += priceFloat;
+        }
+      }
+    }
+
+    return Math.floor(total);
+  };
+
   return (
     <div className="h-[calc(100%-80px)] overflow-y-scroll w-full bg-erniedarkcream flex flex-col gap-6 relative p-6">
       {showingActivity && <Activity backAction={back} />}
+      {console.log(getTotal())}
       <div className="p-6 rounded-xl bg-ernieteal">
         <div className="flex flex-row items-center gap-4">
           <div className="aspect-square w-24 min-w-[80px]">
@@ -44,7 +63,7 @@ export const Rewards = () => {
           </div>
           <div className="flex flex-col justify-center">
             <p className="font-circe text-5xl text-erniecream leading-[34px] mt-4">
-              490
+              {getTotal()}
               <span className="text-xl leading-[30px] uppercase ml-1">
                 points{" "}
               </span>

@@ -202,7 +202,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                 tagCategoryImages {
                   displayOrder
                   tagImage {
-                    sourceUrl
+                    node {
+                      sourceUrl
+                    }
                   }
                 }
                 tagOrder {
@@ -261,13 +263,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productDisplayStyle {
                     badgeImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     bgImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     secondaryImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     titleStyle
                     priceSuffix
@@ -282,7 +290,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       tagCategoryImages {
                         displayOrder
                         tagImage {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                     }
@@ -293,7 +303,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       description
                       brandingImage {
                         image {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                       brandOrder {
@@ -368,13 +380,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productDisplayStyle {
                     badgeImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     bgImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     secondaryImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     titleStyle
                     shortDescription
@@ -390,7 +408,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       tagCategoryImages {
                         displayOrder
                         tagImage {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                     }
@@ -401,7 +421,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       description
                       brandingImage {
                         image {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                       brandOrder {
@@ -430,7 +452,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                   fieldGroupName
                   howDidYouHearAboutUs
                   impactCertificate {
-                    sourceUrl
+                    node {
+                      sourceUrl
+                    }
                   }
                   invoicingContactEmail
                   invoicingContactFirstName
@@ -481,8 +505,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                             }
                           }
                         }
+                        type
                       }
                     }
+                    subtotal
                   }
                 }
                 customer {
@@ -1035,8 +1061,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                                   }
                                 }
                               }
+                              type
                             }
                           }
+                          subtotal
                         }
                       }
                       customer {
@@ -2230,7 +2258,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setShowingCert={setShowingCert}
                 />
               )}
-              {activeTab == 3 && <Rewards />}
+              {activeTab == 3 && <Rewards orders={orderData} />}
               {activeTab == 4 && (
                 <Accounts
                   userQuantity={getUserTotalOrderQty()}
