@@ -1618,7 +1618,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   const tabs = [
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
-    { name: "Impact", index: 2, icon: "/impact.png" },
+    // { name: "Impact", index: 2, icon: "/impact.png" },
     { name: "Rewards", index: 3, icon: "/impact.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];

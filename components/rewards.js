@@ -90,7 +90,7 @@ export const Rewards = ({ loyaltyTiers, orders }) => {
                   stroke-width="2.5"
                   stroke-dasharray="100"
                   stroke-dashoffset={`${
-                    100 - (calculateTotal() / nextTier?.lt.pointsNeeded) * 100
+                    100 - (calculateTotal() / nextTier?.lt?.pointsNeeded) * 100
                   }`}
                   stroke-linecap="round"
                 ></circle>
