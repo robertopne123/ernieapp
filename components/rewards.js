@@ -65,8 +65,6 @@ export const Rewards = ({ loyaltyTiers, orders }) => {
     <div className="h-[calc(100%-80px)] overflow-y-scroll w-full bg-erniedarkcream flex flex-col gap-6 relative p-6">
       {showingActivity && <Activity backAction={back} />}
       <div className="p-6 rounded-xl bg-ernieteal">
-        {console.log(calculateTotal())}
-        {console.log(nextTier?.lt.pointsNeeded)}
         <div className="flex flex-row items-center gap-4">
           <div className="aspect-square w-24 min-w-[80px]">
             <div class="relative size-40">
