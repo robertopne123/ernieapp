@@ -99,6 +99,7 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [orderData, setOrders] = useState([]);
   const [couponData, setCoupons] = useState([]);
+  const [loyaltyTiers, setLoyaltyTiers] = useState([]);
 
   const [hasSubscription, setHasSubscription] = useState(false);
   const [subscriptionAttempt, setSubAttempt] = useState(false);
@@ -202,7 +203,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                 tagCategoryImages {
                   displayOrder
                   tagImage {
-                    sourceUrl
+                    node {
+                      sourceUrl
+                    }
                   }
                 }
                 tagOrder {
@@ -261,13 +264,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productDisplayStyle {
                     badgeImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     bgImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     secondaryImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     titleStyle
                     priceSuffix
@@ -282,7 +291,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       tagCategoryImages {
                         displayOrder
                         tagImage {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                     }
@@ -293,7 +304,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       description
                       brandingImage {
                         image {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                       brandOrder {
@@ -368,13 +381,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productDisplayStyle {
                     badgeImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     bgImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     secondaryImage {
-                      sourceUrl
+                      node {
+                        sourceUrl
+                      }
                     }
                     titleStyle
                     shortDescription
@@ -390,7 +409,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       tagCategoryImages {
                         displayOrder
                         tagImage {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                     }
@@ -401,7 +422,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       description
                       brandingImage {
                         image {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                       brandOrder {
@@ -430,7 +453,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                   fieldGroupName
                   howDidYouHearAboutUs
                   impactCertificate {
-                    sourceUrl
+                    node {
+                      sourceUrl
+                    }
                   }
                   invoicingContactEmail
                   invoicingContactFirstName
@@ -481,8 +506,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                             }
                           }
                         }
+                        type
                       }
                     }
+                    subtotal
                   }
                 }
                 customer {
@@ -497,6 +524,7 @@ export default function Dashboard({ data, categories, products, orders }) {
             coupons {
               nodes {
                 code
+                amount
                 limitUsageToXItems
                 products {
                   nodes {
@@ -517,6 +545,49 @@ export default function Dashboard({ data, categories, products, orders }) {
                   employeeEmail
                   employeeName
                 }
+              }
+            }
+            loyaltyTiers {
+              nodes {
+                lt {
+                  pointsNeeded
+                  coupons {
+                    code
+                    title
+                  }
+                  productOffer {
+                    code
+                    title
+                    product {
+                      nodes {
+                        databaseId
+                        ... on VariableProduct {
+                          id
+                          name
+                          featuredImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          price
+                          databaseId
+                        }
+                        ... on SimpleProduct {
+                          id
+                          name
+                          databaseId
+                          featuredImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          price
+                        }
+                      }
+                    }
+                  }
+                }
+                title
               }
             }
           }
@@ -541,6 +612,10 @@ export default function Dashboard({ data, categories, products, orders }) {
         setOrders(data.data.orders.nodes);
 
         setCoupons(data.data.coupons.nodes);
+
+        console.log(data.data.loyaltyTiers.nodes);
+
+        setLoyaltyTiers(data.data.loyaltyTiers.nodes);
 
         setOrderHistory(getLoggedInUserOrders(data.data.orders.nodes));
 
@@ -756,7 +831,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       tagCategoryImages {
                         displayOrder
                         tagImage {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                       tagOrder {
@@ -815,13 +892,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                         }
                         productDisplayStyle {
                           badgeImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           bgImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           secondaryImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           titleStyle
                           priceSuffix
@@ -836,7 +919,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             tagCategoryImages {
                               displayOrder
                               tagImage {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                           }
@@ -847,7 +932,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             description
                             brandingImage {
                               image {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                             brandOrder {
@@ -870,6 +957,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                         id
                         name
                         price
+                        attributes(first: 100) {
+                          nodes {
+                            name
+                            options
+                            variation
+                          }
+                        }
                         variations {
                           nodes {
                             databaseId
@@ -915,13 +1009,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                         }
                         productDisplayStyle {
                           badgeImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           bgImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           secondaryImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           titleStyle
                           shortDescription
@@ -937,7 +1037,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             tagCategoryImages {
                               displayOrder
                               tagImage {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                           }
@@ -948,7 +1050,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             description
                             brandingImage {
                               image {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                             brandOrder {
@@ -958,13 +1062,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                         }
                         productOrdering {
                           productOrder
-                        }
-                        attributes(first: 100) {
-                          nodes {
-                            name
-                            options
-                            variation
-                          }
                         }
                       }
                     }
@@ -984,7 +1081,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                         fieldGroupName
                         howDidYouHearAboutUs
                         impactCertificate {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                         invoicingContactEmail
                         invoicingContactFirstName
@@ -1035,8 +1134,10 @@ export default function Dashboard({ data, categories, products, orders }) {
                                   }
                                 }
                               }
+                              type
                             }
                           }
+                          subtotal
                         }
                       }
                       customer {
@@ -1071,6 +1172,49 @@ export default function Dashboard({ data, categories, products, orders }) {
                         employeeEmail
                         employeeName
                       }
+                    }
+                  }
+                  loyaltyTiers {
+                    nodes {
+                      lt {
+                        pointsNeeded
+                        coupons {
+                          code
+                          title
+                        }
+                        productOffer {
+                          code
+                          title
+                          product {
+                            nodes {
+                              databaseId
+                              ... on VariableProduct {
+                                id
+                                name
+                                featuredImage {
+                                  node {
+                                    sourceUrl
+                                  }
+                                }
+                                price
+                                databaseId
+                              }
+                              ... on SimpleProduct {
+                                id
+                                name
+                                databaseId
+                                featuredImage {
+                                  node {
+                                    sourceUrl
+                                  }
+                                }
+                                price
+                              }
+                            }
+                          }
+                        }
+                      }
+                      title
                     }
                   }
                 }
@@ -1108,6 +1252,8 @@ export default function Dashboard({ data, categories, products, orders }) {
               setOrders(data.data.orders.nodes);
 
               setCoupons(data.data.coupons.nodes);
+
+              setLoyaltyTiers(data.data.loyaltyTiers.nodes);
 
               let clients = data.data.clients.nodes;
 
@@ -1473,7 +1619,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
     { name: "Impact", index: 2, icon: "/impact.png" },
-    // { name: "Rewards", index: 3, icon: "/impact.png" },
+    { name: "Rewards", index: 3, icon: "/impact.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
 
@@ -2230,7 +2376,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setShowingCert={setShowingCert}
                 />
               )}
-              {activeTab == 3 && <Rewards />}
+              {activeTab == 3 && (
+                <Rewards loyaltyTiers={loyaltyTiers} orders={orderData} />
+              )}
               {activeTab == 4 && (
                 <Accounts
                   userQuantity={getUserTotalOrderQty()}

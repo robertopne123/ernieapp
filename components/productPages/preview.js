@@ -293,7 +293,7 @@ export default function Preview({
                 ></Image>
 
                 <Image
-                  src={product.productDisplayStyle.badgeImage.sourceUrl}
+                  src={product.productDisplayStyle.badgeImage.node.sourceUrl}
                   width={100}
                   height={100}
                   priority
@@ -304,7 +304,9 @@ export default function Preview({
             {product?.productTags.nodes[0].name == "healthy snacks" && (
               <div className="h-full mx-auto relative z-10">
                 <Image
-                  src={product.productDisplayStyle.secondaryImage.sourceUrl}
+                  src={
+                    product.productDisplayStyle.secondaryImage.node.sourceUrl
+                  }
                   fill={true}
                   priority
                   className="h-full mx-auto"

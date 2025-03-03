@@ -84,6 +84,7 @@ export const Basket = ({
   const [deliveryAmount, setDeliveryAmount] = useState(0.0);
 
   const [voucher, setVoucher] = useState("");
+  const [voucherType, setVoucherType] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState("");
   const [voucherApplied, setVoucherApplied] = useState(false);
   const [voucherFound, setVoucherFound] = useState(false);
@@ -307,7 +308,9 @@ export const Basket = ({
             fieldGroupName
             howDidYouHearAboutUs
             impactCertificate {
-              sourceUrl
+              node {
+                sourceUrl
+              }
             }
             invoicingContactEmail
             invoicingContactFirstName
@@ -846,7 +849,7 @@ export const Basket = ({
         : "0.0";
 
     if (purchaseType == 0) {
-      console.log;
+      console.log(appliedVoucher);
 
       try {
         checkout({
@@ -1600,12 +1603,8 @@ export const Basket = ({
 
   useEffect(() => {
     if (managingSubscription) {
-      if (voucherApplied && appliedVoucher == "FREECOFFEE") {
+      if (voucherApplied && appliedVoucher === "FREECOFFEE") {
         setDeliveryAmount(0.0);
-
-        for (let i = 0; i < subAdjBasket.length; i++) {
-          console.log(subAdjBasket[i]);
-        }
 
         setVoucherAmount(
           parseFloat(
@@ -1621,49 +1620,47 @@ export const Basket = ({
             parseFloat(getSubSubtotal().toFixed(2)) <
           80.0
         ) {
-          if (cfh) {
-            setDeliveryAmount(5.25);
-          } else {
-            setDeliveryAmount(8.95);
-          }
-          setVoucherAmount(0.0);
+          setDeliveryAmount(cfh ? 5.25 : 8.95);
         } else {
           setDeliveryAmount(0.0);
-          setVoucherAmount(0.0);
         }
+        setVoucherAmount(0.0); // Only reset if no voucher is applied
       }
-    } else {
-      if (purchaseType == 0) {
-        if (voucherApplied) {
-          let currentVoucher = {};
+    } else if (purchaseType === 0) {
+      if (voucherApplied) {
+        let currentVoucher = coupons.find(
+          (coupon) => coupon.code === appliedVoucher.toLowerCase()
+        );
 
-          for (let i = 0; i < coupons.length; i++) {
-            if (coupons[i].code == appliedVoucher.toLowerCase()) {
-              currentVoucher = coupons[i];
-            }
-          }
+        console.log(currentVoucher);
 
-          console.log(currentVoucher);
+        if (currentVoucher?.freeShipping) {
+          setDeliveryAmount(0.0);
+        } else {
+          setDeliveryAmount(cfh ? 5.25 : 8.95);
+        }
 
-          if (currentVoucher.freeShipping) {
-            setDeliveryAmount(0.0);
+        if (appliedVoucher.toUpperCase() === "FREECOFFEE") {
+          setDeliveryAmount(0.0);
+
+          const lastItem = oneOffBasket[oneOffBasket.length - 1];
+
+          if (lastItem?.product.type === "VARIABLE") {
+            setVoucherAmount(
+              parseFloat(lastItem.selectedVariant.price.replace("£", "")) * -1
+            );
           } else {
-            if (cfh) {
-              setDeliveryAmount(5.25);
-            } else {
-              setDeliveryAmount(8.95);
-            }
+            setVoucherAmount(
+              parseFloat(lastItem?.product.price.replace("£", "")) * -1
+            );
           }
-
-          for (let i = 0; i < oneOffBasket.length; i++) {
-            console.log(oneOffBasket[i]);
-          }
-
-          if (currentVoucher.code === "groundswellstaff") {
-            // Apply 20% discount to the basket
-            const subtotal = parseFloat(getOneOffSubtotal().toFixed(2));
-            const discount = subtotal * 0.2;
-            setVoucherAmount(-discount);
+        } else if (currentVoucher?.code === "groundswellstaff") {
+          setVoucherAmount(-parseFloat(getOneOffSubtotal().toFixed(2)) * 0.2);
+        } else if (currentVoucher?.amount != null) {
+          if (currentVoucher.discountType === "FIXED_CART") {
+            setVoucherAmount(parseFloat(currentVoucher.amount) * -1);
+          } else if (currentVoucher.discountType === "FIXED_PRODUCT") {
+            setVoucherAmount(parseFloat(currentVoucher.amount) * -1);
           } else {
             setVoucherAmount(
               parseFloat(
@@ -1671,60 +1668,26 @@ export const Basket = ({
                   "£",
                   ""
                 )
-              ) * -1
+              ) *
+                currentVoucher.amount *
+                -1
             );
-          }
-        } else {
-          if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
-            if (cfh) {
-              setDeliveryAmount(5.25);
-            } else {
-              setDeliveryAmount(8.95);
-            }
-
-            setVoucherAmount(0.0);
-          } else {
-            setDeliveryAmount(0.0);
-            setVoucherAmount(0.0);
           }
         }
       } else {
-        if (voucherApplied && appliedVoucher == "FREECOFFEE") {
-          setDeliveryAmount(0.0);
-
-          for (let i = 0; i < subAdjBasket.length; i++) {
-            console.log(subAdjBasket[i]);
-          }
-
-          setVoucherAmount(
-            parseFloat(
-              subAdjBasket[subAdjBasket.length - 1]?.product.price.replace(
-                "£",
-                ""
-              )
-            ) * -1
-          );
+        // Reset voucher amount **only if no voucher is applied**
+        if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
+          setDeliveryAmount(cfh ? 5.25 : 8.95);
         } else {
-          if (parseFloat(getSubSubtotal().toFixed(2)) < 80.0) {
-            if (cfh) {
-              setDeliveryAmount(5.25);
-            } else {
-              setDeliveryAmount(8.95);
-            }
-
-            setVoucherAmount(0.0);
-          } else {
-            setDeliveryAmount(0.0);
-            setVoucherAmount(0.0);
-          }
+          setDeliveryAmount(0.0);
         }
+        setVoucherAmount(0.0);
       }
     }
   }, [
     subAdjBasket,
     getCurSubSubTotal,
     getSubSubtotal,
-    voucher,
     voucherApplied,
     managingSubscription,
     oneOffBasket,
@@ -2284,6 +2247,8 @@ export const Basket = ({
                                   })
                                     .then((data) => {
                                       usage = data.data.checkCouponUsage.usage;
+
+                                      console.log(voucher);
 
                                       console.log(usage);
 
@@ -2890,8 +2855,8 @@ export const Basket = ({
                                   <p className="font-circular text-erniegreen text-sm font-[500]">
                                     DISCOUNT: {appliedVoucher}
                                   </p>
+                                  {console.log(voucherAmount)}
                                   <p className="font-circular text-erniegreen text-sm">
-                                    -
                                     {appliedVoucher == "groundswellstaff"
                                       ? "£" +
                                         (
@@ -2899,9 +2864,9 @@ export const Basket = ({
                                             ? getOneOffSubtotal()
                                             : getSubSubtotal()) * 0.2
                                         ).toFixed(2)
-                                      : purchaseType == 0 &&
-                                        mProducts[matchedProduct]?.product
-                                          .price}
+                                      : voucherAmount
+                                          .toFixed(2)
+                                          .replace("-", "-£")}
                                   </p>
                                   {console.log(matchedProduct)}
                                 </div>
