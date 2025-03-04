@@ -202,7 +202,7 @@ export const Rewards = ({ loyaltyTiers, orders }) => {
                   calculateTotal() < tier.lt.pointsNeeded && "opacity-50"
                 }`}
               >
-                <div className="flex md:flex-row flex-col items-start gap-4 justify-start md:justify-start">
+                <div className="flex md:flex-row flex-col items-center gap-4 justify-start md:justify-start">
                   <img
                     src={product.product.nodes[0].featuredImage.node.sourceUrl}
                     className="w-16 h-16 object-contain min-w-[64px]"
