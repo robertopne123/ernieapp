@@ -507,6 +507,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                         }
                         type
+                        featuredImage {
+                          node {
+                            sourceUrl
+                          }
+                        }
                       }
                     }
                     subtotal
@@ -1135,6 +1140,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 }
                               }
                               type
+                              featuredImage {
+                                node {
+                                  sourceUrl
+                                }
+                              }
                             }
                           }
                           subtotal
@@ -1618,8 +1628,8 @@ export default function Dashboard({ data, categories, products, orders }) {
   const tabs = [
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
-    // { name: "Impact", index: 2, icon: "/impact.png" },
-    { name: "Rewards", index: 3, icon: "/impact.png" },
+    { name: "Impact", index: 2, icon: "/impact.png" },
+    { name: "Rewards", index: 3, icon: "/rewards.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
 
@@ -2229,6 +2239,10 @@ export default function Dashboard({ data, categories, products, orders }) {
     setNewPurchase(true);
   };
 
+  const viewImpact = () => {
+    setTab(2);
+  };
+
   const [managingSubscription, setManagingSubscription] = useState(false);
 
   const setCurrentTab = (tab) => {
@@ -2377,7 +2391,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                 />
               )}
               {activeTab == 3 && (
-                <Rewards loyaltyTiers={loyaltyTiers} orders={orderData} />
+                <Rewards
+                  loyaltyTiers={loyaltyTiers}
+                  orders={orderData}
+                  viewImpact={viewImpact}
+                />
               )}
               {activeTab == 4 && (
                 <Accounts
@@ -2400,9 +2418,9 @@ export default function Dashboard({ data, categories, products, orders }) {
             </div>
             <div
               className={`bg-ernieteal w-screen grid ${
-                coffeeFromHome ? "grid-cols-3" : "grid-cols-4"
+                coffeeFromHome ? "grid-cols-3" : "grid-cols-5"
               } ${
-                groundswell ? "grid-cols-3" : "grid-cols-4"
+                groundswell ? "grid-cols-3" : "grid-cols-5"
               } justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >

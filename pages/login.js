@@ -172,6 +172,7 @@ export default function Login() {
           avatar {
             url
           }
+          registeredDate
         }
       }
     }
@@ -358,6 +359,11 @@ export default function Login() {
       );
 
       localStorage.setItem("avatar", data?.data?.login?.user.avatar.url);
+
+      localStorage.setItem(
+        "registeredDate",
+        data?.data?.login?.user.registeredDate
+      );
 
       console.log(data);
 
@@ -553,6 +559,11 @@ export default function Login() {
         }
 
         localStorage.setItem("avatar", data?.data?.login?.user.avatar.url);
+
+        localStorage.setItem(
+          "registeredDate",
+          data?.data?.login?.user.registeredDate
+        );
 
         console.log(data);
 
@@ -997,7 +1008,7 @@ export default function Login() {
                     </p>
                   </div>
                   <div
-                    className="bg-transparent px-2 pb-2  [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
+                    className="bg-erniegold px-2 pb-2 pt-2.5  [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
                     onClick={(e) => {
                       e.preventDefault();
                       loginUser(
@@ -1009,10 +1020,10 @@ export default function Login() {
                       );
                     }}
                   >
-                    <p className="font-circe text-erniecream font-[900] text-lg text-center uppercase">
+                    <p className="font-circe text-erniegreen font-[900] text-lg text-center uppercase">
                       Coffee For Home - Grindswell
                     </p>
-                    <p className="font-circe text-erniecream font-[900] uppercase text-xl">
+                    <p className="font-circe text-erniegreen font-[900] uppercase text-xl">
                       {">"}
                     </p>
                   </div>
@@ -1068,7 +1079,7 @@ export default function Login() {
                     Login
                   </p>
                 </div>
-                <div
+                {/* <div
                   className="bg-erniedarkcream px-2 pb-2 pt-3 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
                   onClick={(e) => {
                     e.preventDefault();
@@ -1087,9 +1098,9 @@ export default function Login() {
                   <p className="font-circe text-erniegreen font-[900] uppercase text-xl">
                     {">"}
                   </p>
-                </div>
+                </div> */}
                 <div
-                  className="bg-erniedarkcream px-2 pb-2 pt-3 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
+                  className="bg-erniegold px-2 pb-2 pt-3 [@media(max-height:708px)]:p-2 rounded-lg cursor-pointer flex flex-row justify-center gap-2"
                   onClick={(e) => {
                     e.preventDefault();
                     loginUser(
@@ -1102,7 +1113,7 @@ export default function Login() {
                   }}
                 >
                   <p className="font-circe text-erniegreen font-[900] text-lg text-center uppercase">
-                    Groundswell
+                    Coffee For Home - Grindswell
                   </p>
                   <p className="font-circe text-erniegreen font-[900] uppercase text-xl">
                     {">"}
