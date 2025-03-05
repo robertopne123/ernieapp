@@ -58,6 +58,26 @@ export const Activity = ({ backAction, orders }) => {
     return "just now";
   };
 
+  const getLineItemsString = (items) => {
+    let str = "";
+
+    console.log(items);
+
+    for (let i = 0; i < items.length; i++) {
+      if (i == 0) {
+        str += items[i].product?.node?.name;
+      } else if (i == items.length - 1) {
+        str += ", and ";
+        str += items[i].product?.node?.name;
+      } else {
+        str += ", ";
+        str += items[i].product?.node?.name;
+      }
+    }
+
+    return str;
+  };
+
   return (
     <div className="absolute top-0 left-0 z-10 bg-erniedarkcream h-full flex-grow flex flex-col overflow-y-auto gap-6 pb-6 w-full px-6">
       <div
@@ -76,7 +96,7 @@ export const Activity = ({ backAction, orders }) => {
           My Activity
         </p>
         <img src="/divider.png" className=" w-full mt-2"></img>
-        {console.log(filterOrders())}
+        {console.log(orders)}
         {filterOrders().map((order, index) => (
           <div className="flex flex-row justify-between gap-4 mt-4 items-center">
             <img
@@ -96,8 +116,8 @@ export const Activity = ({ backAction, orders }) => {
                 </p>
               </div>
               <div className="line-clamp-1">
-                <p className="font-circular font-[500] text-erniegreen">
-                  {order.lineItems.nodes[0].product?.node?.name}
+                <p className="font-circular font-[500] text-erniegreen text-ellipsis max-w-[50ch]">
+                  {getLineItemsString(order.lineItems.nodes)}
                 </p>
               </div>
               <p className="font-circular font-[500] text-ernieteal">

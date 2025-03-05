@@ -99,6 +99,7 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact }) => {
   return (
     <div className="h-[calc(100%)] overflow-y-scroll w-full bg-erniedarkcream flex flex-col gap-6 relative p-6">
       {showingActivity && <Activity backAction={back} orders={orders} />}
+      {console.log(orders)}
       {showingInfo && (
         <Info
           name={"Terms & Conditions"}
