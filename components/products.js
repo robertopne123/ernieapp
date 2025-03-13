@@ -1159,8 +1159,13 @@ export default function Products({
                         .map((product, productIndex) => (
                           <div
                             key={productIndex}
-                            className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
+                            className={`flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6 ${
+                              product.product.productDisplayStyle?.rewardProduct
+                                ? "hidden"
+                                : "flex"
+                            }`}
                           >
+                            {console.log(product)}
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img
                                 src={product.product.image.sourceUrl}

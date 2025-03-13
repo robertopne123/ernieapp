@@ -283,6 +283,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     allowOrdering
                     forHome
                     showProductGroundswell
+                    rewardProduct
                   }
                   productTags {
                     nodes {
@@ -955,6 +956,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           forHome
                           priceSuffix
                           showProductGroundswell
+                          rewardProduct
                         }
                         title
                         productTags {
