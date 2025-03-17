@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Info } from "./rewardPages/info";
 
-export const Rewards = ({ loyaltyTiers, orders, viewImpact }) => {
+export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
   const [showingActivity, setShowingActivity] = useState(false);
   const [copied, setCopied] = useState([]);
   const [nextTier, setNextTier] = useState({});
@@ -197,15 +197,27 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact }) => {
           </div>
         </div>
       </div>
-      <div
-        className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer "
-        onClick={(e) => {
-          setShowingActivity(true);
-        }}
-      >
-        <p className="font-circe text-erniegreen font-[900] text-xl text-center">
-          My Activity
-        </p>
+      <div className="flex flex-row gap-6 w-full">
+        <div
+          className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer w-1/2"
+          onClick={(e) => {
+            claimRewards();
+          }}
+        >
+          <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+            Claim Rewards
+          </p>
+        </div>
+        <div
+          className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer w-1/2"
+          onClick={(e) => {
+            setShowingActivity(true);
+          }}
+        >
+          <p className="font-circe text-erniegreen font-[900] text-xl text-center">
+            My Activity
+          </p>
+        </div>
       </div>
       {loyaltyTiers
         .slice(0)

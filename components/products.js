@@ -44,7 +44,30 @@ export default function Products({
   setAddingToOBasket,
   cfh,
   gs,
+  showingRewards,
 }) {
+  const rewardProductsExist = (rewardProducts) => {
+    for (let i = 0; i < rewardProducts.length; i++) {
+      if (rewardProducts[i].product.productDisplayStyle?.rewardProduct) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const brandRewardProductsExist = (brandRewardProducts) => {
+    console.log(brandRewardProducts);
+
+    for (let i = 0; i < brandRewardProducts.brands.length; i++) {
+      if (rewardProductsExist(brandRewardProducts.brands[i].products)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   // function filteredCategories() {
   //   let filtered = [];
 
@@ -867,7 +890,7 @@ export default function Products({
                     <div
                       className={`py-2 px-3 rounded-lg text-nowrap w-auto lg:w-auto ${
                         selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
-                      }`}
+                      } `}
                       key={index}
                       onClick={() => {
                         setSelectedTab(index);
@@ -1097,6 +1120,12 @@ export default function Products({
                 .map((tab, index) => (
                   <div
                     className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
+                      showingRewards
+                        ? brandRewardProductsExist(filteredCategories()[index])
+                          ? "flex"
+                          : "hidden"
+                        : "flex"
+                    } ${
                       selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
                     }`}
                     key={index}
@@ -1125,7 +1154,13 @@ export default function Products({
                 })
                 .map((brand, index) => (
                   <div
-                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full`}
+                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full ${
+                      showingRewards
+                        ? rewardProductsExist(brand.products)
+                          ? "flex"
+                          : "hidden"
+                        : "flex"
+                    }`}
                     key={index}
                   >
                     <div className="flex flex-row justify-between">
@@ -1159,7 +1194,17 @@ export default function Products({
                         .map((product, productIndex) => (
                           <div
                             key={productIndex}
-                            className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
+                            className={`flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6 ${
+                              showingRewards
+                                ? product.product.productDisplayStyle
+                                    ?.rewardProduct
+                                  ? "flex"
+                                  : "hidden"
+                                : product.product.productDisplayStyle
+                                    ?.rewardProduct
+                                ? "hidden"
+                                : "flex"
+                            }`}
                           >
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img

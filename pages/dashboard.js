@@ -66,6 +66,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   console.log(newUser);
 
   const [activeTab, setTab] = useState(0);
+  const [showingRewards, setShowingRewards] = useState(false);
 
   const [dataObject, setData] = useState(null);
   const [cartObject, setCart] = useState(null);
@@ -284,6 +285,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     allowOrdering
                     forHome
                     showProductGroundswell
+                    rewardProduct
                   }
                   productTags {
                     nodes {
@@ -1034,6 +1036,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           forHome
                           priceSuffix
                           showProductGroundswell
+                          rewardProduct
                         }
                         title
                         productTags {
@@ -2237,16 +2240,23 @@ export default function Dashboard({ data, categories, products, orders }) {
     setPurchasing(true);
     setPurchaseType(type);
     setNewPurchase(true);
+    setShowingRewards(false);
   };
 
   const viewImpact = () => {
     setTab(2);
   };
 
+  const claimRewards = () => {
+    setTab(1);
+    setShowingRewards(true);
+  };
+
   const [managingSubscription, setManagingSubscription] = useState(false);
 
   const setCurrentTab = (tab) => {
     setTab(tab);
+    setShowingRewards(false);
   };
 
   const [showingCert, setShowingCert] = useState(false);
@@ -2375,6 +2385,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setAddingToOBasket={setAddingToOBasket}
                   cfh={coffeeFromHome}
                   gs={groundswell}
+                  showingRewards={showingRewards}
                 />
               )}
               {activeTab == 2 && (
@@ -2395,6 +2406,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   loyaltyTiers={loyaltyTiers}
                   orders={orderData}
                   viewImpact={viewImpact}
+                  claimRewards={claimRewards}
                 />
               )}
               {activeTab == 4 && (
@@ -2438,6 +2450,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           console.log(tab.index, activeTab);
                           setShowingBasket(false);
                           setManagingSubscription(false);
+                          setShowingRewards(false);
                         }}
                       >
                         <div className="w-8 h-8 mx-auto relative">
@@ -2461,6 +2474,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           console.log(tab.index, activeTab);
                           setShowingBasket(false);
                           setManagingSubscription(false);
+                          setShowingRewards(false);
                         }}
                       >
                         <div className="w-8 h-8 mx-auto relative">
@@ -2483,6 +2497,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           console.log(tab.index, activeTab);
                           setShowingBasket(false);
                           setManagingSubscription(false);
+                          setShowingRewards(false);
                         }}
                       >
                         <div className="w-8 h-8 mx-auto relative">
@@ -2502,6 +2517,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     } `}
                     onClick={(e) => {
                       setTab(tab.index);
+                      setShowingRewards(false);
                     }}
                   >
                     <div className="w-8 h-8 mx-auto relative">
