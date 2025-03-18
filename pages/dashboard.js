@@ -247,6 +247,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                     varietal
                     appearance
                   }
+                  coffeeMachineExtraInfo {
+                    cupsPerDay
+                    displayType
+                    showCupsPerDay
+                    showCupsPerDayCopy
+                    whatsIncluded
+                  }
                   hotChocolateExtraInfo {
                     dietType
                     ingredients
@@ -365,6 +372,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                     varietal
                     appearance
                   }
+                  coffeeMachineExtraInfo {
+                    cupsPerDay
+                    displayType
+                    showCupsPerDay
+                    showCupsPerDayCopy
+                    whatsIncluded
+                  }
                   hotChocolateExtraInfo {
                     dietType
                     ingredients
@@ -434,6 +448,110 @@ export default function Dashboard({ data, categories, products, orders }) {
                   }
                   productOrdering {
                     productOrder
+                  }
+                }
+                ... on SubscriptionProduct {
+                  id
+                  name
+                  price
+                  chocolateBarsExtraInfo {
+                    calories
+                    dietType
+                    ingredients
+                    type
+                    allergens
+                    health
+                  }
+                  coffeeExtraInfo {
+                    flavours
+                    origin
+                    roast
+                    type
+                    varietal
+                    appearance
+                  }
+                  hotChocolateExtraInfo {
+                    dietType
+                    ingredients
+                    origin
+                    type
+                  }
+                  teaExtraInfo {
+                    origin
+                    elavation
+                    flavours
+                    process
+                    howToDrink
+                    packaging
+                  }
+                  productDisplayStyle {
+                    badgeImage {
+                      node {
+                        sourceUrl
+                      }
+                    }
+                    bgImage {
+                      node {
+                        sourceUrl
+                      }
+                    }
+                    secondaryImage {
+                      node {
+                        sourceUrl
+                      }
+                    }
+                    titleStyle
+                    priceSuffix
+                    shortDescription
+                    allowOrdering
+                    forHome
+                    showProductGroundswell
+                  }
+                  productTags {
+                    nodes {
+                      name
+                      tagCategoryImages {
+                        displayOrder
+                        tagImage {
+                          node {
+                            sourceUrl
+                          }
+                        }
+                      }
+                    }
+                  }
+                  brands {
+                    nodes {
+                      name
+                      description
+                      brandingImage {
+                        image {
+                          node {
+                            sourceUrl
+                          }
+                        }
+                      }
+                      brandOrder {
+                        brandOrder
+                      }
+                    }
+                  }
+                  productOrdering {
+                    productOrder
+                  }
+                  attributes {
+                    nodes {
+                      name
+                      options
+                      variation
+                    }
+                  }
+                  coffeeMachineExtraInfo {
+                    cupsPerDay
+                    displayType
+                    showCupsPerDay
+                    showCupsPerDayCopy
+                    whatsIncluded
                   }
                 }
               }
@@ -826,6 +944,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                           varietal
                           appearance
                         }
+                        coffeeMachineExtraInfo {
+                          cupsPerDay
+                          displayType
+                          showCupsPerDay
+                          showCupsPerDayCopy
+                          whatsIncluded
+                        }
                         hotChocolateExtraInfo {
                           dietType
                           ingredients
@@ -926,6 +1051,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                           varietal
                           appearance
                         }
+                        coffeeMachineExtraInfo {
+                          cupsPerDay
+                          displayType
+                          showCupsPerDay
+                          showCupsPerDayCopy
+                          whatsIncluded
+                        }
                         hotChocolateExtraInfo {
                           dietType
                           ingredients
@@ -993,6 +1125,110 @@ export default function Dashboard({ data, categories, products, orders }) {
                             options
                             variation
                           }
+                        }
+                      }
+                      ... on SubscriptionProduct {
+                        id
+                        name
+                        price
+                        chocolateBarsExtraInfo {
+                          calories
+                          dietType
+                          ingredients
+                          type
+                          allergens
+                          health
+                        }
+                        coffeeExtraInfo {
+                          flavours
+                          origin
+                          roast
+                          type
+                          varietal
+                          appearance
+                        }
+                        hotChocolateExtraInfo {
+                          dietType
+                          ingredients
+                          origin
+                          type
+                        }
+                        teaExtraInfo {
+                          origin
+                          elavation
+                          flavours
+                          process
+                          howToDrink
+                          packaging
+                        }
+                        productDisplayStyle {
+                          badgeImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          bgImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          secondaryImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          titleStyle
+                          priceSuffix
+                          shortDescription
+                          allowOrdering
+                          forHome
+                          showProductGroundswell
+                        }
+                        productTags {
+                          nodes {
+                            name
+                            tagCategoryImages {
+                              displayOrder
+                              tagImage {
+                                node {
+                                  sourceUrl
+                                }
+                              }
+                            }
+                          }
+                        }
+                        brands {
+                          nodes {
+                            name
+                            description
+                            brandingImage {
+                              image {
+                                node {
+                                  sourceUrl
+                                }
+                              }
+                            }
+                            brandOrder {
+                              brandOrder
+                            }
+                          }
+                        }
+                        productOrdering {
+                          productOrder
+                        }
+                        attributes {
+                          nodes {
+                            name
+                            options
+                            variation
+                          }
+                        }
+                        coffeeMachineExtraInfo {
+                          cupsPerDay
+                          displayType
+                          showCupsPerDay
+                          showCupsPerDayCopy
+                          whatsIncluded
                         }
                       }
                     }

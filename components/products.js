@@ -205,6 +205,9 @@ export default function Products({
         }
       } else {
         const tagName = product.productTags?.nodes[0].name;
+
+        console.log(tagName);
+
         if (tagName) {
           if (!acc[tagName]) {
             acc[tagName] = [];
@@ -574,94 +577,66 @@ export default function Products({
 
     let productsCopy = [...products];
 
+    console.log(products);
+
     for (let i = 0; i < productsCopy.length; i++) {
-      if (productsCopy[i].__typename != "SubscriptionProduct") {
-        let groupFound = false;
+      let groupFound = false;
 
-        if (
-          productsCopy[i].productTags?.nodes[0].name != "coffee machine" &&
-          productsCopy[i].productTags?.nodes[0].name != "old-products" &&
-          productsCopy[i].productTags?.nodes[0].name != "Donation"
-        ) {
-          if (groups.length != 0) {
-            for (let j = 0; j < groups.length; j++) {
-              if (
-                groups[j].category == productsCopy[i].productTags?.nodes[0].name //Category match
-              ) {
-                // console.log(productsCopy[i].brands?.nodes[0].name);
-                // console.log(productsCopy[i]);
-                // console.log(i);
-                // console.log(groups[j]);
-                // console.log(groups[j].brands);
-                let brandFound = false;
+      if (
+        productsCopy[i].productTags?.nodes[0].name != "old-products" &&
+        productsCopy[i].productTags?.nodes[0].name != "Donation"
+      ) {
+        if (groups.length != 0) {
+          for (let j = 0; j < groups.length; j++) {
+            if (
+              groups[j].category == productsCopy[i].productTags?.nodes[0].name //Category match
+            ) {
+              // console.log(productsCopy[i].brands?.nodes[0].name);
+              // console.log(productsCopy[i]);
+              // console.log(i);
+              // console.log(groups[j]);
+              // console.log(groups[j].brands);
+              let brandFound = false;
 
-                for (let k = 0; k < groups[j].brands?.length; k++) {
-                  if (
-                    groups[j].brands?.[k].name ==
-                    productsCopy[i].brands?.nodes[0].name
-                  ) {
-                    // console.log(productsCopy[i].productTags?.nodes[0].name);
+              for (let k = 0; k < groups[j].brands?.length; k++) {
+                if (
+                  groups[j].brands?.[k].name ==
+                  productsCopy[i].brands?.nodes[0]?.name
+                ) {
+                  // console.log(productsCopy[i].productTags?.nodes[0].name);
 
-                    groups[j].brands?.[k].products.push(productsCopy[i]);
-                    brandFound = true;
+                  groups[j].brands?.[k].products.push(productsCopy[i]);
+                  brandFound = true;
 
-                    groupFound = true;
-                  }
-
-                  continue;
-                }
-
-                if (!brandFound) {
-                  let products = [];
-
-                  // console.log(productsCopy[i]);
-
-                  products.push(productsCopy[i]);
-
-                  groups[j].brands?.push({
-                    name: productsCopy[i].brands.nodes[0]?.name,
-                    description: productsCopy[i].brands.nodes[0]?.description,
-                    image:
-                      productsCopy[i].brands.nodes[0].brandingImage.image
-                        ?.sourceUrl,
-                    products: products,
-                  });
                   groupFound = true;
-
-                  continue;
                 }
+
+                continue;
+              }
+
+              if (!brandFound) {
+                let products = [];
+
+                // console.log(productsCopy[i]);
+
+                products.push(productsCopy[i]);
+
+                groups[j].brands?.push({
+                  name: productsCopy[i].brands.nodes[0]?.name,
+                  description: productsCopy[i].brands.nodes[0]?.description,
+                  image:
+                    productsCopy[i].brands.nodes[0]?.brandingImage?.image
+                      ?.sourceUrl,
+                  products: products,
+                });
+                groupFound = true;
+
+                continue;
               }
             }
+          }
 
-            if (!groupFound) {
-              let tempProducts = [];
-
-              tempProducts.push(productsCopy[i]);
-
-              let tempBrands = [];
-
-              tempBrands.push({
-                name: productsCopy[i].brands.nodes[0]?.name,
-                description: productsCopy[i].brands.nodes[0]?.description,
-                image:
-                  productsCopy[i].brands.nodes[0]?.brandingImage?.image
-                    ?.sourceUrl,
-                products: tempProducts,
-              });
-
-              groups.push({
-                category: productsCopy[i].productTags.nodes[0].name,
-                brands: tempBrands,
-                displayOrder:
-                  productsCopy[i].productTags.nodes[0].tagCategoryImages
-                    .displayOrder,
-              });
-
-              groupFound = true;
-
-              continue;
-            }
-          } else {
+          if (!groupFound) {
             let tempProducts = [];
 
             tempProducts.push(productsCopy[i]);
@@ -672,11 +647,10 @@ export default function Products({
               name: productsCopy[i].brands.nodes[0]?.name,
               description: productsCopy[i].brands.nodes[0]?.description,
               image:
-                productsCopy[i].brands.nodes[0]?.brandingImage.image?.sourceUrl,
+                productsCopy[i].brands.nodes[0]?.brandingImage?.image
+                  ?.sourceUrl,
               products: tempProducts,
             });
-
-            // console.log(tempProducts);
 
             groups.push({
               category: productsCopy[i].productTags.nodes[0].name,
@@ -685,9 +659,36 @@ export default function Products({
                 productsCopy[i].productTags.nodes[0].tagCategoryImages
                   .displayOrder,
             });
+
+            groupFound = true;
+
+            continue;
           }
+        } else {
+          let tempProducts = [];
+
+          tempProducts.push(productsCopy[i]);
+
+          let tempBrands = [];
+
+          tempBrands.push({
+            name: productsCopy[i].brands.nodes[0]?.name,
+            description: productsCopy[i].brands.nodes[0]?.description,
+            image:
+              productsCopy[i].brands.nodes[0]?.brandingImage.image?.sourceUrl,
+            products: tempProducts,
+          });
+
+          // console.log(tempProducts);
+
+          groups.push({
+            category: productsCopy[i].productTags.nodes[0].name,
+            brands: tempBrands,
+            displayOrder:
+              productsCopy[i].productTags.nodes[0].tagCategoryImages
+                .displayOrder,
+          });
         }
-      } else {
       }
     }
 
@@ -934,10 +935,10 @@ export default function Products({
                               <div className="flex relative aspect-[3/4] h-[100px]">
                                 <img
                                   src={product.product.image.sourceUrl}
-                                  className={`h-[100px] w-auto aspect-[3/4] ${
+                                  className={`h-[100px] w-auto aspect-[1/1] ${
                                     selectedTab == 1
                                       ? "object-contain"
-                                      : "object-cover"
+                                      : "object-contain"
                                   }`}
                                 ></img>
                                 {product.product.productDisplayStyle.badgeImage
@@ -985,7 +986,7 @@ export default function Products({
                                       }`}
                                     >
                                       {console.log(product.product.type)}
-                                      {product.product.type == "SIMPLE"
+                                      {product.product.type != "VARIABLE"
                                         ? product.product.price
                                         : getCheapestVariant(
                                             product.product.variations?.nodes
@@ -1169,10 +1170,10 @@ export default function Products({
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img
                                 src={product.product.image.sourceUrl}
-                                className={`h-[100px] w-auto aspect-[3/4] ${
+                                className={`h-[100px] w-auto aspect-[1/1] ${
                                   selectedTab == 1
                                     ? "object-contain"
-                                    : "object-cover"
+                                    : "object-contain"
                                 }`}
                               ></img>
                               {product.product.productDisplayStyle.badgeImage
@@ -1221,7 +1222,7 @@ export default function Products({
                                         : "mt-2"
                                     }`}
                                   >
-                                    {product.product.type == "SIMPLE"
+                                    {product.product.type != "VARIABLE"
                                       ? product.product.price
                                       : getCheapestVariant(
                                           product.product.variations?.nodes
