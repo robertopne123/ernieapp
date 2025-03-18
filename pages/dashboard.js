@@ -403,6 +403,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     forHome
                     priceSuffix
                     showProductGroundswell
+                    rewardProduct
                   }
                   title
                   productTags {
@@ -526,6 +527,12 @@ export default function Dashboard({ data, categories, products, orders }) {
                 date
                 orderNumber
                 status
+                couponLines {
+                  nodes {
+                    code
+                    databaseId
+                  }
+                }
               }
             }
             coupons {
@@ -578,6 +585,16 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                           price
                           databaseId
+                          productTags {
+                            nodes {
+                              name
+                            }
+                          }
+                          productCategories {
+                            nodes {
+                              name
+                            }
+                          }
                         }
                         ... on SimpleProduct {
                           id
@@ -589,6 +606,16 @@ export default function Dashboard({ data, categories, products, orders }) {
                             }
                           }
                           price
+                          productTags {
+                            nodes {
+                              name
+                            }
+                          }
+                          productCategories {
+                            nodes {
+                              name
+                            }
+                          }
                         }
                       }
                     }
@@ -919,6 +946,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           allowOrdering
                           forHome
                           showProductGroundswell
+                          rewardProduct
                         }
                         productTags {
                           nodes {
@@ -1160,6 +1188,12 @@ export default function Dashboard({ data, categories, products, orders }) {
                       date
                       orderNumber
                       status
+                      couponLines {
+                        nodes {
+                          code
+                          databaseId
+                        }
+                      }
                     }
                   }
                   coupons {
@@ -1211,6 +1245,16 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 }
                                 price
                                 databaseId
+                                productTags {
+                                  nodes {
+                                    name
+                                  }
+                                }
+                                productCategories {
+                                  nodes {
+                                    name
+                                  }
+                                }
                               }
                               ... on SimpleProduct {
                                 id
@@ -1222,6 +1266,16 @@ export default function Dashboard({ data, categories, products, orders }) {
                                   }
                                 }
                                 price
+                                productTags {
+                                  nodes {
+                                    name
+                                  }
+                                }
+                                productCategories {
+                                  nodes {
+                                    name
+                                  }
+                                }
                               }
                             }
                           }
@@ -2204,9 +2258,13 @@ export default function Dashboard({ data, categories, products, orders }) {
   const addToOneOffBasket = (item) => {
     let oneOffBasketCopy = [...oneOffBasket];
 
+    console.log(item);
+
     oneOffBasketCopy.push(item);
 
     setOneOffBasket(oneOffBasketCopy);
+
+    console.log(oneOffBasketCopy);
 
     setTimeout(function () {
       setAddingToOBasket(false);
@@ -2407,6 +2465,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                   orders={orderData}
                   viewImpact={viewImpact}
                   claimRewards={claimRewards}
+                  addToOneOffBasket={addToOneOffBasket}
+                  setAddingToOBasket={setAddingToOBasket}
+                  addingToOBasket={addingToOBasket}
+                  setPurchaseType={setPurchaseType}
+                  setPurchasing={setPurchasing}
                 />
               )}
               {activeTab == 4 && (

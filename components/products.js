@@ -227,7 +227,7 @@ export default function Products({
           return acc;
         }
       } else {
-        const tagName = product.productTags?.nodes[0].name;
+        const tagName = product.productTags?.nodes[0]?.name;
         if (tagName) {
           if (!acc[tagName]) {
             acc[tagName] = [];
@@ -602,14 +602,15 @@ export default function Products({
         let groupFound = false;
 
         if (
-          productsCopy[i].productTags?.nodes[0].name != "coffee machine" &&
-          productsCopy[i].productTags?.nodes[0].name != "old-products" &&
-          productsCopy[i].productTags?.nodes[0].name != "Donation"
+          productsCopy[i].productTags?.nodes[0]?.name != "coffee machine" &&
+          productsCopy[i].productTags?.nodes[0]?.name != "old-products" &&
+          productsCopy[i].productTags?.nodes[0]?.name != "Donation"
         ) {
           if (groups.length != 0) {
             for (let j = 0; j < groups.length; j++) {
               if (
-                groups[j].category == productsCopy[i].productTags?.nodes[0].name //Category match
+                groups[j].category ==
+                productsCopy[i].productTags?.nodes[0]?.name //Category match
               ) {
                 // console.log(productsCopy[i].brands?.nodes[0].name);
                 // console.log(productsCopy[i]);
@@ -621,7 +622,7 @@ export default function Products({
                 for (let k = 0; k < groups[j].brands?.length; k++) {
                   if (
                     groups[j].brands?.[k].name ==
-                    productsCopy[i].brands?.nodes[0].name
+                    productsCopy[i].brands?.nodes[0]?.name
                   ) {
                     // console.log(productsCopy[i].productTags?.nodes[0].name);
 
@@ -673,10 +674,10 @@ export default function Products({
               });
 
               groups.push({
-                category: productsCopy[i].productTags.nodes[0].name,
+                category: productsCopy[i].productTags.nodes[0]?.name,
                 brands: tempBrands,
                 displayOrder:
-                  productsCopy[i].productTags.nodes[0].tagCategoryImages
+                  productsCopy[i].productTags.nodes[0]?.tagCategoryImages
                     .displayOrder,
               });
 
@@ -702,10 +703,10 @@ export default function Products({
             // console.log(tempProducts);
 
             groups.push({
-              category: productsCopy[i].productTags.nodes[0].name,
+              category: productsCopy[i].productTags.nodes[0]?.name,
               brands: tempBrands,
               displayOrder:
-                productsCopy[i].productTags.nodes[0].tagCategoryImages
+                productsCopy[i].productTags.nodes[0]?.tagCategoryImages
                   .displayOrder,
             });
           }
@@ -1158,7 +1159,7 @@ export default function Products({
                       showingRewards
                         ? rewardProductsExist(brand.products)
                           ? "flex"
-                          : "hidden"
+                          : "flex"
                         : "flex"
                     }`}
                     key={index}
@@ -1199,13 +1200,19 @@ export default function Products({
                                 ? product.product.productDisplayStyle
                                     ?.rewardProduct
                                   ? "flex"
-                                  : "hidden"
+                                  : "flex"
                                 : product.product.productDisplayStyle
                                     ?.rewardProduct
                                 ? "hidden"
                                 : "flex"
                             }`}
                           >
+                            {console.log(
+                              product.product.name,
+                              product.product.productDisplayStyle
+                                ?.rewardProduct,
+                              showingRewards
+                            )}
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img
                                 src={product.product.image.sourceUrl}

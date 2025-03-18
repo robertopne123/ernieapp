@@ -142,7 +142,7 @@ export const Basket = ({
       subtotal =
         subtotal +
         parseFloat(
-          subBasket[i].product.type == "SIMPLE"
+          subBasket[i].product.type != "VARIABLE"
             ? subBasket[i].product.price.replace("£", "")
             : subBasket[i].selectedVariant?.price.replace("£", "")
         ) *
@@ -166,7 +166,7 @@ export const Basket = ({
         subtotal =
           subtotal +
           parseFloat(
-            arr[i].product?.node.type == "SIMPLE"
+            arr[i].product?.node.type != "VARIABLE"
               ? arr[i].product?.node.price.replace("£", "")
               : arr[i].variation?.node.price.replace("£", "")
           ) *
@@ -183,12 +183,14 @@ export const Basket = ({
     for (let i = 0; i < oneOffBasket.length; i++) {
       subtotal =
         subtotal +
-        (oneOffBasket[i].product.type == "SIMPLE"
-          ? parseFloat(oneOffBasket[i].product.price.replace("£", "")) *
-            oneOffBasket[i].quantity
+        (oneOffBasket[i].product.type != "VARIABLE"
+          ? oneOffBasket[i].product.price
+            ? parseFloat(oneOffBasket[i].product.price?.replace("£", "")) *
+              oneOffBasket[i].quantity
+            : 0.0
           : parseFloat(
               oneOffBasket[i].selectedVariant
-                ? oneOffBasket[i].selectedVariant?.price.replace("£", "")
+                ? oneOffBasket[i].selectedVariant?.price?.replace("£", "")
                 : oneOffBasket[i].variation?.price.replace("£", "")
             ) * oneOffBasket[i].quantity);
     }
@@ -700,7 +702,7 @@ export const Basket = ({
         ) {
           if (basket[i].quantity > 1) {
             for (let j = 0; j < basket[i].quantity; j++) {
-              if (basket[i].product.type == "SIMPLE") {
+              if (basket[i].product.type != "VARIABLE") {
                 lineItems.push({
                   name: basket[i].product.name,
                   productId: basket[i].product.databaseId,
@@ -744,7 +746,7 @@ export const Basket = ({
         }
       }
 
-      if (basket[i].product.type == "SIMPLE") {
+      if (basket[i].product.type != "VARIABLE") {
         lineItems.push({
           name: basket[i].product.name,
           productId: basket[i].product.databaseId,
@@ -1617,8 +1619,11 @@ export const Basket = ({
       } else {
         if (
           parseFloat(getCurSubSubTotal().toFixed(2)) +
-            parseFloat(getSubSubtotal().toFixed(2)) <
-          80.0
+            parseFloat(getSubSubtotal().toFixed(2)) <=
+            80.0 &&
+          parseFloat(getCurSubSubTotal().toFixed(2)) +
+            parseFloat(getSubSubtotal().toFixed(2)) >
+            0.0
         ) {
           setDeliveryAmount(cfh ? 5.25 : 8.95);
         } else {
@@ -1676,7 +1681,10 @@ export const Basket = ({
         }
       } else {
         // Reset voucher amount **only if no voucher is applied**
-        if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
+        if (
+          parseFloat(getOneOffSubtotal().toFixed(2)) <= 80.0 &&
+          parseFloat(getOneOffSubtotal().toFixed(2)) > 0.0
+        ) {
           setDeliveryAmount(cfh ? 5.25 : 8.95);
         } else {
           setDeliveryAmount(0.0);
@@ -2777,7 +2785,7 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.type == "SIMPLE"
+                                    {item.product.type != "VARIABLE"
                                       ? item.product.name
                                       : item.selectedVariant?.name}
                                   </p>
@@ -2785,7 +2793,7 @@ export const Basket = ({
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.type == "SIMPLE"
+                                        item.product.type != "VARIABLE"
                                           ? item.product.price.replace("£", "")
                                           : item.selectedVariant?.price.replace(
                                               "£",
@@ -2806,8 +2814,9 @@ export const Basket = ({
                                   className="w-full grid grid-cols-4 items-center"
                                   key={index}
                                 >
+                                  {console.log(item.product)}
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.type == "SIMPLE"
+                                    {item.product?.type != "VARIABLE"
                                       ? item.product.name
                                       : item.selectedVariant?.name}
                                   </p>
@@ -2815,8 +2824,13 @@ export const Basket = ({
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.type == "SIMPLE"
-                                          ? item.product.price.replace("£", "")
+                                        item.product?.type != "VARIABLE"
+                                          ? item.product.price
+                                            ? item.product.price?.replace(
+                                                "£",
+                                                ""
+                                              )
+                                            : 0.0
                                           : item.selectedVariant?.price.replace(
                                               "£",
                                               ""
@@ -3085,12 +3099,14 @@ export const Basket = ({
                                           key={index}
                                         >
                                           <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.name
                                               : item.variation.node.name}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.price
                                               : item.variation.node.price}
                                           </p>
@@ -3107,12 +3123,14 @@ export const Basket = ({
                                           key={index}
                                         >
                                           <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.name
                                               : item.variation.node.name}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.price
                                               : item.variation.node.price}
                                           </p>
@@ -3142,7 +3160,7 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.type == "SIMPLE"
+                                    {item.product.type != "VARIABLE"
                                       ? item.product.name
                                       : item.selectedVariant.name}
                                   </p>
@@ -3150,7 +3168,7 @@ export const Basket = ({
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.type == "SIMPLE"
+                                        item.product.type != "VARIABLE"
                                           ? item.product.price.replace("£", "")
                                           : item.selectedVariant.price.replace(
                                               "£",
@@ -3302,22 +3320,26 @@ export const Basket = ({
                             >
                               <p className="font-circular text-erniegreen col-span-2 text-sm">
                                 {console.log(item)}
-                                {item.product.type == "SIMPLE"
+                                {item.product.type != "VARIABLE"
                                   ? item.product.name
                                   : item.selectedVariant?.name}
                               </p>
                               <p className="font-circular text-erniegreen text-sm">
-                                {item.product.type == "SIMPLE"
+                                {item.product.type != "VARIABLE"
                                   ? `£
-                                ${(
-                                  parseFloat(
-                                    item.product.price.replace("£", "")
-                                  ) * item.quantity
+                                ${(item.product.price
+                                  ? parseFloat(
+                                      item.product.price?.replace("£", "")
+                                    ) * item.quantity
+                                  : 0.0
                                 ).toFixed(2)}`
                                   : `£
                                 ${(
                                   parseFloat(
-                                    item.selectedVariant?.price.replace("£", "")
+                                    item.selectedVariant?.price?.replace(
+                                      "£",
+                                      ""
+                                    )
                                   ) * item.quantity
                                 ).toFixed(2)}`}
                               </p>

@@ -3,7 +3,17 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Info } from "./rewardPages/info";
 
-export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
+export const Rewards = ({
+  loyaltyTiers,
+  orders,
+  viewImpact,
+  claimRewards,
+  addToOneOffBasket,
+  setAddingToOBasket,
+  addingToOBasket,
+  setPurchaseType,
+  setPurchasing,
+}) => {
   const [showingActivity, setShowingActivity] = useState(false);
   const [copied, setCopied] = useState([]);
   const [nextTier, setNextTier] = useState({});
@@ -31,6 +41,34 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
     }
 
     return Math.floor(total);
+  };
+
+  const checkLoyaltyItem = (item) => {
+    for (let i = 0; i < orders.length; i++) {
+      // console.log(orders[i].lineItems.nodes);
+
+      if (item.code != null) {
+        for (let j = 0; j < orders[i].couponLines.nodes.length; j++) {
+          if (item.code == orders[i].couponLines.nodes[j].code) {
+            return true;
+          } else {
+          }
+        }
+      } else {
+        for (let j = 0; j < orders[i].lineItems.nodes.length; j++) {
+          for (let k = 0; k < item.product.nodes.length; k++) {
+            if (
+              item.product.nodes[k].databaseId ==
+              orders[i].lineItems.nodes[j].product.node.databaseId
+            ) {
+              return true;
+            }
+          }
+        }
+      }
+
+      return false;
+    }
   };
 
   const timeSinceRegistration = (timecode) => {
@@ -100,6 +138,7 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
     <div className="h-[calc(100%)] overflow-y-scroll w-full bg-erniedarkcream flex flex-col gap-6 relative p-6">
       {showingActivity && <Activity backAction={back} orders={orders} />}
       {console.log(orders)}
+
       {showingInfo && (
         <Info
           name={"Terms & Conditions"}
@@ -198,7 +237,7 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
         </div>
       </div>
       <div className="flex flex-row gap-6 w-full">
-        <div
+        {/* <div
           className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer w-1/2"
           onClick={(e) => {
             claimRewards();
@@ -207,9 +246,9 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
           <p className="font-circe text-erniegreen font-[900] text-xl text-center">
             Claim Rewards
           </p>
-        </div>
+        </div> */}
         <div
-          className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer w-1/2"
+          className="bg-erniegold px-4 py-2 rounded-lg cursor-pointer w-full"
           onClick={(e) => {
             setShowingActivity(true);
           }}
@@ -241,7 +280,7 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
               </p>
             )}
             <div className="grid grid-cols-2 gap-4 md:flex md:flex-col flex-wrap mt-4">
-              {tier.lt.coupons?.map((coupon, cIndex) => (
+              {/* {tier.lt.coupons?.map((coupon, cIndex) => (
                 <div
                   className={`flex md:flex-row flex-col justify-between md:gap-4 gap-4  mt-4 ${
                     calculateTotal() < tier.lt.pointsNeeded && "opacity-50"
@@ -294,18 +333,23 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
                     )}
                   </div>
                 </div>
-              ))}
+              ))} */}
 
               {tier.lt.productOffer?.map((product, pIndex) => (
                 <div
                   className={`flex md:flex-row flex-col justify-between md:gap-4 gap-4  mt-4  ${
                     calculateTotal() < tier.lt.pointsNeeded && "opacity-50"
+                  } ${
+                    !checkLoyaltyItem(product)
+                      ? "opacity-100"
+                      : "opacity-50 pointer-events-none"
                   }`}
                 >
+                  {console.log(checkLoyaltyItem(product))}
                   <div className="flex md:flex-row flex-col items-center gap-4 justify-start md:justify-start">
                     <img
                       src={
-                        product.product.nodes[0].featuredImage.node.sourceUrl
+                        product.product.nodes[0].featuredImage?.node?.sourceUrl
                       }
                       className="w-16 h-16 object-contain min-w-[64px]"
                     ></img>
@@ -315,36 +359,69 @@ export const Rewards = ({ loyaltyTiers, orders, viewImpact, claimRewards }) => {
                       </p>{" "}
                     </div>
                   </div>
-                  <div className="flex flex-row justify-center md:justify-start gap-4 items-center min-w-[120px] ">
+                  <div className="flex flex-row justify-center md:justify-end gap-4 items-center min-w-[120px] ">
                     <div
                       className="bg-erniemint py-2 md:px-4 px-2 rounded-md flex flex-row gap-2 self-center hover:bg-erniegold cursor-pointer"
                       onClick={(e) => {
-                        setCopied((prevCopied) => {
-                          let tempCopied = [...prevCopied]; // Make a proper copy
+                        if (
+                          product.product.nodes[0].productCategories?.nodes[0]
+                            ?.name == "Donation"
+                        ) {
+                          setPurchaseType(0);
 
-                          tempCopied[tier.lt.coupons.length + pIndex] = true; // Set copied state to true
-                          navigator.clipboard.writeText(
-                            product.code.toUpperCase()
-                          );
+                          setPurchasing(true);
 
-                          setTimeout(() => {
-                            setCopied((prevCopied) => {
-                              let resetCopied = [...prevCopied];
-                              resetCopied[
-                                tier.lt.coupons.length + pIndex
-                              ] = false;
-                              return resetCopied;
-                            });
-                          }, 5000); // Reset after 5 seconds
+                          setAddingToOBasket(true);
 
-                          return tempCopied;
-                        });
+                          addToOneOffBasket({
+                            product: product.product.nodes[0],
+                            quantity: 1,
+                            selectedVariant: null,
+                          });
+
+                          console.log(addingToOBasket);
+                        } else {
+                          setCopied((prevCopied) => {
+                            let tempCopied = [...prevCopied]; // Make a proper copy
+
+                            tempCopied[tier.lt.coupons.length + pIndex] = true; // Set copied state to true
+                            navigator.clipboard.writeText(
+                              product.code.toUpperCase()
+                            );
+
+                            setTimeout(() => {
+                              setCopied((prevCopied) => {
+                                let resetCopied = [...prevCopied];
+                                resetCopied[
+                                  tier.lt.coupons.length + pIndex
+                                ] = false;
+                                return resetCopied;
+                              });
+                            }, 5000); // Reset after 5 seconds
+
+                            return tempCopied;
+                          });
+                        }
                       }}
                     >
                       <p className="font-circular font-[500] md:text-base text-sm text-erniegreen">
-                        {product.code.toUpperCase()}
+                        {product.product.nodes[0].productCategories?.nodes[0]
+                          ?.name == "Donation"
+                          ? !checkLoyaltyItem(product)
+                            ? "Claim Reward"
+                            : "Claimed"
+                          : product.code?.toUpperCase()}
                       </p>
-                      <img src="/copy.svg" className="w-5"></img>
+                      {console.log(
+                        product.product.nodes[0].productCategories?.nodes[0]
+                          ?.name
+                      )}
+                      {product.product.nodes[0].productCategories?.nodes[0]
+                        ?.name == "Donation" ? (
+                        <></>
+                      ) : (
+                        <img src="/copy.svg" className="w-5"></img>
+                      )}
                     </div>
                     {copied[tier.lt.coupons?.length + pIndex] && (
                       <p className="font-circular font-[500] self-center text-sm text-ernieteal">
