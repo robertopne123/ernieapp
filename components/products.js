@@ -602,30 +602,29 @@ export default function Products({
     for (let i = 0; i < productsCopy.length; i++) {
       let groupFound = false;
 
-        if (
-          productsCopy[i].productTags?.nodes[0]?.name != "coffee machine" &&
-          productsCopy[i].productTags?.nodes[0]?.name != "old-products" &&
-          productsCopy[i].productTags?.nodes[0]?.name != "Donation"
-        ) {
-          if (groups.length != 0) {
-            for (let j = 0; j < groups.length; j++) {
-              if (
-                groups[j].category ==
-                productsCopy[i].productTags?.nodes[0]?.name //Category match
-              ) {
-                // console.log(productsCopy[i].brands?.nodes[0].name);
-                // console.log(productsCopy[i]);
-                // console.log(i);
-                // console.log(groups[j]);
-                // console.log(groups[j].brands);
-                let brandFound = false;
+      if (
+        productsCopy[i].productTags?.nodes[0]?.name != "coffee machine" &&
+        productsCopy[i].productTags?.nodes[0]?.name != "old-products" &&
+        productsCopy[i].productTags?.nodes[0]?.name != "Donation"
+      ) {
+        if (groups.length != 0) {
+          for (let j = 0; j < groups.length; j++) {
+            if (
+              groups[j].category == productsCopy[i].productTags?.nodes[0]?.name //Category match
+            ) {
+              // console.log(productsCopy[i].brands?.nodes[0].name);
+              // console.log(productsCopy[i]);
+              // console.log(i);
+              // console.log(groups[j]);
+              // console.log(groups[j].brands);
+              let brandFound = false;
 
-                for (let k = 0; k < groups[j].brands?.length; k++) {
-                  if (
-                    groups[j].brands?.[k].name ==
-                    productsCopy[i].brands?.nodes[0]?.name
-                  ) {
-                    // console.log(productsCopy[i].productTags?.nodes[0].name);
+              for (let k = 0; k < groups[j].brands?.length; k++) {
+                if (
+                  groups[j].brands?.[k].name ==
+                  productsCopy[i].brands?.nodes[0]?.name
+                ) {
+                  // console.log(productsCopy[i].productTags?.nodes[0].name);
 
                   groups[j].brands?.[k].products.push(productsCopy[i]);
                   brandFound = true;
@@ -658,35 +657,7 @@ export default function Products({
             }
           }
 
-            if (!groupFound) {
-              let tempProducts = [];
-
-              tempProducts.push(productsCopy[i]);
-
-              let tempBrands = [];
-
-              tempBrands.push({
-                name: productsCopy[i].brands.nodes[0]?.name,
-                description: productsCopy[i].brands.nodes[0]?.description,
-                image:
-                  productsCopy[i].brands.nodes[0]?.brandingImage?.image
-                    ?.sourceUrl,
-                products: tempProducts,
-              });
-
-              groups.push({
-                category: productsCopy[i].productTags.nodes[0]?.name,
-                brands: tempBrands,
-                displayOrder:
-                  productsCopy[i].productTags.nodes[0]?.tagCategoryImages
-                    .displayOrder,
-              });
-
-              groupFound = true;
-
-              continue;
-            }
-          } else {
+          if (!groupFound) {
             let tempProducts = [];
 
             tempProducts.push(productsCopy[i]);
@@ -725,29 +696,54 @@ export default function Products({
             name: productsCopy[i].brands.nodes[0]?.name,
             description: productsCopy[i].brands.nodes[0]?.description,
             image:
-              productsCopy[i].brands.nodes[0]?.brandingImage.image?.sourceUrl,
+              productsCopy[i].brands.nodes[0]?.brandingImage?.image?.sourceUrl,
             products: tempProducts,
           });
 
-          // console.log(tempProducts);
-
           groups.push({
-            category: productsCopy[i].productTags.nodes[0].name,
+            category: productsCopy[i].productTags.nodes[0]?.name,
             brands: tempBrands,
             displayOrder:
-              productsCopy[i].productTags.nodes[0].tagCategoryImages
+              productsCopy[i].productTags.nodes[0]?.tagCategoryImages
                 .displayOrder,
           });
+
+          groupFound = true;
+
+          continue;
         }
+      } else {
+        let tempProducts = [];
+
+        tempProducts.push(productsCopy[i]);
+
+        let tempBrands = [];
+
+        tempBrands.push({
+          name: productsCopy[i].brands.nodes[0]?.name,
+          description: productsCopy[i].brands.nodes[0]?.description,
+          image:
+            productsCopy[i].brands.nodes[0]?.brandingImage.image?.sourceUrl,
+          products: tempProducts,
+        });
+
+        // console.log(tempProducts);
+
+        groups.push({
+          category: productsCopy[i].productTags.nodes[0].name,
+          brands: tempBrands,
+          displayOrder:
+            productsCopy[i].productTags.nodes[0].tagCategoryImages.displayOrder,
+        });
       }
     }
-
-    let sortedGroups = getSortedProducts(groups);
-
-    // console.log(sortedGroups);
-
-    return sortedGroups;
   };
+
+  let sortedGroups = getSortedProducts(groups);
+
+  // console.log(sortedGroups);
+
+  return sortedGroups;
 
   const [selectedTab, setSelectedTab] = useState(0);
 
