@@ -44,7 +44,30 @@ export default function Products({
   setAddingToOBasket,
   cfh,
   gs,
+  showingRewards,
 }) {
+  const rewardProductsExist = (rewardProducts) => {
+    for (let i = 0; i < rewardProducts.length; i++) {
+      if (rewardProducts[i].product.productDisplayStyle?.rewardProduct) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const brandRewardProductsExist = (brandRewardProducts) => {
+    console.log(brandRewardProducts);
+
+    for (let i = 0; i < brandRewardProducts.brands.length; i++) {
+      if (rewardProductsExist(brandRewardProducts.brands[i].products)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
   // function filteredCategories() {
   //   let filtered = [];
 
@@ -204,10 +227,14 @@ export default function Products({
           return acc;
         }
       } else {
+<<<<<<< HEAD
         const tagName = product.productTags?.nodes[0].name;
 
         console.log(tagName);
 
+=======
+        const tagName = product.productTags?.nodes[0]?.name;
+>>>>>>> origin/testing
         if (tagName) {
           if (!acc[tagName]) {
             acc[tagName] = [];
@@ -582,6 +609,7 @@ export default function Products({
     for (let i = 0; i < productsCopy.length; i++) {
       let groupFound = false;
 
+<<<<<<< HEAD
       if (
         productsCopy[i].productTags?.nodes[0].name != "old-products" &&
         productsCopy[i].productTags?.nodes[0].name != "Donation"
@@ -604,6 +632,32 @@ export default function Products({
                   productsCopy[i].brands?.nodes[0]?.name
                 ) {
                   // console.log(productsCopy[i].productTags?.nodes[0].name);
+=======
+        if (
+          productsCopy[i].productTags?.nodes[0]?.name != "coffee machine" &&
+          productsCopy[i].productTags?.nodes[0]?.name != "old-products" &&
+          productsCopy[i].productTags?.nodes[0]?.name != "Donation"
+        ) {
+          if (groups.length != 0) {
+            for (let j = 0; j < groups.length; j++) {
+              if (
+                groups[j].category ==
+                productsCopy[i].productTags?.nodes[0]?.name //Category match
+              ) {
+                // console.log(productsCopy[i].brands?.nodes[0].name);
+                // console.log(productsCopy[i]);
+                // console.log(i);
+                // console.log(groups[j]);
+                // console.log(groups[j].brands);
+                let brandFound = false;
+
+                for (let k = 0; k < groups[j].brands?.length; k++) {
+                  if (
+                    groups[j].brands?.[k].name ==
+                    productsCopy[i].brands?.nodes[0]?.name
+                  ) {
+                    // console.log(productsCopy[i].productTags?.nodes[0].name);
+>>>>>>> origin/testing
 
                   groups[j].brands?.[k].products.push(productsCopy[i]);
                   brandFound = true;
@@ -636,7 +690,39 @@ export default function Products({
             }
           }
 
+<<<<<<< HEAD
           if (!groupFound) {
+=======
+            if (!groupFound) {
+              let tempProducts = [];
+
+              tempProducts.push(productsCopy[i]);
+
+              let tempBrands = [];
+
+              tempBrands.push({
+                name: productsCopy[i].brands.nodes[0]?.name,
+                description: productsCopy[i].brands.nodes[0]?.description,
+                image:
+                  productsCopy[i].brands.nodes[0]?.brandingImage?.image
+                    ?.sourceUrl,
+                products: tempProducts,
+              });
+
+              groups.push({
+                category: productsCopy[i].productTags.nodes[0]?.name,
+                brands: tempBrands,
+                displayOrder:
+                  productsCopy[i].productTags.nodes[0]?.tagCategoryImages
+                    .displayOrder,
+              });
+
+              groupFound = true;
+
+              continue;
+            }
+          } else {
+>>>>>>> origin/testing
             let tempProducts = [];
 
             tempProducts.push(productsCopy[i]);
@@ -653,10 +739,10 @@ export default function Products({
             });
 
             groups.push({
-              category: productsCopy[i].productTags.nodes[0].name,
+              category: productsCopy[i].productTags.nodes[0]?.name,
               brands: tempBrands,
               displayOrder:
-                productsCopy[i].productTags.nodes[0].tagCategoryImages
+                productsCopy[i].productTags.nodes[0]?.tagCategoryImages
                   .displayOrder,
             });
 
@@ -868,7 +954,7 @@ export default function Products({
                     <div
                       className={`py-2 px-3 rounded-lg text-nowrap w-auto lg:w-auto ${
                         selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
-                      }`}
+                      } `}
                       key={index}
                       onClick={() => {
                         setSelectedTab(index);
@@ -1098,6 +1184,12 @@ export default function Products({
                 .map((tab, index) => (
                   <div
                     className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
+                      showingRewards
+                        ? brandRewardProductsExist(filteredCategories()[index])
+                          ? "flex"
+                          : "hidden"
+                        : "flex"
+                    } ${
                       selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
                     }`}
                     key={index}
@@ -1126,7 +1218,13 @@ export default function Products({
                 })
                 .map((brand, index) => (
                   <div
-                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full`}
+                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full ${
+                      showingRewards
+                        ? rewardProductsExist(brand.products)
+                          ? "flex"
+                          : "flex"
+                        : "flex"
+                    }`}
                     key={index}
                   >
                     <div className="flex flex-row justify-between">
@@ -1161,12 +1259,31 @@ export default function Products({
                           <div
                             key={productIndex}
                             className={`flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6 ${
+<<<<<<< HEAD
                               product.product.productDisplayStyle?.rewardProduct
+=======
+                              showingRewards
+                                ? product.product.productDisplayStyle
+                                    ?.rewardProduct
+                                  ? "flex"
+                                  : "flex"
+                                : product.product.productDisplayStyle
+                                    ?.rewardProduct
+>>>>>>> origin/testing
                                 ? "hidden"
                                 : "flex"
                             }`}
                           >
+<<<<<<< HEAD
                             {console.log(product)}
+=======
+                            {console.log(
+                              product.product.name,
+                              product.product.productDisplayStyle
+                                ?.rewardProduct,
+                              showingRewards
+                            )}
+>>>>>>> origin/testing
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img
                                 src={product.product.image.sourceUrl}

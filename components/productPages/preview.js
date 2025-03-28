@@ -291,6 +291,7 @@ export default function Preview({
                   priority
                   style={{ objectFit: "contain" }}
                 ></Image>
+<<<<<<< HEAD
                 {product.productDisplayStyle?.badgeImage && (
                   <Image
                     src={product.productDisplayStyle?.badgeImage?.sourceUrl}
@@ -300,12 +301,24 @@ export default function Preview({
                     className="w-28 lg:w-28 absolute bottom-0 right-0 lg:right-[-20px] rounded-full"
                   />
                 )}
+=======
+
+                <Image
+                  src={product.productDisplayStyle.badgeImage.node.sourceUrl}
+                  width={100}
+                  height={100}
+                  priority
+                  className="w-28 lg:w-28 absolute bottom-0 right-0 lg:right-[-20px] rounded-full"
+                />
+>>>>>>> origin/testing
               </div>
             )}
             {product?.productTags.nodes[0].name == "healthy snacks" && (
               <div className="h-full mx-auto relative z-10">
                 <Image
-                  src={product.productDisplayStyle.secondaryImage.sourceUrl}
+                  src={
+                    product.productDisplayStyle.secondaryImage.node.sourceUrl
+                  }
                   fill={true}
                   priority
                   className="h-full mx-auto"

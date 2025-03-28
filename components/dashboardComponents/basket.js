@@ -84,6 +84,7 @@ export const Basket = ({
   const [deliveryAmount, setDeliveryAmount] = useState(0.0);
 
   const [voucher, setVoucher] = useState("");
+  const [voucherType, setVoucherType] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState("");
   const [voucherApplied, setVoucherApplied] = useState(false);
   const [voucherFound, setVoucherFound] = useState(false);
@@ -141,7 +142,7 @@ export const Basket = ({
       subtotal =
         subtotal +
         parseFloat(
-          subBasket[i].product.type == "SIMPLE"
+          subBasket[i].product.type != "VARIABLE"
             ? subBasket[i].product.price.replace("£", "")
             : subBasket[i].selectedVariant?.price.replace("£", "")
         ) *
@@ -165,7 +166,7 @@ export const Basket = ({
         subtotal =
           subtotal +
           parseFloat(
-            arr[i].product?.node.type == "SIMPLE"
+            arr[i].product?.node.type != "VARIABLE"
               ? arr[i].product?.node.price.replace("£", "")
               : arr[i].variation?.node.price.replace("£", "")
           ) *
@@ -182,12 +183,14 @@ export const Basket = ({
     for (let i = 0; i < oneOffBasket.length; i++) {
       subtotal =
         subtotal +
-        (oneOffBasket[i].product.type == "SIMPLE"
-          ? parseFloat(oneOffBasket[i].product.price.replace("£", "")) *
-            oneOffBasket[i].quantity
+        (oneOffBasket[i].product.type != "VARIABLE"
+          ? oneOffBasket[i].product.price
+            ? parseFloat(oneOffBasket[i].product.price?.replace("£", "")) *
+              oneOffBasket[i].quantity
+            : 0.0
           : parseFloat(
               oneOffBasket[i].selectedVariant
-                ? oneOffBasket[i].selectedVariant?.price.replace("£", "")
+                ? oneOffBasket[i].selectedVariant?.price?.replace("£", "")
                 : oneOffBasket[i].variation?.price.replace("£", "")
             ) * oneOffBasket[i].quantity);
     }
@@ -307,7 +310,9 @@ export const Basket = ({
             fieldGroupName
             howDidYouHearAboutUs
             impactCertificate {
-              sourceUrl
+              node {
+                sourceUrl
+              }
             }
             invoicingContactEmail
             invoicingContactFirstName
@@ -697,7 +702,7 @@ export const Basket = ({
         ) {
           if (basket[i].quantity > 1) {
             for (let j = 0; j < basket[i].quantity; j++) {
-              if (basket[i].product.type == "SIMPLE") {
+              if (basket[i].product.type != "VARIABLE") {
                 lineItems.push({
                   name: basket[i].product.name,
                   productId: basket[i].product.databaseId,
@@ -741,7 +746,7 @@ export const Basket = ({
         }
       }
 
-      if (basket[i].product.type == "SIMPLE") {
+      if (basket[i].product.type != "VARIABLE") {
         lineItems.push({
           name: basket[i].product.name,
           productId: basket[i].product.databaseId,
@@ -846,7 +851,7 @@ export const Basket = ({
         : "0.0";
 
     if (purchaseType == 0) {
-      console.log;
+      console.log(appliedVoucher);
 
       try {
         checkout({
@@ -1600,12 +1605,8 @@ export const Basket = ({
 
   useEffect(() => {
     if (managingSubscription) {
-      if (voucherApplied && appliedVoucher == "FREECOFFEE") {
+      if (voucherApplied && appliedVoucher === "FREECOFFEE") {
         setDeliveryAmount(0.0);
-
-        for (let i = 0; i < subAdjBasket.length; i++) {
-          console.log(subAdjBasket[i]);
-        }
 
         setVoucherAmount(
           parseFloat(
@@ -1618,52 +1619,53 @@ export const Basket = ({
       } else {
         if (
           parseFloat(getCurSubSubTotal().toFixed(2)) +
-            parseFloat(getSubSubtotal().toFixed(2)) <
-          80.0
+            parseFloat(getSubSubtotal().toFixed(2)) <=
+            80.0 &&
+          parseFloat(getCurSubSubTotal().toFixed(2)) +
+            parseFloat(getSubSubtotal().toFixed(2)) >
+            0.0
         ) {
-          if (cfh) {
-            setDeliveryAmount(5.25);
-          } else {
-            setDeliveryAmount(8.95);
-          }
-          setVoucherAmount(0.0);
+          setDeliveryAmount(cfh ? 5.25 : 8.95);
         } else {
           setDeliveryAmount(0.0);
-          setVoucherAmount(0.0);
         }
+        setVoucherAmount(0.0); // Only reset if no voucher is applied
       }
-    } else {
-      if (purchaseType == 0) {
-        if (voucherApplied) {
-          let currentVoucher = {};
+    } else if (purchaseType === 0) {
+      if (voucherApplied) {
+        let currentVoucher = coupons.find(
+          (coupon) => coupon.code === appliedVoucher.toLowerCase()
+        );
 
-          for (let i = 0; i < coupons.length; i++) {
-            if (coupons[i].code == appliedVoucher.toLowerCase()) {
-              currentVoucher = coupons[i];
-            }
-          }
+        console.log(currentVoucher);
 
-          console.log(currentVoucher);
+        if (currentVoucher?.freeShipping) {
+          setDeliveryAmount(0.0);
+        } else {
+          setDeliveryAmount(cfh ? 5.25 : 8.95);
+        }
 
-          if (currentVoucher.freeShipping) {
-            setDeliveryAmount(0.0);
+        if (appliedVoucher.toUpperCase() === "FREECOFFEE") {
+          setDeliveryAmount(0.0);
+
+          const lastItem = oneOffBasket[oneOffBasket.length - 1];
+
+          if (lastItem?.product.type === "VARIABLE") {
+            setVoucherAmount(
+              parseFloat(lastItem.selectedVariant.price.replace("£", "")) * -1
+            );
           } else {
-            if (cfh) {
-              setDeliveryAmount(5.25);
-            } else {
-              setDeliveryAmount(8.95);
-            }
+            setVoucherAmount(
+              parseFloat(lastItem?.product.price.replace("£", "")) * -1
+            );
           }
-
-          for (let i = 0; i < oneOffBasket.length; i++) {
-            console.log(oneOffBasket[i]);
-          }
-
-          if (currentVoucher.code === "groundswellstaff") {
-            // Apply 20% discount to the basket
-            const subtotal = parseFloat(getOneOffSubtotal().toFixed(2));
-            const discount = subtotal * 0.2;
-            setVoucherAmount(-discount);
+        } else if (currentVoucher?.code === "groundswellstaff") {
+          setVoucherAmount(-parseFloat(getOneOffSubtotal().toFixed(2)) * 0.2);
+        } else if (currentVoucher?.amount != null) {
+          if (currentVoucher.discountType === "FIXED_CART") {
+            setVoucherAmount(parseFloat(currentVoucher.amount) * -1);
+          } else if (currentVoucher.discountType === "FIXED_PRODUCT") {
+            setVoucherAmount(parseFloat(currentVoucher.amount) * -1);
           } else {
             setVoucherAmount(
               parseFloat(
@@ -1671,60 +1673,29 @@ export const Basket = ({
                   "£",
                   ""
                 )
-              ) * -1
+              ) *
+                currentVoucher.amount *
+                -1
             );
-          }
-        } else {
-          if (parseFloat(getOneOffSubtotal().toFixed(2)) < 80.0) {
-            if (cfh) {
-              setDeliveryAmount(5.25);
-            } else {
-              setDeliveryAmount(8.95);
-            }
-
-            setVoucherAmount(0.0);
-          } else {
-            setDeliveryAmount(0.0);
-            setVoucherAmount(0.0);
           }
         }
       } else {
-        if (voucherApplied && appliedVoucher == "FREECOFFEE") {
-          setDeliveryAmount(0.0);
-
-          for (let i = 0; i < subAdjBasket.length; i++) {
-            console.log(subAdjBasket[i]);
-          }
-
-          setVoucherAmount(
-            parseFloat(
-              subAdjBasket[subAdjBasket.length - 1]?.product.price.replace(
-                "£",
-                ""
-              )
-            ) * -1
-          );
+        // Reset voucher amount **only if no voucher is applied**
+        if (
+          parseFloat(getOneOffSubtotal().toFixed(2)) <= 80.0 &&
+          parseFloat(getOneOffSubtotal().toFixed(2)) > 0.0
+        ) {
+          setDeliveryAmount(cfh ? 5.25 : 8.95);
         } else {
-          if (parseFloat(getSubSubtotal().toFixed(2)) < 80.0) {
-            if (cfh) {
-              setDeliveryAmount(5.25);
-            } else {
-              setDeliveryAmount(8.95);
-            }
-
-            setVoucherAmount(0.0);
-          } else {
-            setDeliveryAmount(0.0);
-            setVoucherAmount(0.0);
-          }
+          setDeliveryAmount(0.0);
         }
+        setVoucherAmount(0.0);
       }
     }
   }, [
     subAdjBasket,
     getCurSubSubTotal,
     getSubSubtotal,
-    voucher,
     voucherApplied,
     managingSubscription,
     oneOffBasket,
@@ -2285,6 +2256,8 @@ export const Basket = ({
                                     .then((data) => {
                                       usage = data.data.checkCouponUsage.usage;
 
+                                      console.log(voucher);
+
                                       console.log(usage);
 
                                       setApplyingVoucher(false);
@@ -2812,7 +2785,7 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.type == "SIMPLE"
+                                    {item.product.type != "VARIABLE"
                                       ? item.product.name
                                       : item.selectedVariant?.name}
                                   </p>
@@ -2820,7 +2793,7 @@ export const Basket = ({
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.type == "SIMPLE"
+                                        item.product.type != "VARIABLE"
                                           ? item.product.price.replace("£", "")
                                           : item.selectedVariant?.price.replace(
                                               "£",
@@ -2841,8 +2814,9 @@ export const Basket = ({
                                   className="w-full grid grid-cols-4 items-center"
                                   key={index}
                                 >
+                                  {console.log(item.product)}
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.type == "SIMPLE"
+                                    {item.product?.type != "VARIABLE"
                                       ? item.product.name
                                       : item.selectedVariant?.name}
                                   </p>
@@ -2850,8 +2824,13 @@ export const Basket = ({
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.type == "SIMPLE"
-                                          ? item.product.price.replace("£", "")
+                                        item.product?.type != "VARIABLE"
+                                          ? item.product.price
+                                            ? item.product.price?.replace(
+                                                "£",
+                                                ""
+                                              )
+                                            : 0.0
                                           : item.selectedVariant?.price.replace(
                                               "£",
                                               ""
@@ -2890,8 +2869,8 @@ export const Basket = ({
                                   <p className="font-circular text-erniegreen text-sm font-[500]">
                                     DISCOUNT: {appliedVoucher}
                                   </p>
+                                  {console.log(voucherAmount)}
                                   <p className="font-circular text-erniegreen text-sm">
-                                    -
                                     {appliedVoucher == "groundswellstaff"
                                       ? "£" +
                                         (
@@ -2899,9 +2878,9 @@ export const Basket = ({
                                             ? getOneOffSubtotal()
                                             : getSubSubtotal()) * 0.2
                                         ).toFixed(2)
-                                      : purchaseType == 0 &&
-                                        mProducts[matchedProduct]?.product
-                                          .price}
+                                      : voucherAmount
+                                          .toFixed(2)
+                                          .replace("-", "-£")}
                                   </p>
                                   {console.log(matchedProduct)}
                                 </div>
@@ -3120,12 +3099,14 @@ export const Basket = ({
                                           key={index}
                                         >
                                           <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.name
                                               : item.variation.node.name}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.price
                                               : item.variation.node.price}
                                           </p>
@@ -3142,12 +3123,14 @@ export const Basket = ({
                                           key={index}
                                         >
                                           <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.name
                                               : item.variation.node.name}
                                           </p>
                                           <p className="font-circular text-erniegreen col-span-1 text-sm">
-                                            {item.product.node.type == "SIMPLE"
+                                            {item.product.node.type !=
+                                            "VARIABLE"
                                               ? item.product.node.price
                                               : item.variation.node.price}
                                           </p>
@@ -3177,7 +3160,7 @@ export const Basket = ({
                                   key={index}
                                 >
                                   <p className="font-circular text-erniegreen col-span-2 text-sm">
-                                    {item.product.type == "SIMPLE"
+                                    {item.product.type != "VARIABLE"
                                       ? item.product.name
                                       : item.selectedVariant.name}
                                   </p>
@@ -3185,7 +3168,7 @@ export const Basket = ({
                                     £
                                     {(
                                       parseFloat(
-                                        item.product.type == "SIMPLE"
+                                        item.product.type != "VARIABLE"
                                           ? item.product.price.replace("£", "")
                                           : item.selectedVariant.price.replace(
                                               "£",
@@ -3337,22 +3320,26 @@ export const Basket = ({
                             >
                               <p className="font-circular text-erniegreen col-span-2 text-sm">
                                 {console.log(item)}
-                                {item.product.type == "SIMPLE"
+                                {item.product.type != "VARIABLE"
                                   ? item.product.name
                                   : item.selectedVariant?.name}
                               </p>
                               <p className="font-circular text-erniegreen text-sm">
-                                {item.product.type == "SIMPLE"
+                                {item.product.type != "VARIABLE"
                                   ? `£
-                                ${(
-                                  parseFloat(
-                                    item.product.price.replace("£", "")
-                                  ) * item.quantity
+                                ${(item.product.price
+                                  ? parseFloat(
+                                      item.product.price?.replace("£", "")
+                                    ) * item.quantity
+                                  : 0.0
                                 ).toFixed(2)}`
                                   : `£
                                 ${(
                                   parseFloat(
-                                    item.selectedVariant?.price.replace("£", "")
+                                    item.selectedVariant?.price?.replace(
+                                      "£",
+                                      ""
+                                    )
                                   ) * item.quantity
                                 ).toFixed(2)}`}
                               </p>

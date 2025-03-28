@@ -66,6 +66,7 @@ export default function Dashboard({ data, categories, products, orders }) {
   console.log(newUser);
 
   const [activeTab, setTab] = useState(0);
+  const [showingRewards, setShowingRewards] = useState(false);
 
   const [dataObject, setData] = useState(null);
   const [cartObject, setCart] = useState(null);
@@ -99,6 +100,7 @@ export default function Dashboard({ data, categories, products, orders }) {
 
   const [orderData, setOrders] = useState([]);
   const [couponData, setCoupons] = useState([]);
+  const [loyaltyTiers, setLoyaltyTiers] = useState([]);
 
   const [hasSubscription, setHasSubscription] = useState(false);
   const [subscriptionAttempt, setSubAttempt] = useState(false);
@@ -415,6 +417,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     forHome
                     priceSuffix
                     showProductGroundswell
+                    rewardProduct
                   }
                   title
                   productTags {
@@ -625,6 +628,14 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                         }
                         type
+<<<<<<< HEAD
+=======
+                        featuredImage {
+                          node {
+                            sourceUrl
+                          }
+                        }
+>>>>>>> origin/testing
                       }
                     }
                     subtotal
@@ -637,11 +648,18 @@ export default function Dashboard({ data, categories, products, orders }) {
                 date
                 orderNumber
                 status
+                couponLines {
+                  nodes {
+                    code
+                    databaseId
+                  }
+                }
               }
             }
             coupons {
               nodes {
                 code
+                amount
                 limitUsageToXItems
                 products {
                   nodes {
@@ -662,6 +680,69 @@ export default function Dashboard({ data, categories, products, orders }) {
                   employeeEmail
                   employeeName
                 }
+              }
+            }
+            loyaltyTiers {
+              nodes {
+                lt {
+                  pointsNeeded
+                  coupons {
+                    code
+                    title
+                  }
+                  productOffer {
+                    code
+                    title
+                    product {
+                      nodes {
+                        databaseId
+                        ... on VariableProduct {
+                          id
+                          name
+                          featuredImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          price
+                          databaseId
+                          productTags {
+                            nodes {
+                              name
+                            }
+                          }
+                          productCategories {
+                            nodes {
+                              name
+                            }
+                          }
+                        }
+                        ... on SimpleProduct {
+                          id
+                          name
+                          databaseId
+                          featuredImage {
+                            node {
+                              sourceUrl
+                            }
+                          }
+                          price
+                          productTags {
+                            nodes {
+                              name
+                            }
+                          }
+                          productCategories {
+                            nodes {
+                              name
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                title
               }
             }
           }
@@ -686,6 +767,10 @@ export default function Dashboard({ data, categories, products, orders }) {
         setOrders(data.data.orders.nodes);
 
         setCoupons(data.data.coupons.nodes);
+
+        console.log(data.data.loyaltyTiers.nodes);
+
+        setLoyaltyTiers(data.data.loyaltyTiers.nodes);
 
         setOrderHistory(getLoggedInUserOrders(data.data.orders.nodes));
 
@@ -901,7 +986,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                       tagCategoryImages {
                         displayOrder
                         tagImage {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                       }
                       tagOrder {
@@ -967,13 +1054,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                         }
                         productDisplayStyle {
                           badgeImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           bgImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           secondaryImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           titleStyle
                           priceSuffix
@@ -981,6 +1074,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           allowOrdering
                           forHome
                           showProductGroundswell
+                          rewardProduct
                         }
                         productTags {
                           nodes {
@@ -988,7 +1082,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             tagCategoryImages {
                               displayOrder
                               tagImage {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                           }
@@ -999,7 +1095,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             description
                             brandingImage {
                               image {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                             brandOrder {
@@ -1022,6 +1120,13 @@ export default function Dashboard({ data, categories, products, orders }) {
                         id
                         name
                         price
+                        attributes(first: 100) {
+                          nodes {
+                            name
+                            options
+                            variation
+                          }
+                        }
                         variations {
                           nodes {
                             databaseId
@@ -1074,13 +1179,19 @@ export default function Dashboard({ data, categories, products, orders }) {
                         }
                         productDisplayStyle {
                           badgeImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           bgImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           secondaryImage {
-                            sourceUrl
+                            node {
+                              sourceUrl
+                            }
                           }
                           titleStyle
                           shortDescription
@@ -1097,7 +1208,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             tagCategoryImages {
                               displayOrder
                               tagImage {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                           }
@@ -1108,7 +1221,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                             description
                             brandingImage {
                               image {
-                                sourceUrl
+                                node {
+                                  sourceUrl
+                                }
                               }
                             }
                             brandOrder {
@@ -1118,13 +1233,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                         }
                         productOrdering {
                           productOrder
-                        }
-                        attributes(first: 100) {
-                          nodes {
-                            name
-                            options
-                            variation
-                          }
                         }
                       }
                       ... on SubscriptionProduct {
@@ -1248,7 +1356,9 @@ export default function Dashboard({ data, categories, products, orders }) {
                         fieldGroupName
                         howDidYouHearAboutUs
                         impactCertificate {
-                          sourceUrl
+                          node {
+                            sourceUrl
+                          }
                         }
                         invoicingContactEmail
                         invoicingContactFirstName
@@ -1300,6 +1410,14 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 }
                               }
                               type
+<<<<<<< HEAD
+=======
+                              featuredImage {
+                                node {
+                                  sourceUrl
+                                }
+                              }
+>>>>>>> origin/testing
                             }
                           }
                           subtotal
@@ -1312,6 +1430,12 @@ export default function Dashboard({ data, categories, products, orders }) {
                       date
                       orderNumber
                       status
+                      couponLines {
+                        nodes {
+                          code
+                          databaseId
+                        }
+                      }
                     }
                   }
                   coupons {
@@ -1337,6 +1461,69 @@ export default function Dashboard({ data, categories, products, orders }) {
                         employeeEmail
                         employeeName
                       }
+                    }
+                  }
+                  loyaltyTiers {
+                    nodes {
+                      lt {
+                        pointsNeeded
+                        coupons {
+                          code
+                          title
+                        }
+                        productOffer {
+                          code
+                          title
+                          product {
+                            nodes {
+                              databaseId
+                              ... on VariableProduct {
+                                id
+                                name
+                                featuredImage {
+                                  node {
+                                    sourceUrl
+                                  }
+                                }
+                                price
+                                databaseId
+                                productTags {
+                                  nodes {
+                                    name
+                                  }
+                                }
+                                productCategories {
+                                  nodes {
+                                    name
+                                  }
+                                }
+                              }
+                              ... on SimpleProduct {
+                                id
+                                name
+                                databaseId
+                                featuredImage {
+                                  node {
+                                    sourceUrl
+                                  }
+                                }
+                                price
+                                productTags {
+                                  nodes {
+                                    name
+                                  }
+                                }
+                                productCategories {
+                                  nodes {
+                                    name
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      title
                     }
                   }
                 }
@@ -1374,6 +1561,8 @@ export default function Dashboard({ data, categories, products, orders }) {
               setOrders(data.data.orders.nodes);
 
               setCoupons(data.data.coupons.nodes);
+
+              setLoyaltyTiers(data.data.loyaltyTiers.nodes);
 
               let clients = data.data.clients.nodes;
 
@@ -1739,7 +1928,7 @@ export default function Dashboard({ data, categories, products, orders }) {
     { name: "Home", index: 0, icon: "/home.png" },
     { name: "Products", index: 1, icon: "/tea.png" },
     { name: "Impact", index: 2, icon: "/impact.png" },
-    // { name: "Rewards", index: 3, icon: "/impact.png" },
+    { name: "Rewards", index: 3, icon: "/rewards.png" },
     { name: "Account", index: 4, icon: "/account.png" },
   ];
 
@@ -2311,9 +2500,13 @@ export default function Dashboard({ data, categories, products, orders }) {
   const addToOneOffBasket = (item) => {
     let oneOffBasketCopy = [...oneOffBasket];
 
+    console.log(item);
+
     oneOffBasketCopy.push(item);
 
     setOneOffBasket(oneOffBasketCopy);
+
+    console.log(oneOffBasketCopy);
 
     setTimeout(function () {
       setAddingToOBasket(false);
@@ -2347,12 +2540,23 @@ export default function Dashboard({ data, categories, products, orders }) {
     setPurchasing(true);
     setPurchaseType(type);
     setNewPurchase(true);
+    setShowingRewards(false);
+  };
+
+  const viewImpact = () => {
+    setTab(2);
+  };
+
+  const claimRewards = () => {
+    setTab(1);
+    setShowingRewards(true);
   };
 
   const [managingSubscription, setManagingSubscription] = useState(false);
 
   const setCurrentTab = (tab) => {
     setTab(tab);
+    setShowingRewards(false);
   };
 
   const [showingCert, setShowingCert] = useState(false);
@@ -2481,6 +2685,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setAddingToOBasket={setAddingToOBasket}
                   cfh={coffeeFromHome}
                   gs={groundswell}
+                  showingRewards={showingRewards}
                 />
               )}
               {activeTab == 2 && (
@@ -2496,7 +2701,23 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setShowingCert={setShowingCert}
                 />
               )}
+<<<<<<< HEAD
               {activeTab == 3 && <Rewards orders={orderData} />}
+=======
+              {activeTab == 3 && (
+                <Rewards
+                  loyaltyTiers={loyaltyTiers}
+                  orders={orderData}
+                  viewImpact={viewImpact}
+                  claimRewards={claimRewards}
+                  addToOneOffBasket={addToOneOffBasket}
+                  setAddingToOBasket={setAddingToOBasket}
+                  addingToOBasket={addingToOBasket}
+                  setPurchaseType={setPurchaseType}
+                  setPurchasing={setPurchasing}
+                />
+              )}
+>>>>>>> origin/testing
               {activeTab == 4 && (
                 <Accounts
                   userQuantity={getUserTotalOrderQty()}
@@ -2518,9 +2739,9 @@ export default function Dashboard({ data, categories, products, orders }) {
             </div>
             <div
               className={`bg-ernieteal w-screen grid ${
-                coffeeFromHome ? "grid-cols-3" : "grid-cols-4"
+                coffeeFromHome ? "grid-cols-3" : "grid-cols-5"
               } ${
-                groundswell ? "grid-cols-3" : "grid-cols-4"
+                groundswell ? "grid-cols-3" : "grid-cols-5"
               } justify-between items-center h-[12vh] min-h-[12vh] absolute bottom-0 lg:top-20 lg:left-0 lg:flex lg:flex-col lg:h-[calc(100vh-80px)] lg:w-28 z-10
             `}
             >
@@ -2538,6 +2759,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           console.log(tab.index, activeTab);
                           setShowingBasket(false);
                           setManagingSubscription(false);
+                          setShowingRewards(false);
                         }}
                       >
                         <div className="w-8 h-8 mx-auto relative">
@@ -2561,6 +2783,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           console.log(tab.index, activeTab);
                           setShowingBasket(false);
                           setManagingSubscription(false);
+                          setShowingRewards(false);
                         }}
                       >
                         <div className="w-8 h-8 mx-auto relative">
@@ -2583,6 +2806,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                           console.log(tab.index, activeTab);
                           setShowingBasket(false);
                           setManagingSubscription(false);
+                          setShowingRewards(false);
                         }}
                       >
                         <div className="w-8 h-8 mx-auto relative">
@@ -2602,6 +2826,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                     } `}
                     onClick={(e) => {
                       setTab(tab.index);
+                      setShowingRewards(false);
                     }}
                   >
                     <div className="w-8 h-8 mx-auto relative">
