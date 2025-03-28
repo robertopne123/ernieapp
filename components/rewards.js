@@ -3,9 +3,6 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { Info } from "./rewardPages/info";
 
-<<<<<<< HEAD
-export const Rewards = ({ orders }) => {
-=======
 export const Rewards = ({
   loyaltyTiers,
   orders,
@@ -17,7 +14,6 @@ export const Rewards = ({
   setPurchaseType,
   setPurchasing,
 }) => {
->>>>>>> origin/testing
   const [showingActivity, setShowingActivity] = useState(false);
   const [copied, setCopied] = useState([]);
   const [nextTier, setNextTier] = useState({});
@@ -27,19 +23,6 @@ export const Rewards = ({
     setShowingActivity(false);
   };
 
-<<<<<<< HEAD
-  const getTotal = () => {
-    let total = 0.0;
-
-    for (let i = 0; i < orders.length; i++) {
-      for (let j = 0; j < orders[i].lineItems.nodes.length; j++) {
-        let priceFloat = parseFloat(orders[i].lineItems.nodes[j].subtotal);
-
-        if (orders[i].lineItems.nodes[j].subtotal == null) {
-          total += 0.0;
-        } else {
-          total += priceFloat;
-=======
   const closeInfo = () => {
     setShowingInfo(false);
   };
@@ -53,7 +36,6 @@ export const Rewards = ({
       for (let j = 0; j < lineItems.length; j++) {
         if (lineItems[j].subtotal != null) {
           total += parseFloat(lineItems[j].subtotal);
->>>>>>> origin/testing
         }
       }
     }
@@ -61,12 +43,6 @@ export const Rewards = ({
     return Math.floor(total);
   };
 
-<<<<<<< HEAD
-  return (
-    <div className="h-[calc(100%-80px)] overflow-y-scroll w-full bg-erniedarkcream flex flex-col gap-6 relative p-6">
-      {showingActivity && <Activity backAction={back} />}
-      {console.log(getTotal())}
-=======
   const checkLoyaltyItem = (item) => {
     for (let i = 0; i < orders.length; i++) {
       // console.log(orders[i].lineItems.nodes);
@@ -174,7 +150,6 @@ export const Rewards = ({
           }}
         />
       )}
->>>>>>> origin/testing
       <div className="p-6 rounded-xl bg-ernieteal">
         <div className="flex flex-col md:flex-row-reverse justify-between">
           <p className="font-circe font-[500] text-erniecream uppercase text-2xl flex md:hidden">
@@ -238,18 +213,9 @@ export const Rewards = ({
               </div>
             </div>
           </div>
-<<<<<<< HEAD
-          <div className="flex flex-col justify-center">
-            <p className="font-circe text-5xl text-erniecream leading-[34px] mt-4">
-              {getTotal()}
-              <span className="text-xl leading-[30px] uppercase ml-1">
-                points{" "}
-              </span>
-=======
           <div className="flex-col md:w-1/2 hidden md:flex">
             <p className="font-circe font-[500] text-erniecream uppercase text-2xl">
               {localStorage.getItem("companyname")}
->>>>>>> origin/testing
             </p>
             <p className="font-circular font-[500] text-erniecream opacity-60">
               Joined us{" "}

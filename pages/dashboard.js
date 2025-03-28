@@ -628,14 +628,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                           }
                         }
                         type
-<<<<<<< HEAD
-=======
                         featuredImage {
                           node {
                             sourceUrl
                           }
                         }
->>>>>>> origin/testing
                       }
                     }
                     subtotal
@@ -1410,14 +1407,11 @@ export default function Dashboard({ data, categories, products, orders }) {
                                 }
                               }
                               type
-<<<<<<< HEAD
-=======
                               featuredImage {
                                 node {
                                   sourceUrl
                                 }
                               }
->>>>>>> origin/testing
                             }
                           }
                           subtotal
@@ -2701,9 +2695,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setShowingCert={setShowingCert}
                 />
               )}
-<<<<<<< HEAD
-              {activeTab == 3 && <Rewards orders={orderData} />}
-=======
               {activeTab == 3 && (
                 <Rewards
                   loyaltyTiers={loyaltyTiers}
@@ -2717,7 +2708,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                   setPurchasing={setPurchasing}
                 />
               )}
->>>>>>> origin/testing
               {activeTab == 4 && (
                 <Accounts
                   userQuantity={getUserTotalOrderQty()}

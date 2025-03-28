@@ -227,14 +227,7 @@ export default function Products({
           return acc;
         }
       } else {
-<<<<<<< HEAD
-        const tagName = product.productTags?.nodes[0].name;
-
-        console.log(tagName);
-
-=======
         const tagName = product.productTags?.nodes[0]?.name;
->>>>>>> origin/testing
         if (tagName) {
           if (!acc[tagName]) {
             acc[tagName] = [];
@@ -609,30 +602,6 @@ export default function Products({
     for (let i = 0; i < productsCopy.length; i++) {
       let groupFound = false;
 
-<<<<<<< HEAD
-      if (
-        productsCopy[i].productTags?.nodes[0].name != "old-products" &&
-        productsCopy[i].productTags?.nodes[0].name != "Donation"
-      ) {
-        if (groups.length != 0) {
-          for (let j = 0; j < groups.length; j++) {
-            if (
-              groups[j].category == productsCopy[i].productTags?.nodes[0].name //Category match
-            ) {
-              // console.log(productsCopy[i].brands?.nodes[0].name);
-              // console.log(productsCopy[i]);
-              // console.log(i);
-              // console.log(groups[j]);
-              // console.log(groups[j].brands);
-              let brandFound = false;
-
-              for (let k = 0; k < groups[j].brands?.length; k++) {
-                if (
-                  groups[j].brands?.[k].name ==
-                  productsCopy[i].brands?.nodes[0]?.name
-                ) {
-                  // console.log(productsCopy[i].productTags?.nodes[0].name);
-=======
         if (
           productsCopy[i].productTags?.nodes[0]?.name != "coffee machine" &&
           productsCopy[i].productTags?.nodes[0]?.name != "old-products" &&
@@ -657,7 +626,6 @@ export default function Products({
                     productsCopy[i].brands?.nodes[0]?.name
                   ) {
                     // console.log(productsCopy[i].productTags?.nodes[0].name);
->>>>>>> origin/testing
 
                   groups[j].brands?.[k].products.push(productsCopy[i]);
                   brandFound = true;
@@ -690,9 +658,6 @@ export default function Products({
             }
           }
 
-<<<<<<< HEAD
-          if (!groupFound) {
-=======
             if (!groupFound) {
               let tempProducts = [];
 
@@ -722,7 +687,6 @@ export default function Products({
               continue;
             }
           } else {
->>>>>>> origin/testing
             let tempProducts = [];
 
             tempProducts.push(productsCopy[i]);
@@ -1259,9 +1223,6 @@ export default function Products({
                           <div
                             key={productIndex}
                             className={`flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6 ${
-<<<<<<< HEAD
-                              product.product.productDisplayStyle?.rewardProduct
-=======
                               showingRewards
                                 ? product.product.productDisplayStyle
                                     ?.rewardProduct
@@ -1269,21 +1230,16 @@ export default function Products({
                                   : "flex"
                                 : product.product.productDisplayStyle
                                     ?.rewardProduct
->>>>>>> origin/testing
                                 ? "hidden"
                                 : "flex"
                             }`}
                           >
-<<<<<<< HEAD
-                            {console.log(product)}
-=======
                             {console.log(
                               product.product.name,
                               product.product.productDisplayStyle
                                 ?.rewardProduct,
                               showingRewards
                             )}
->>>>>>> origin/testing
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img
                                 src={product.product.image.sourceUrl}
