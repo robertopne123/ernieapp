@@ -737,133 +737,363 @@ export default function Products({
         });
       }
     }
+
+    let sortedGroups = getSortedProducts(groups);
+
+    // console.log(sortedGroups);
+
+    return sortedGroups;
   };
 
-  let sortedGroups = getSortedProducts(groups);
+  const [selectedTab, setSelectedTab] = useState(0);
 
-  // console.log(sortedGroups);
+  const [previewing, setPreviewing] = useState(false);
 
-  return sortedGroups;
-}
+  const [selectedProduct, setSelectedProduct] = useState(0);
 
-const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedBrand, setSelectedBrands] = useState(0);
 
-const [previewing, setPreviewing] = useState(false);
+  const [showingInfo, setShowingInfo] = useState(false);
 
-const [selectedProduct, setSelectedProduct] = useState(0);
+  const setTabFromProducts = (tab) => {
+    setTab(tab);
+  };
 
-const [selectedBrand, setSelectedBrands] = useState(0);
+  const [infoName, setInfoName] = useState("");
+  const [infoDesc, setInfoDesc] = useState("");
+  const [infoImage, setInfoImage] = useState("");
 
-const [showingInfo, setShowingInfo] = useState(false);
+  const close = () => {
+    setShowingInfo(false);
+  };
 
-const setTabFromProducts = (tab) => {
-  setTab(tab);
-};
+  const getSortedProducts = (arr) => {
+    return arr.sort(function (a, b) {
+      return a.displayOrder - b.displayOrder;
+    });
+  };
 
-const [infoName, setInfoName] = useState("");
-const [infoDesc, setInfoDesc] = useState("");
-const [infoImage, setInfoImage] = useState("");
+  const addToSubBasketFromProducts = (item) => {
+    addToSubBasket(item);
+  };
 
-const close = () => {
-  setShowingInfo(false);
-};
+  const addToOneOffBasketFromProducts = (item) => {
+    addToOneOffBasket(item);
+  };
 
-const getSortedProducts = (arr) => {
-  return arr.sort(function (a, b) {
-    return a.displayOrder - b.displayOrder;
-  });
-};
+  const setPType = (val) => {
+    setPurchaseType(val);
+  };
 
-const addToSubBasketFromProducts = (item) => {
-  addToSubBasket(item);
-};
+  const setP = (val) => {
+    setPurchasing(val);
+  };
 
-const addToOneOffBasketFromProducts = (item) => {
-  addToOneOffBasket(item);
-};
+  const setNewP = (val) => {
+    setNewPurchase(val);
+  };
 
-const setPType = (val) => {
-  setPurchaseType(val);
-};
+  const getCheapestVariant = (variants) => {
+    let lowestPrice = 0.0;
+    let lowestPriceLoc = 0;
 
-const setP = (val) => {
-  setPurchasing(val);
-};
+    for (let i = 0; i < variants?.length; i++) {
+      let price = parseFloat(variants[i]?.price.replace("£", ""));
 
-const setNewP = (val) => {
-  setNewPurchase(val);
-};
+      console.log(price);
 
-const getCheapestVariant = (variants) => {
-  let lowestPrice = 0.0;
-  let lowestPriceLoc = 0;
-
-  for (let i = 0; i < variants?.length; i++) {
-    let price = parseFloat(variants[i]?.price.replace("£", ""));
-
-    console.log(price);
-
-    if (lowestPrice == 0.0) {
-      lowestPrice = price;
-      lowestPriceLoc = i;
-    } else {
-      if (lowestPrice > price) {
+      if (lowestPrice == 0.0) {
         lowestPrice = price;
         lowestPriceLoc = i;
+      } else {
+        if (lowestPrice > price) {
+          lowestPrice = price;
+          lowestPriceLoc = i;
+        }
       }
     }
-  }
 
-  return variants[lowestPriceLoc]?.price;
-};
+    return variants[lowestPriceLoc]?.price;
+  };
 
-return (
-  <ApolloProvider client={graphqlClient}>
-    <div className="h-full lg:w-[calc(100vw-112px)] relative flex flex-col bg-erniedarkcream overflow-auto">
-      {showingInfo && (
-        <BrandInfo
-          close={close}
-          name={infoName}
-          description={infoDesc}
-          image={infoImage}
-        />
-      )}
-      {purchasing && !newPurchase && (
-        <Purchasing
-          close={close}
-          purchaseType={purchaseType}
-          setPurchaseType={setPType}
-          setPurchasing={setP}
-          setNewPurchase={setNewP}
-          cfh={cfh}
-          gs={gs}
-        />
-      )}
-      <div className="h-full flex lg:hidden relative">
-        {previewing ? (
-          <Preview
-            product={products[selectedProduct]}
-            backAction={back}
-            role={1}
-            addToBasket={addToBasket}
-            category={getGroupedProducts()[selectedTab].category}
-            addToSubBasket={addToSubBasketFromProducts}
-            addToOneOffBasket={addToOneOffBasketFromProducts}
-            subBasket={subBasket}
-            oneOffBasket={oneOffBasket}
-            pType={purchaseType}
-            subscriptions={subscriptions}
-            managingSubscription={managingSubscription}
-            setTab={setTabFromProducts}
-            productsContext={productsContext}
-            setProductsContext={setProductsContextFromProducts}
-            addingToSBasket={addingToSBasket}
-            addingToOBasket={addingToOBasket}
-            setAddingToSBasket={setAddingToSBasketFromProductPage}
-            setAddingToOBasket={setAddingToOBasketFromProductPage}
+  return (
+    <ApolloProvider client={graphqlClient}>
+      <div className="h-full lg:w-[calc(100vw-112px)] relative flex flex-col bg-erniedarkcream overflow-auto">
+        {showingInfo && (
+          <BrandInfo
+            close={close}
+            name={infoName}
+            description={infoDesc}
+            image={infoImage}
           />
-        ) : (
-          <div className="flex flex-col gap-0 h-auto pb-0 w-full pt-8 lg:pt-10 pb-8 lg:pb-10">
+        )}
+        {purchasing && !newPurchase && (
+          <Purchasing
+            close={close}
+            purchaseType={purchaseType}
+            setPurchaseType={setPType}
+            setPurchasing={setP}
+            setNewPurchase={setNewP}
+            cfh={cfh}
+            gs={gs}
+          />
+        )}
+        <div className="h-full flex lg:hidden relative">
+          {previewing ? (
+            <Preview
+              product={products[selectedProduct]}
+              backAction={back}
+              role={1}
+              addToBasket={addToBasket}
+              category={getGroupedProducts()[selectedTab].category}
+              addToSubBasket={addToSubBasketFromProducts}
+              addToOneOffBasket={addToOneOffBasketFromProducts}
+              subBasket={subBasket}
+              oneOffBasket={oneOffBasket}
+              pType={purchaseType}
+              subscriptions={subscriptions}
+              managingSubscription={managingSubscription}
+              setTab={setTabFromProducts}
+              productsContext={productsContext}
+              setProductsContext={setProductsContextFromProducts}
+              addingToSBasket={addingToSBasket}
+              addingToOBasket={addingToOBasket}
+              setAddingToSBasket={setAddingToSBasketFromProductPage}
+              setAddingToOBasket={setAddingToOBasketFromProductPage}
+            />
+          ) : (
+            <div className="flex flex-col gap-0 h-auto pb-0 w-full pt-8 lg:pt-10 pb-8 lg:pb-10">
+              {purchaseType == 0 && (
+                <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
+                  <div className="flex flex-row justify-between">
+                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                      One-off Purchase
+                    </p>
+                  </div>
+                  <img
+                    src="/divider.png"
+                    className="h-1.5 w-full mt-2 mb-2"
+                  ></img>
+                </div>
+              )}
+
+              {console.log(managingSubscription)}
+              {purchaseType == 1 &&
+                (managingSubscription ? (
+                  <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
+                    <div className="flex flex-row justify-between">
+                      <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                        Managing Subscription
+                      </p>
+                    </div>
+                    <img
+                      src="/divider.png"
+                      className="h-1.5 w-full mt-2 mb-2"
+                    ></img>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-0 mx-6 mb-4">
+                    <div className="flex flex-row justify-between">
+                      <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                        Add To Subscription
+                      </p>
+                    </div>
+                    <img
+                      src="/divider.png"
+                      className="h-1.5 w-full mt-2 mb-2"
+                    ></img>
+                  </div>
+                ))}
+
+              <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer flex-none">
+                {filteredCategories()
+                  .sort(function (a, b) {
+                    return a.order - b.order;
+                  })
+                  .map((tab, index) => (
+                    <div
+                      className={`py-2 px-3 rounded-lg text-nowrap w-auto lg:w-auto ${
+                        selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
+                      } `}
+                      key={index}
+                      onClick={() => {
+                        setSelectedTab(index);
+                      }}
+                    >
+                      <p
+                        className={`font-circular font-[500] text-sm capitalize tab text-nowrap lg:text-base ${
+                          selectedTab == index
+                            ? "text-erniecream"
+                            : "text-erniegreen"
+                        }`}
+                      >
+                        {tab.category}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+              {console.log(products)}
+              <div className="flex flex-col-reverse">
+                {console.log(filteredCategories()[selectedTab])}
+
+                {filteredCategories()
+                  [selectedTab].brands.sort(function (a, b) {
+                    return b.order - a.order;
+                  })
+                  .map((brand, index) => (
+                    <div
+                      className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full`}
+                      key={index}
+                    >
+                      <div className="flex flex-row justify-between">
+                        <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
+                          {brand.name}
+                        </p>
+                        <img
+                          src="/info.svg"
+                          className="w-8 mt-1"
+                          onClick={() => {
+                            setShowingInfo(true);
+                            setInfoName(brand.name);
+                            setInfoDesc(brand.description);
+                            setInfoImage(brand.image);
+                          }}
+                        />
+                      </div>
+                      <img
+                        src="/divider.png"
+                        className="h-1.5 w-full mt-2 mb-2"
+                      ></img>
+                      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 mt-4">
+                        {console.log(brand.products)}
+                        {brand.products
+                          .sort(function (a, b) {
+                            return (
+                              a.product.productOrdering?.productOrder -
+                              b.product.productOrdering?.productOrder
+                            );
+                          })
+                          .map((product, productIndex) => (
+                            <div
+                              key={productIndex}
+                              className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
+                            >
+                              <div className="flex relative aspect-[3/4] h-[100px]">
+                                <img
+                                  src={product.product.image.sourceUrl}
+                                  className={`h-[100px] w-auto aspect-[1/1] ${
+                                    selectedTab == 1
+                                      ? "object-contain"
+                                      : "object-contain"
+                                  }`}
+                                ></img>
+                                {product.product.productDisplayStyle.badgeImage
+                                  ?.sourceUrl && (
+                                  <img
+                                    src={
+                                      product.product.productDisplayStyle
+                                        .badgeImage.sourceUrl
+                                    }
+                                    className="absolute w-10 -bottom-4 -right-4 rounded-full"
+                                  ></img>
+                                )}
+                              </div>
+                              <div className="flex flex-col flex-shrink max-w-[calc(100vw-75px-48px-48px)] h-full pl-4">
+                                <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
+                                  {product.product.name}
+                                </p>
+                                <div className="line-clamp-3">
+                                  <p
+                                    className={`font-circular text-erniegreen font-[400] text-xs mt-2 ${
+                                      product.product.description
+                                        ? "block"
+                                        : "hidden"
+                                    } ${
+                                      product?.product?.productDisplayStyle
+                                        ?.allowOrdering
+                                        ? "mb-2"
+                                        : "mb-4"
+                                    }`}
+                                  >
+                                    {product.product.description}
+                                  </p>
+                                </div>
+                                {product?.product.productDisplayStyle
+                                  ?.allowOrdering && (
+                                  <div className="flex flex-row gap-1 items-end mt-2">
+                                    <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
+                                      from
+                                    </p>
+                                    <p
+                                      className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
+                                        product.product.description
+                                          ? "mt-0"
+                                          : "mt-2"
+                                      }`}
+                                    >
+                                      {console.log(product.product.type)}
+                                      {product.product.type != "VARIABLE"
+                                        ? product.product.price
+                                        : getCheapestVariant(
+                                            product.product.variations?.nodes
+                                          )}
+                                    </p>
+                                  </div>
+                                )}
+                                <div
+                                  className={`bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer  ${
+                                    product.product?.productDisplayStyle
+                                      .allowOrdering
+                                      ? "mt-2"
+                                      : "mt-4"
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedBrands(index);
+                                    setSelectedProduct(product.arrIndex);
+
+                                    setPreviewing(true);
+                                  }}
+                                >
+                                  <p className="font-circe font-[900] text-sm">
+                                    Choose Options
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden lg:flex w-full">
+          {previewing && (
+            <Preview
+              product={products[selectedProduct]}
+              backAction={back}
+              role={1}
+              addToBasket={addToBasket}
+              category={getGroupedProducts()[selectedTab].category}
+              addToSubBasket={addToSubBasketFromProducts}
+              addToOneOffBasket={addToOneOffBasketFromProducts}
+              subBasket={subBasket}
+              oneOffBasket={oneOffBasket}
+              pType={purchaseType}
+              subscriptions={subscriptions}
+              managingSubscription={managingSubscription}
+              setTab={setTabFromProducts}
+              productsContext={productsContext}
+              setProductsContext={setProductsContextFromProducts}
+              addingToSBasket={addingToSBasket}
+              addingToOBasket={addingToOBasket}
+              setAddingToSBasket={setAddingToSBasketFromProductPage}
+              setAddingToOBasket={setAddingToOBasketFromProductPage}
+            />
+          )}
+          <div className="flex flex-col my-10 gap-0 h-auto">
             {purchaseType == 0 && (
               <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
                 <div className="flex flex-row justify-between">
@@ -906,16 +1136,22 @@ return (
                 </div>
               ))}
 
-            <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer flex-none">
+            <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer">
               {filteredCategories()
                 .sort(function (a, b) {
                   return a.order - b.order;
                 })
                 .map((tab, index) => (
                   <div
-                    className={`py-2 px-3 rounded-lg text-nowrap w-auto lg:w-auto ${
+                    className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
+                      showingRewards
+                        ? brandRewardProductsExist(filteredCategories()[index])
+                          ? "flex"
+                          : "hidden"
+                        : "flex"
+                    } ${
                       selectedTab == index ? "bg-ernieteal" : "bg-erniecream"
-                    } `}
+                    }`}
                     key={index}
                     onClick={() => {
                       setSelectedTab(index);
@@ -933,7 +1169,6 @@ return (
                   </div>
                 ))}
             </div>
-            {console.log(products)}
             <div className="flex flex-col-reverse">
               {console.log(filteredCategories()[selectedTab])}
 
@@ -943,7 +1178,13 @@ return (
                 })
                 .map((brand, index) => (
                   <div
-                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full`}
+                    className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full ${
+                      showingRewards
+                        ? rewardProductsExist(brand.products)
+                          ? "flex"
+                          : "flex"
+                        : "flex"
+                    }`}
                     key={index}
                   >
                     <div className="flex flex-row justify-between">
@@ -977,8 +1218,24 @@ return (
                         .map((product, productIndex) => (
                           <div
                             key={productIndex}
-                            className="flex flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6"
+                            className={`flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6 ${
+                              showingRewards
+                                ? product.product.productDisplayStyle
+                                    ?.rewardProduct
+                                  ? "flex"
+                                  : "flex"
+                                : product.product.productDisplayStyle
+                                    ?.rewardProduct
+                                ? "hidden"
+                                : "flex"
+                            }`}
                           >
+                            {console.log(
+                              product.product.name,
+                              product.product.productDisplayStyle
+                                ?.rewardProduct,
+                              showingRewards
+                            )}
                             <div className="flex relative aspect-[3/4] h-[100px]">
                               <img
                                 src={product.product.image.sourceUrl}
@@ -1019,12 +1276,14 @@ return (
                                   {product.product.description}
                                 </p>
                               </div>
+                              {console.log(product)}
                               {product?.product.productDisplayStyle
                                 ?.allowOrdering && (
                                 <div className="flex flex-row gap-1 items-end mt-2">
                                   <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
                                     from
                                   </p>
+
                                   <p
                                     className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
                                       product.product.description
@@ -1032,7 +1291,6 @@ return (
                                         : "mt-2"
                                     }`}
                                   >
-                                    {console.log(product.product.type)}
                                     {product.product.type != "VARIABLE"
                                       ? product.product.price
                                       : getCheapestVariant(
@@ -1042,12 +1300,12 @@ return (
                                 </div>
                               )}
                               <div
-                                className={`bg-erniegold py-2 px-4 rounded-xl inline self-start mt-2 cursor-pointer  ${
+                                className={`bg-erniegold py-2 px-4 rounded-xl inline self-start ${
                                   product.product?.productDisplayStyle
                                     .allowOrdering
                                     ? "mt-2"
                                     : "mt-4"
-                                }`}
+                                } cursor-pointer`}
                                 onClick={() => {
                                   setSelectedBrands(index);
                                   setSelectedProduct(product.arrIndex);
@@ -1067,262 +1325,9 @@ return (
                 ))}
             </div>
           </div>
-        )}
-      </div>
-
-      <div className="hidden lg:flex w-full">
-        {previewing && (
-          <Preview
-            product={products[selectedProduct]}
-            backAction={back}
-            role={1}
-            addToBasket={addToBasket}
-            category={getGroupedProducts()[selectedTab].category}
-            addToSubBasket={addToSubBasketFromProducts}
-            addToOneOffBasket={addToOneOffBasketFromProducts}
-            subBasket={subBasket}
-            oneOffBasket={oneOffBasket}
-            pType={purchaseType}
-            subscriptions={subscriptions}
-            managingSubscription={managingSubscription}
-            setTab={setTabFromProducts}
-            productsContext={productsContext}
-            setProductsContext={setProductsContextFromProducts}
-            addingToSBasket={addingToSBasket}
-            addingToOBasket={addingToOBasket}
-            setAddingToSBasket={setAddingToSBasketFromProductPage}
-            setAddingToOBasket={setAddingToOBasketFromProductPage}
-          />
-        )}
-        <div className="flex flex-col my-10 gap-0 h-auto">
-          {purchaseType == 0 && (
-            <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
-              <div className="flex flex-row justify-between">
-                <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
-                  One-off Purchase
-                </p>
-              </div>
-              <img src="/divider.png" className="h-1.5 w-full mt-2 mb-2"></img>
-            </div>
-          )}
-
-          {console.log(managingSubscription)}
-          {purchaseType == 1 &&
-            (managingSubscription ? (
-              <div className="flex flex-col gap-0 mx-6 lg:mx-10 mb-4">
-                <div className="flex flex-row justify-between">
-                  <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
-                    Managing Subscription
-                  </p>
-                </div>
-                <img
-                  src="/divider.png"
-                  className="h-1.5 w-full mt-2 mb-2"
-                ></img>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-0 mx-6 mb-4">
-                <div className="flex flex-row justify-between">
-                  <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
-                    Add To Subscription
-                  </p>
-                </div>
-                <img
-                  src="/divider.png"
-                  className="h-1.5 w-full mt-2 mb-2"
-                ></img>
-              </div>
-            ))}
-
-          <div className="flex flex-row overflow-auto flex-nowrap px-6 lg:px-10 gap-2 cursor-pointer">
-            {filteredCategories()
-              .sort(function (a, b) {
-                return a.order - b.order;
-              })
-              .map((tab, index) => (
-                <div
-                  className={`py-2 px-3 rounded-lg text-nowrap w-full lg:w-auto ${
-                    showingRewards
-                      ? brandRewardProductsExist(filteredCategories()[index])
-                        ? "flex"
-                        : "hidden"
-                      : "flex"
-                  } ${selectedTab == index ? "bg-ernieteal" : "bg-erniecream"}`}
-                  key={index}
-                  onClick={() => {
-                    setSelectedTab(index);
-                  }}
-                >
-                  <p
-                    className={`font-circular font-[500] text-sm capitalize tab text-nowrap lg:text-base ${
-                      selectedTab == index
-                        ? "text-erniecream"
-                        : "text-erniegreen"
-                    }`}
-                  >
-                    {tab.category}
-                  </p>
-                </div>
-              ))}
-          </div>
-          <div className="flex flex-col-reverse">
-            {console.log(filteredCategories()[selectedTab])}
-
-            {filteredCategories()
-              [selectedTab].brands.sort(function (a, b) {
-                return b.order - a.order;
-              })
-              .map((brand, index) => (
-                <div
-                  className={`flex flex-col gap-0 pb-4 px-6 lg:px-10 pb-2 pt-4 lg:pt-6 w-full ${
-                    showingRewards
-                      ? rewardProductsExist(brand.products)
-                        ? "flex"
-                        : "flex"
-                      : "flex"
-                  }`}
-                  key={index}
-                >
-                  <div className="flex flex-row justify-between">
-                    <p className="font-circe text-2xl text-erniegreen font-[900] uppercase mt-2">
-                      {brand.name}
-                    </p>
-                    <img
-                      src="/info.svg"
-                      className="w-8 mt-1"
-                      onClick={() => {
-                        setShowingInfo(true);
-                        setInfoName(brand.name);
-                        setInfoDesc(brand.description);
-                        setInfoImage(brand.image);
-                      }}
-                    />
-                  </div>
-                  <img
-                    src="/divider.png"
-                    className="h-1.5 w-full mt-2 mb-2"
-                  ></img>
-                  <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 mt-4">
-                    {console.log(brand.products)}
-                    {brand.products
-                      .sort(function (a, b) {
-                        return (
-                          a.product.productOrdering?.productOrder -
-                          b.product.productOrdering?.productOrder
-                        );
-                      })
-                      .map((product, productIndex) => (
-                        <div
-                          key={productIndex}
-                          className={`flex-row gap-4 w-full items-center bg-erniecream rounded-xl p-6 ${
-                            showingRewards
-                              ? product.product.productDisplayStyle
-                                  ?.rewardProduct
-                                ? "flex"
-                                : "flex"
-                              : product.product.productDisplayStyle
-                                  ?.rewardProduct
-                              ? "hidden"
-                              : "flex"
-                          }`}
-                        >
-                          {console.log(
-                            product.product.name,
-                            product.product.productDisplayStyle?.rewardProduct,
-                            showingRewards
-                          )}
-                          <div className="flex relative aspect-[3/4] h-[100px]">
-                            <img
-                              src={product.product.image.sourceUrl}
-                              className={`h-[100px] w-auto aspect-[1/1] ${
-                                selectedTab == 1
-                                  ? "object-contain"
-                                  : "object-contain"
-                              }`}
-                            ></img>
-                            {product.product.productDisplayStyle.badgeImage
-                              ?.sourceUrl && (
-                              <img
-                                src={
-                                  product.product.productDisplayStyle.badgeImage
-                                    .sourceUrl
-                                }
-                                className="absolute w-10 -bottom-4 -right-4 rounded-full"
-                              ></img>
-                            )}
-                          </div>
-                          <div className="flex flex-col flex-shrink max-w-[calc(100vw-75px-48px-48px)] h-full pl-4">
-                            <p className="font-circe text-erniegreen uppercase text-lg font-[900] w-full leading-[20px]">
-                              {product.product.name}
-                            </p>
-                            <div className="line-clamp-3">
-                              <p
-                                className={`font-circular text-erniegreen font-[400] text-xs mt-2 ${
-                                  product.product.description
-                                    ? "block"
-                                    : "hidden"
-                                } ${
-                                  product?.product?.productDisplayStyle
-                                    ?.allowOrdering
-                                    ? "mb-2"
-                                    : "mb-4"
-                                }`}
-                              >
-                                {product.product.description}
-                              </p>
-                            </div>
-                            {console.log(product)}
-                            {product?.product.productDisplayStyle
-                              ?.allowOrdering && (
-                              <div className="flex flex-row gap-1 items-end mt-2">
-                                <p className="font-circular text-erniegreen text-sm font-[500] leading-[28px]">
-                                  from
-                                </p>
-
-                                <p
-                                  className={`font-circe text-erniegreen uppercase text-lg font-[900] ${
-                                    product.product.description
-                                      ? "mt-0"
-                                      : "mt-2"
-                                  }`}
-                                >
-                                  {product.product.type != "VARIABLE"
-                                    ? product.product.price
-                                    : getCheapestVariant(
-                                        product.product.variations?.nodes
-                                      )}
-                                </p>
-                              </div>
-                            )}
-                            <div
-                              className={`bg-erniegold py-2 px-4 rounded-xl inline self-start ${
-                                product.product?.productDisplayStyle
-                                  .allowOrdering
-                                  ? "mt-2"
-                                  : "mt-4"
-                              } cursor-pointer`}
-                              onClick={() => {
-                                setSelectedBrands(index);
-                                setSelectedProduct(product.arrIndex);
-
-                                setPreviewing(true);
-                              }}
-                            >
-                              <p className="font-circe font-[900] text-sm">
-                                Choose Options
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              ))}
-          </div>
         </div>
-      </div>
 
-      {/* {productFilter == -1 && (
+        {/* {productFilter == -1 && (
           <div
             className={`w-full flex bg-erniecream flex-col flex-grow overflow-auto`}
           >
@@ -1356,65 +1361,65 @@ return (
             ))}
           </div>
         )} */}
-      {productFilter == 0 && (
-        <ProductLists
-          products={products}
-          category={"cups/bottles"}
-          backAction={back}
-          role={role}
-          addToBasket={addToBasketFromProductPage}
-          hideBasket={hideBasket}
-        ></ProductLists>
-      )}
-      {productFilter == 1 && (
-        <ProductLists
-          products={products}
-          category={"coffee"}
-          backAction={back}
-          role={role}
-          addToBasket={addToBasketFromProductPage}
-          hideBasket={hideBasket}
-        ></ProductLists>
-      )}
-      {productFilter == 2 && (
-        <ProductLists
-          products={products}
-          category={"hot chocolate"}
-          backAction={back}
-          role={role}
-          addToBasket={addToBasketFromProductPage}
-          hideBasket={hideBasket}
-        ></ProductLists>
-      )}
-      {productFilter == 3 && (
-        <ProductLists
-          products={products}
-          category={"healthy snacks"}
-          backAction={back}
-          role={role}
-          addToBasket={addToBasketFromProductPage}
-          hideBasket={hideBasket}
-        ></ProductLists>
-      )}
-      {showingCheckout && (
-        <Checkout
-          backAction={checkoutBack}
-          basket={basket}
-          subsidy={subsidy}
-          customer={customer}
-          setBasket={setBasketFromProductPage}
-          setBasketCount={setBasketCount}
-          setSelectedIndex={setSelectedIndex}
-          setAlert={showAlertFromProductPage}
-          setShowingAlert={setShowingAlert}
-          setShowingCheckout={setShowingCheckoutFromProductPage}
-          setShowingBasket={setShowingBasketFromProductPage}
-          employerUser={employerUser}
-        />
-      )}
-      {/* {console.log("CART")}
+        {productFilter == 0 && (
+          <ProductLists
+            products={products}
+            category={"cups/bottles"}
+            backAction={back}
+            role={role}
+            addToBasket={addToBasketFromProductPage}
+            hideBasket={hideBasket}
+          ></ProductLists>
+        )}
+        {productFilter == 1 && (
+          <ProductLists
+            products={products}
+            category={"coffee"}
+            backAction={back}
+            role={role}
+            addToBasket={addToBasketFromProductPage}
+            hideBasket={hideBasket}
+          ></ProductLists>
+        )}
+        {productFilter == 2 && (
+          <ProductLists
+            products={products}
+            category={"hot chocolate"}
+            backAction={back}
+            role={role}
+            addToBasket={addToBasketFromProductPage}
+            hideBasket={hideBasket}
+          ></ProductLists>
+        )}
+        {productFilter == 3 && (
+          <ProductLists
+            products={products}
+            category={"healthy snacks"}
+            backAction={back}
+            role={role}
+            addToBasket={addToBasketFromProductPage}
+            hideBasket={hideBasket}
+          ></ProductLists>
+        )}
+        {showingCheckout && (
+          <Checkout
+            backAction={checkoutBack}
+            basket={basket}
+            subsidy={subsidy}
+            customer={customer}
+            setBasket={setBasketFromProductPage}
+            setBasketCount={setBasketCount}
+            setSelectedIndex={setSelectedIndex}
+            setAlert={showAlertFromProductPage}
+            setShowingAlert={setShowingAlert}
+            setShowingCheckout={setShowingCheckoutFromProductPage}
+            setShowingBasket={setShowingBasketFromProductPage}
+            employerUser={employerUser}
+          />
+        )}
+        {/* {console.log("CART")}
         {console.log(cart?.data?.cart)} */}
-      {/* <div className="relative h-[7%]">
+        {/* <div className="relative h-[7%]">
           {basketShowing && (
             <div className="absolute w-full h-[55vh] bg-erniegreen bottom-full z-10 px-4 py-6">
               {basket?.length == 0 ? (
@@ -1617,14 +1622,15 @@ return (
             />
           </div>
         </div> */}
-      {showingAlert && (
-        <Alert
-          message={alertMessage}
-          type={alertAction}
-          close={closeAlert}
-          action={removeItem}
-        />
-      )}
-    </div>
-  </ApolloProvider>
-);
+        {showingAlert && (
+          <Alert
+            message={alertMessage}
+            type={alertAction}
+            close={closeAlert}
+            action={removeItem}
+          />
+        )}
+      </div>
+    </ApolloProvider>
+  );
+}
