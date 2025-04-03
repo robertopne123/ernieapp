@@ -262,9 +262,8 @@ export const Basket = ({
   const UPDATECLIENT = gql`
     mutation UpdateClient(
       $id: ID!
-      $m25: Float!
       $phones: Int!
-      $trees: Int!
+      $trees: Float!
       $coffee: Int!
       $bags: Int!
       $carbon: Float!
@@ -280,7 +279,6 @@ export const Basket = ({
       updateClient(
         input: {
           id: $id
-          m25: $m25
           phones: $phones
           trees: $trees
           coffee: $coffee
@@ -338,7 +336,6 @@ export const Basket = ({
             bags
             carbon
             coffee
-            m25
             phones
             trees
           }
@@ -942,6 +939,7 @@ export const Basket = ({
             console.log(cInfo);
 
             let address = cInfo.deliveryCompanyAddress;
+
             let coffeeMachine =
               cInfo.coffeeMachineOnSite != null
                 ? cInfo.coffeeMachineOnSite
@@ -961,21 +959,13 @@ export const Basket = ({
                   parseFloat(localStorage.getItem("carbon")) +
                   (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
                 trees:
-                  parseInt(localStorage.getItem("trees")) +
-                  Math.floor(totalQty / 6),
+                  parseFloat(localStorage.getItem("trees")) +
+                  parseFloat(totalQty * 0.25),
                 coffee:
                   parseInt(localStorage.getItem("coffee")) + totalQty * 100,
                 phones:
                   parseInt(localStorage.getItem("phones")) +
                   Math.round(totalQty * 0.44 * 120),
-                m25:
-                  Math.round((totalQty * 0.44) / 32.148) +
-                    parseFloat(localStorage.getItem("m25")) <
-                  1
-                    ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
-                      parseFloat(localStorage.getItem("m25"))
-                    : Math.round((total * 0.44) / 32.148) +
-                      parseFloat(localStorage.getItem("m25")),
                 address: address,
                 coffeeMachine: coffeeMachine,
                 contactNumber: contactNumber,
@@ -1118,21 +1108,13 @@ export const Basket = ({
                       parseFloat(localStorage.getItem("carbon")) +
                       (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
                     trees:
-                      parseInt(localStorage.getItem("trees")) +
-                      Math.floor(totalQty / 6),
+                      parseFloat(localStorage.getItem("trees")) +
+                      parseFloat(totalQty * 0.25),
                     coffee:
                       parseInt(localStorage.getItem("coffee")) + totalQty * 100,
                     phones:
                       parseInt(localStorage.getItem("phones")) +
                       Math.round(totalQty * 0.44 * 120),
-                    m25:
-                      Math.round((totalQty * 0.44) / 32.148) +
-                        parseFloat(localStorage.getItem("m25")) <
-                      1
-                        ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
-                          parseFloat(localStorage.getItem("m25"))
-                        : Math.round((total * 0.44) / 32.148) +
-                          parseFloat(localStorage.getItem("m25")),
                     address: address,
                     coffeeMachine: coffeeMachine,
                     contactNumber: contactNumber,
@@ -1260,21 +1242,13 @@ export const Basket = ({
                   parseFloat(localStorage.getItem("carbon")) +
                   (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
                 trees:
-                  parseInt(localStorage.getItem("trees")) +
-                  Math.floor(totalQty / 6),
+                  parseFloat(localStorage.getItem("trees")) +
+                  parseFloat(totalQty * 0.25),
                 coffee:
                   parseInt(localStorage.getItem("coffee")) + totalQty * 100,
                 phones:
                   parseInt(localStorage.getItem("phones")) +
                   Math.round(totalQty * 0.44 * 120),
-                m25:
-                  Math.round((totalQty * 0.44) / 32.148) +
-                    parseFloat(localStorage.getItem("m25")) <
-                  1
-                    ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
-                      parseFloat(localStorage.getItem("m25"))
-                    : Math.round((total * 0.44) / 32.148) +
-                      parseFloat(localStorage.getItem("m25")),
                 address: address,
                 coffeeMachine: coffeeMachine,
                 contactNumber: contactNumber,
@@ -1387,21 +1361,13 @@ export const Basket = ({
                       parseFloat(localStorage.getItem("carbon")) +
                       (totalQty * 0.44 + Math.floor(totalQty / 2) * 25),
                     trees:
-                      parseInt(localStorage.getItem("trees")) +
-                      Math.floor(totalQty / 6),
+                      parseFloat(localStorage.getItem("trees")) +
+                      parseFloat(totalQty * 0.25),
                     coffee:
                       parseInt(localStorage.getItem("coffee")) + totalQty * 100,
                     phones:
                       parseInt(localStorage.getItem("phones")) +
                       Math.round(totalQty * 0.44 * 120),
-                    m25:
-                      Math.round((totalQty * 0.44) / 32.148) +
-                        parseFloat(localStorage.getItem("m25")) <
-                      1
-                        ? Math.round(((totalQty * 0.44) / 32.148) * 100) / 100 +
-                          parseFloat(localStorage.getItem("m25"))
-                        : Math.round((total * 0.44) / 32.148) +
-                          parseFloat(localStorage.getItem("m25")),
                     address: address,
                     coffeeMachine: coffeeMachine,
                     contactNumber: contactNumber,

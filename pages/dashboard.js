@@ -602,7 +602,7 @@ export default function Dashboard({ data, categories, products, orders }) {
                   bags
                   carbon
                   coffee
-                  m25
+
                   phones
                   trees
                 }
@@ -1381,7 +1381,6 @@ export default function Dashboard({ data, categories, products, orders }) {
                         bags
                         carbon
                         coffee
-                        m25
                         phones
                         trees
                       }

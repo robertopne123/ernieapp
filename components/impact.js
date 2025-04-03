@@ -243,9 +243,10 @@ export default function Impact({
                       ></Image>
                       <div className="flex flex-col justify-center pr-1">
                         <p className="font-circe uppercase text-erniegreen text-4xl md:text-3xl font-[900]">
+                          £
                           {client.impactFigures.trees != null
-                            ? client.impactFigures.trees
-                            : 0}
+                            ? parseFloat(client.impactFigures.trees)
+                            : 0.0}
                         </p>
                         <p className="font-circular font-[500] text-erniegreen md:text-sm">
                           Trees planted
@@ -287,25 +288,6 @@ export default function Impact({
                         </p>
                         <p className="font-circular font-[500] text-erniegreen md:text-sm">
                           Phones charged from Tco2e saved
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-row gap-2 lg:gap-4">
-                      <Image
-                        src="https://ernie.london/wp-content/uploads/2023/07/CAR_COLOURED.gif"
-                        width={112}
-                        height={112}
-                        priority
-                        className="w-28 h-28 xl:w-32 xl:h-32 lg:w-24 lg:h-24"
-                      ></Image>
-                      <div className="flex flex-col justify-center pr-1">
-                        <p className="font-circe uppercase text-erniegreen text-4xl md:text-3xl font-[900]">
-                          {client.impactFigures.m25 != null
-                            ? client.impactFigures.m25
-                            : 0}
-                        </p>
-                        <p className="font-circular font-[500] text-erniegreen md:text-sm">
-                          Loops of the M25 worth of carbon saved
                         </p>
                       </div>
                     </div>
